@@ -22,6 +22,11 @@
 // Number of blocks per tetronimo
 #define NUM_PIECES 4 
 
+struct RGB_Color;
+struct Coords;
+struct Tetronimo;
+struct I_Piece;
+
 // Movement direction
 typedef enum { M_LEFT, M_DOWN, M_RIGHT, M_UP } M_Direction;
 
@@ -29,36 +34,42 @@ typedef enum { M_LEFT, M_DOWN, M_RIGHT, M_UP } M_Direction;
 // 10x40 actual, 10x20 visible
 extern uint8_t play_field[FIELD_Y][FIELD_X];
 
-// Each type of tetromino there are 8 including empties.
-typedef enum { T_NONE, T_O, T_I, T_S, T_Z, T_L, T_J, T_T } T_Type;
+// Each type of tetromino. There are 7 pieces.
+// T_ORIGIN will just be for drawing the origin during debugging
+typedef enum { T_NONE, T_O, T_I, T_S, T_Z, T_L, T_J, T_T, T_ORIGIN} T_Type;
+
+// Degrees of rotation
+typedef enum { D_0, D_90, D_180, D_270 } D_ROT;
 
 void FillField();
 void EmptyField();
 void TestField();
 
-typedef struct RGB_Color {
-	uint8_t r, g, b;
-} RGB_Color;
+int max_x(struct Tetronimo* tetronimo);
+int min_x(struct Tetronimo* tetronimo);
+int max_y(struct Tetronimo* tetronimo);
+int min_y(struct Tetronimo* tetronimo);
 
 typedef struct Coords {
 	uint8_t x, y;
 } Coords;
 
 typedef struct Tetronimo {
-	Coords pos; // The pivot at which the piece will be rotated is (x,y)
+	T_Type t_type;
+	Coords origin; // The pivot at which the piece will be rotated is (x,y)
 	Coords pieces[4]; // The coordinates of each individual piece
-	bool is_upright; // The position which the piece is facing will be important for determining if movement is legal.
+	D_ROT d_rot;
+	bool is_upright; // The position which the piece is facing will be important for determining if movement is legal. TODO: Switch to D_ROT impl
 } Tetronimo;
 
 typedef struct I_Piece {
-	T_Type t_type;
 	Tetronimo tetronimo;
-	RGB_Color color;
 } I_Piece;
 
 I_Piece* new_I_Piece();
-bool move_I_Piece(SDL_Window* window, SDL_Renderer* renderer, I_Piece* i_piece, M_Direction dir);
+void set_I_Piece(Tetronimo* tetronimo);
+bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
 // set is a helper function for new and move, you shouldn't need to call it directly
-void set_I_Piece(I_Piece* block);
+void set_Tetronimo(Tetronimo* tetronimo);
 
 #endif // TETRIS_H

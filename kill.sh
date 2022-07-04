@@ -1,1 +1,1 @@
-killall -9 TETRIS
+killall -9 TetriC

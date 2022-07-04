@@ -37,9 +37,9 @@ void RenderPlayField(SDL_Window* window, SDL_Renderer* renderer){
 	for (int i = 0; i < FIELD_Y/2; i++){
 		line = GetFieldLine(0, (i+1), window, renderer);
 		SDL_RenderDrawRects(renderer, line, FIELD_X);
-		SDL_RenderPresent(renderer);
 		free(line);
 	}
+	// SDL_RenderPresent(renderer);
 }
 
 void PrintPlayField(){
@@ -75,7 +75,6 @@ void RenderBlocksByLine(SDL_Window* window, SDL_Renderer* renderer){
 		num_blocks = 0;
 		free(line);
 	}
-	SDL_RenderPresent(renderer);
 }
 
 void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
@@ -84,8 +83,12 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 			// printf("T_NONE\n");
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			break;
+		// TODO: This should only show for debugging purposes
+		case T_ORIGIN:
+			SDL_SetRenderDrawColor(renderer, 255, 84, 235, 255);
+			break;
 		case T_I:
-			printf("T_I\n");
+			// printf("T_I\n");
 			SDL_SetRenderDrawColor(renderer, 24, 102, 204, 255);
 			break;
 		default:
