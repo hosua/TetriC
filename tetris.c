@@ -151,7 +151,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	// cannot continue to rotate it.
 	bool is_falling = true;
 	bool legal_move = true;
-	bool can_move[4] = { 1, 1, 1, 1};
 	T_Type t_type = tetronimo->t_type;
 	D_ROT d_rot = tetronimo->d_rot;
 	printf("d_rot: %i\n", d_rot);
@@ -175,6 +174,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 
 	// Perform the actual movement
 	switch(t_type){
+		// I Piece
 		case T_I:
 		{
 			switch(dir){
@@ -210,18 +210,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					break;
 				case M_LEFT:
 					if (d_rot == D_0 || d_rot == D_180){
-						// Unset the move flag if it is illegal
+						// Unset the move flag if it is illegal and break
 						for (int i = 0; i < NUM_PIECES; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (x == 0 || play_field[y][x-1] > T_ORIGIN){
-								can_move[i] = false;
-								break;
-							}
-						}
-						// Check if all move flags are legal, if one is not, then we can't move the piece.
-						for (int i = 0; i < NUM_PIECES; i++){
-							if (!can_move[i]){
 								legal_move = false;
 								break;
 							}
@@ -237,18 +230,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					break;
 				case M_RIGHT:
 					if (d_rot == D_0 || d_rot == D_180){
-						// Unset the move flag if it is illegal
+						// Unset the move flag if it is illegal and break
 						for (int i = 0; i < NUM_PIECES; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (x == FIELD_X-1 || play_field[y][x+1] > T_ORIGIN){
-								can_move[i] = false;
-								break;
-							}
-						}
-						// Check if all move flags are legal, if one is not, then we can't move the piece.
-						for (int i = 0; i < NUM_PIECES; i++){
-							if (!can_move[i]){
 								legal_move = false;
 								break;
 							}
