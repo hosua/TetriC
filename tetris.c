@@ -187,12 +187,26 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_LEFT);
 					break;
 				case M_DOWN:
-					// Only downward movement should determine if the piece will lock or not.
-					if (y_max == FIELD_Y-1 || play_field[y_max+1][x] > T_ORIGIN){
-						is_falling = false;
-						break;
+					if (d_rot == D_0 || d_rot == D_180){
+						if (y_max == FIELD_Y-1 || play_field[y_max+1][x_max] > T_ORIGIN)
+							legal_move = false;
+					} else {
+						for (int i = 0; i < NUM_PIECES; i++){
+							x = tetronimo->pieces[i].x;
+							y = tetronimo->pieces[i].y;
+							if (y == FIELD_Y-1 || play_field[y+1][x] > T_ORIGIN){
+								legal_move = false;
+								break;
+							}
+						}
+
 					}
-					tetronimo->origin.y += 1;
+					if (legal_move){
+						tetronimo->origin.y += 1;
+					} else {
+						// Only downward movement should determine if the piece will lock or not.
+						is_falling = false;
+					}
 					break;
 				case M_LEFT:
 					if (d_rot == D_0 || d_rot == D_180){

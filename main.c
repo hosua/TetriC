@@ -30,7 +30,6 @@ int main(){
 	}
 	
 	ClearScreen(window, renderer);
-	RenderPlayField(window, renderer);
 	Tetronimo* tetronimo = new_Piece();
 	RenderPlayField(window, renderer);
 	RenderBlocksByLine(window, renderer);
