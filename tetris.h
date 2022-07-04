@@ -28,7 +28,14 @@ struct Tetronimo;
 struct I_Piece;
 
 // Movement direction (And left and right rotation)
-typedef enum { M_LEFT, M_DOWN, M_RIGHT, M_UP, M_ROT_RIGHT, M_ROT_LEFT } M_Direction;
+typedef enum { 
+	M_LEFT, 
+	M_DOWN, 
+	M_RIGHT, 
+	M_UP, 
+	M_ROT_RIGHT, 
+	M_ROT_LEFT 
+} M_Direction;
 
 // First 20 (the top 20) lines respective to the y-axis are not visible.
 // 10x40 actual, 10x20 visible
@@ -36,14 +43,27 @@ extern uint8_t play_field[FIELD_Y][FIELD_X];
 
 // Each type of tetromino. There are 7 pieces.
 // T_ORIGIN will just be for drawing the origin during debugging
-typedef enum { T_NONE, T_O, T_I, T_S, T_Z, T_L, T_J, T_T, T_ORIGIN} T_Type;
+// Enums will automatically assign the next enumeration as +1 of the previous value
+// When checking for invalid moves, make the check if ( foo > T_ORIGIN )
+typedef enum { 
+	T_NONE, 
+	T_ORIGIN, 
+	T_O, 
+	T_I, 
+	T_S, 
+	T_Z, 
+	T_L, 
+	T_J, 
+	T_T
+} T_Type;
 
 // Degrees of rotation
-typedef enum { D_0, D_90, D_180, D_270 } D_ROT;
-
-void FillField();
-void EmptyField();
-void TestField();
+typedef enum { 
+	D_0, 
+	D_90, 
+	D_180, 
+	D_270 
+} D_ROT;
 
 int max_x(struct Tetronimo* tetronimo);
 int min_x(struct Tetronimo* tetronimo);
@@ -59,7 +79,6 @@ typedef struct Tetronimo {
 	Coords origin; // The pivot at which the piece will be rotated is (x,y)
 	Coords pieces[4]; // The coordinates of each individual piece
 	D_ROT d_rot;
-	bool is_upright; // The position which the piece is facing will be important for determining if movement is legal. TODO: Switch to D_ROT impl
 } Tetronimo;
 
 Tetronimo* new_Piece();
@@ -68,6 +87,7 @@ Tetronimo* new_I_Piece();
 
 
 void set_Piece(Tetronimo* tetronimo);
+// Returns true or false indicating if the piece is still falling or not
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
 // set_Tetronimo is a helper function for new and move, it shouldn't be called directly
 void set_Tetronimo(Tetronimo* tetronimo);

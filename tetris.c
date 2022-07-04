@@ -4,27 +4,6 @@
 // 10x40 (However only 10x20 is visible to the player)
 uint8_t play_field[FIELD_Y][FIELD_X] = {0};
 
-void FillField(){
-	for (int i = 0; i < FIELD_Y; i++){
-		for (int j = 0; j < FIELD_X; j++){
-			play_field[i][j] = 1;
-		}
-	}
-}
-
-void EmptyField(){
-	for (int i = 0; i < FIELD_Y; i++){
-		for (int j = 0; j < FIELD_X; j++){
-			play_field[i][j] = 0;
-		}
-	}
-}
-
-void TestField(){
-	for (int i = 0; i < 4; i++)
-		play_field[20][i] = 1;
-}
-
 // The play field is numbers from lowest to greatest, top to bottom. So the bottom of the play field is not 0, it is 39.
 int max_x(Tetronimo* tetronimo){
 	int max = 0, x_pos = 0;
@@ -127,7 +106,7 @@ void set_Tetronimo(Tetronimo* tetronimo){
 		play_field[y][x] = t_type;
 	}
 
-	// TODO: Debugging: Set the origin 
+	// TODO: Debugging: Set the origin. Origin breaks gameplay so we need to turn this off when testing gameplay
 	// x = tetronimo->origin.x;
 	// y = tetronimo->origin.y;
 	// play_field[y][x] = T_ORIGIN;
@@ -184,7 +163,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 		y = tetronimo->pieces[i].y;
 		play_field[y][x] = T_NONE;
 	}
-	// TODO: Debugging: Unset the origin 
+	// TODO: Debugging: Unset the origin. Origin breaks gameplay so we need to turn this off when testing gameplay
 	// x =	tetronimo->origin.x;
 	// y =	tetronimo->origin.y;
 	// play_field[y][x] = T_NONE;
@@ -209,7 +188,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					break;
 				case M_DOWN:
 					// Only downward movement should determine if the piece will lock or not.
-					if (y_max == FIELD_Y-1 || play_field[y_max+1][x] != T_NONE){
+					if (y_max == FIELD_Y-1 || play_field[y_max+1][x] > T_ORIGIN){
 						is_falling = false;
 						break;
 					}
@@ -221,7 +200,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						for (int i = 0; i < NUM_PIECES; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (x == 0 || play_field[y][x-1]){
+							if (x == 0 || play_field[y][x-1] > T_ORIGIN){
 								can_move[i] = false;
 								break;
 							}
@@ -235,7 +214,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						}
 					// Piece is horizontal, which means we only need to check one unit to the left of the left-most piece.
 					} else { 						
-						if (x_min == 0 || play_field[y_max][x_min-1])
+						if (x_min == 0 || play_field[y_max][x_min-1] > T_ORIGIN)
 							legal_move = false;
 					}
 					if (legal_move){
@@ -248,7 +227,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						for (int i = 0; i < NUM_PIECES; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (x == FIELD_X-1 || play_field[y][x+1]){
+							if (x == FIELD_X-1 || play_field[y][x+1] > T_ORIGIN){
 								can_move[i] = false;
 								break;
 							}
@@ -262,7 +241,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						}
 					// Piece is horizontal, which means we only need to check one unit to the right of the right-most piece.
 					} else { 						
-						if (x_max == FIELD_X-1 || play_field[y_max][x_max+1])
+						if (x_max == FIELD_X-1 || play_field[y_max][x_max+1] > T_ORIGIN)
 							legal_move = false;
 					}
 					if (legal_move){
@@ -272,13 +251,13 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 				// Upward movement will be in for now while I test things
 				case M_UP:
 					if (d_rot == D_0 || d_rot == D_180){
-						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
+						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max] > T_ORIGIN)
 							legal_move = false;
 					} else {
 						for (int i = 0; i < NUM_PIECES; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (y == (FIELD_Y/2)-1 || play_field[y-1][x]){
+							if (y == (FIELD_Y/2)-1 || play_field[y-1][x] > T_ORIGIN){
 								legal_move = false;
 								break;
 							}
