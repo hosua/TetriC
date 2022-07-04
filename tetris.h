@@ -27,8 +27,8 @@ struct Coords;
 struct Tetronimo;
 struct I_Piece;
 
-// Movement direction
-typedef enum { M_LEFT, M_DOWN, M_RIGHT, M_UP } M_Direction;
+// Movement direction (And left and right rotation)
+typedef enum { M_LEFT, M_DOWN, M_RIGHT, M_UP, M_ROT_RIGHT, M_ROT_LEFT } M_Direction;
 
 // First 20 (the top 20) lines respective to the y-axis are not visible.
 // 10x40 actual, 10x20 visible
@@ -62,14 +62,14 @@ typedef struct Tetronimo {
 	bool is_upright; // The position which the piece is facing will be important for determining if movement is legal. TODO: Switch to D_ROT impl
 } Tetronimo;
 
-typedef struct I_Piece {
-	Tetronimo tetronimo;
-} I_Piece;
+Tetronimo* new_Piece();
 
-I_Piece* new_I_Piece();
-void set_I_Piece(Tetronimo* tetronimo);
+Tetronimo* new_I_Piece();
+
+
+void set_Piece(Tetronimo* tetronimo);
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
-// set is a helper function for new and move, you shouldn't need to call it directly
+// set_Tetronimo is a helper function for new and move, it shouldn't be called directly
 void set_Tetronimo(Tetronimo* tetronimo);
 
 #endif // TETRIS_H

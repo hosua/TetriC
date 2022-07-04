@@ -29,21 +29,21 @@ void TestField(){
 int max_x(Tetronimo* tetronimo){
 	int max = 0, x_pos = 0;
 	for (int i = 0; i < NUM_PIECES; i++){
-		x_pos = tetronimo->pieces[i].y;
+		x_pos = tetronimo->pieces[i].x;
 		if (x_pos > max)
 			max = x_pos;
 	}
-	// printf("max_x: %i\n", max);
+	printf("max_x: %i\n", max);
 	return max;
 }
 int min_x(Tetronimo* tetronimo){
 	int min = INT32_MAX, x_pos = 0;
 	for (int i = 0; i < NUM_PIECES; i++){
-		x_pos = tetronimo->pieces[i].y;
+		x_pos = tetronimo->pieces[i].x;
 		if (x_pos < min)
 			min = x_pos;
 	}
-	// printf("min_x: %i\n", min);
+	printf("min_x: %i\n", min);
 	return min;
 }
 int max_y(Tetronimo* tetronimo){
@@ -53,7 +53,7 @@ int max_y(Tetronimo* tetronimo){
 		if (y_pos > max)
 			max = y_pos;
 	}
-	// printf("max_y: %i\n", max);
+	printf("max_y: %i\n", max);
 	return max;
 }
 int min_y(Tetronimo* tetronimo){
@@ -63,56 +63,64 @@ int min_y(Tetronimo* tetronimo){
 		if (y_pos < min)
 			min = y_pos;
 	}
-	// printf("min_y: %i\n", min);
+	printf("min_y: %i\n", min);
 	return min;
 }
 
+// Generate a random piece via RNG
+Tetronimo* new_Piece(){
+	return new_I_Piece();
+}
 // I_Piece constructor
-I_Piece* new_I_Piece(){
-	I_Piece* i_piece = (I_Piece*)malloc(sizeof(I_Piece));
-	Tetronimo* tetronimo = &i_piece->tetronimo;
-	tetronimo->t_type = T_I;
-	tetronimo->d_rot = D_0;
-	tetronimo->origin.x = SPAWN_X;
-	tetronimo->origin.y = SPAWN_Y;
+Tetronimo* new_I_Piece(){
+	Tetronimo* i_piece = (Tetronimo*)malloc(sizeof(Tetronimo));
+	i_piece->t_type = T_I;
+	i_piece->d_rot = D_0;
+	i_piece->origin.x = SPAWN_X;
+	i_piece->origin.y = SPAWN_Y;
 
-	// TODO: Instead of drawing it from the point of origin in new_piece, I should restructure this
-	// so that I move the point of origin only, and then draw all iterations of the piece from the
-	// point of origin (as I do here) instead of looping to move each piece. It would involve less 
-	// code to do it this way.
-	set_I_Piece(tetronimo);
-	set_Tetronimo(tetronimo);
+	set_Piece(i_piece);
+	set_Tetronimo(i_piece);
 	return i_piece;
 }
 
-// Sets I piece with respect to its origin and degree of rotation.
-void set_I_Piece(Tetronimo* tetronimo){
+// Helper function, do not call set_Piece() directly.
+// Sets piece with respect to its origin and degree of rotation (This does not set the actual play_field)
+void set_Piece(Tetronimo* tetronimo){
 	Coords origin = tetronimo->origin;
-
+	T_Type t_type = tetronimo->t_type;
 	D_ROT d_rot = tetronimo->d_rot;
-	switch(d_rot){
-		case D_0:
-		case D_180:
-			for (int i = 0; i < NUM_PIECES; i++){
-				tetronimo->pieces[i].x = origin.x - 1;
-				tetronimo->pieces[i].y = origin.y + i;
-			}
+	switch(t_type){
+		// I-Piece
+		case T_I:
+			switch(d_rot){
+				case D_0:
+				case D_180:
+					for (int i = 0; i < NUM_PIECES; i++){
+						tetronimo->pieces[i].x = origin.x - 1;
+						tetronimo->pieces[i].y = origin.y + i;
+					}
+					break;
+				case D_90:
+				case D_270:
+					for (int i = 0; i < NUM_PIECES; i++){
+						tetronimo->pieces[i].x = origin.x + i - 3;
+						tetronimo->pieces[i].y = origin.y + 2;
+					}
+					break;
+			}	
 			break;
-		case D_90:
-		case D_270:
-			for (int i = 0; i < NUM_PIECES; i++){
-				tetronimo->pieces[i].x = origin.x + i - 3;
-				tetronimo->pieces[i].y = origin.y + 2;
-			}
+		default:
+			printf("ERROR: Could not set invalid T_Type\n");
 			break;
-
-	}	
+	}
 }
 
 // Sets the tetronimo onto the play_field;
 void set_Tetronimo(Tetronimo* tetronimo){
 	T_Type t_type = tetronimo->t_type;
 	int x = 0, y = 0;
+
 	for (int i = 0; i < NUM_PIECES; i++){
 		x = tetronimo->pieces[i].x;
 		y = tetronimo->pieces[i].y;
@@ -120,23 +128,56 @@ void set_Tetronimo(Tetronimo* tetronimo){
 	}
 
 	// TODO: Debugging: Set the origin 
-	x = tetronimo->origin.x;
-	y = tetronimo->origin.y;
-	play_field[y][x] = T_ORIGIN;
+	// x = tetronimo->origin.x;
+	// y = tetronimo->origin.y;
+	// play_field[y][x] = T_ORIGIN;
 }
 
+// Returns the d_rot value of the tetronimo
+D_ROT rotate_Tetronimo(Tetronimo* tetronimo, M_Direction dir){
+	D_ROT d_rot = tetronimo->d_rot;
+	switch(dir){
+		case M_ROT_RIGHT:
+			// Allow our d_rot value to wrap around the enumeration in both directions
+			if (d_rot < 3)
+				d_rot++;
+			else
+				d_rot = 0;
+			
+			break;
+		case M_ROT_LEFT:
+			if (d_rot > 0)
+				d_rot--;
+			else
+				d_rot = 3;
+			break;
+		default:
+			fprintf(stderr, "Error: Illegal rotation\n");
+			break;
+	}
+	return d_rot;
+}
 
-// TODO: Rewrite this such that the move is initiated on the origin, and then uses the set functions to set each piece type.
+void print_tetronimo_coords(Tetronimo *tetronimo){
+	Coords* coords = tetronimo->pieces;
+	for (int i = 0; i < NUM_PIECES; i++)
+		printf("(%i, %i) ", coords[i].x, coords[i].y);
+	printf("\n");
+}
+
+// Move tetronimo handles actually moving the pieces to their respective coordinates, as well as checking if a move 
+// is legal or not.
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir){
 	// When the piece can no longer move down further, we will need to "lock it" so that the player
 	// cannot continue to rotate it.
-	bool lock_piece = false;
+	bool is_falling = true;
 	bool legal_move = true;
 	bool can_move[4] = { 1, 1, 1, 1};
 	T_Type t_type = tetronimo->t_type;
 	D_ROT d_rot = tetronimo->d_rot;
+	printf("d_rot: %i\n", d_rot);
+	print_tetronimo_coords(tetronimo);
 	int x = 0, y = 0;
-	// TODO: We shouldn't use an is_upright flag because other pieces will require 4 different degrees of rotation.
 	// Unset the pieces
 	for (int i = 0; i < NUM_PIECES; i++){
 		x = tetronimo->pieces[i].x;
@@ -144,9 +185,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 		play_field[y][x] = T_NONE;
 	}
 	// TODO: Debugging: Unset the origin 
-	x =	tetronimo->origin.x;
-	y =	tetronimo->origin.y;
-	play_field[y][x] = T_NONE;
+	// x =	tetronimo->origin.x;
+	// y =	tetronimo->origin.y;
+	// play_field[y][x] = T_NONE;
 
 	int y_max = max_y(tetronimo);
 	int y_min = min_y(tetronimo);
@@ -158,10 +199,18 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 		case T_I:
 		{
 			switch(dir){
+				case M_ROT_RIGHT:
+					// TODO: Need to implement bounary checks before performing the rotation
+					tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_RIGHT);
+					break;
+				case M_ROT_LEFT:
+					// TODO: Need to implement bounary checks before performing the rotation
+					tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_LEFT);
+					break;
 				case M_DOWN:
 					// Only downward movement should determine if the piece will lock or not.
 					if (y_max == FIELD_Y-1 || play_field[y_max+1][x] != T_NONE){
-						lock_piece = true;
+						is_falling = false;
 						break;
 					}
 					tetronimo->origin.y += 1;
@@ -184,7 +233,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								break;
 							}
 						}
-					// Piece is horizontal, which means we only need to check one unit to the left of the leftmost piece.
+					// Piece is horizontal, which means we only need to check one unit to the left of the left-most piece.
 					} else { 						
 						if (x_min == 0 || play_field[y_max][x_min-1])
 							legal_move = false;
@@ -211,9 +260,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								break;
 							}
 						}
-					// Piece is horizontal, which means we only need to check one unit to the left of the leftmost piece.
+					// Piece is horizontal, which means we only need to check one unit to the right of the right-most piece.
 					} else { 						
-						if (x_min == 0 || play_field[y_max][x_min-1])
+						if (x_max == FIELD_X-1 || play_field[y_max][x_max+1])
 							legal_move = false;
 					}
 					if (legal_move){
@@ -244,7 +293,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					fprintf(stderr, "Error: Unknown move\n");
 					break;
 			}
-			set_I_Piece(tetronimo);
+			set_Piece(tetronimo);
 			break;
 		}
 		default:
@@ -252,10 +301,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 			break;
 	}
 
-	// printf("Moved to:\n");
-	// for (int i = 0; i < NUM_PIECES; i++){
-	// 	printf("(%i, %i)\n", tetronimo->pieces[i].x, tetronimo->pieces[i].y);
-	// }
 	set_Tetronimo(tetronimo);
-	return lock_piece;
+	return is_falling;
 }

@@ -25,8 +25,10 @@ void InputController(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetr
 			move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
 		} else if (kb_state[SDL_SCANCODE_Z]){
 			printf("Pressed z\n");
+			move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
 		} else if (kb_state[SDL_SCANCODE_X]){
 			printf("Pressed x\n");
+			move_Tetronimo(window, renderer, tetronimo, M_ROT_RIGHT);
 		}
 		
 	}

@@ -1,18 +1,13 @@
 #include "graphics.h"
 #include "tetris.h"
 #include "input.h"
-#include "clock.h"
-
-// Variable to determine if a piece is still falling. If one is not falling, a new piece is spawned.
-// and then this variable is set to true again.
-bool is_falling = false;
 
 int main(){
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
 	SDL_Surface* surface = NULL;
 
-	window = SDL_CreateWindow("TetriC", 
+	window = SDL_CreateWindow("Tetris", 
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
 			SCREEN_X, SCREEN_Y, 0);
 
@@ -30,28 +25,25 @@ int main(){
 	}
 	
 	ClearScreen(window, renderer);
+	// SDL_RenderPresent(renderer);
 	RenderPlayField(window, renderer);
-	Tetronimo* tetronimo = new_Piece();
+	I_Piece i_piece = *new_I_Piece();
+	Tetronimo* tetronimo = &i_piece.tetronimo;
+
+	// RenderBlocksByBlock(window, renderer);
 	RenderPlayField(window, renderer);
 	RenderBlocksByLine(window, renderer);
-	SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
-								 
-	for ( ;  ; ){
-		// Get user input
+	for (int i = 0;  ; i++){
+		SDL_Event event; 
+		SDL_PollEvent(&event);
+
 		InputController(window, renderer, tetronimo);
 		ClearScreen(window, renderer);
 		RenderPlayField(window, renderer);
+		move_Tetronimo(window, renderer, tetronimo, M_DOWN);
+		// PrintPlayField();
 
-		if (TickCounter()){
-			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
-			if (!is_falling){
-				free(tetronimo);
-				tetronimo = new_Piece();
-			}
-			// PrintPlayField();
-		}
 		RenderBlocksByLine(window, renderer);
-		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
 	}
 	SDL_DestroyWindow(window);
 	SDL_Quit();
