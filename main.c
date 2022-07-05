@@ -8,6 +8,9 @@
 bool is_falling = false;
 
 int main(){
+	// seed the RNG
+	srand(time(0));
+
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
 	SDL_Surface* surface = NULL;
@@ -30,7 +33,8 @@ int main(){
 	}
 	
 	ClearScreen(window, renderer);
-	Tetronimo* tetronimo = new_Piece(T_O);
+	Tetronimo* tetronimo = rand_Piece();
+	// Tetronimo* tetronimo = new_Piece(T_O);
 								 
 	for ( ;  ; ){
 		// Get user input
@@ -42,7 +46,8 @@ int main(){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				free(tetronimo);
-				tetronimo = new_Piece(T_I);
+				// tetronimo = new_Piece(T_I);
+				tetronimo = rand_Piece();
 			}
 			// PrintPlayField();
 		}

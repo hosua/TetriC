@@ -83,7 +83,15 @@ const char* T_Type_to_str(T_Type t_type){
 }
 
 // Generate a random piece via RNG
-Tetronimo* rand_Piece();
+// For now we only have two pieces, but this will generate all random pieces once they are implemented
+// enum order: T_NONE T_ORIGIN T_O T_I T_S T_Z T_L T_J T_T
+Tetronimo* rand_Piece(){
+	T_Type lower = T_O;
+	T_Type upper = T_I;
+	T_Type rand_t_type = rand() % (upper + 1 - lower ) + lower; 
+	Tetronimo* tetronimo = new_Piece(rand_t_type);
+	return tetronimo;
+}
 
 Tetronimo* new_Piece(T_Type t_type){
 	Tetronimo* new_piece = (Tetronimo*)malloc(sizeof(Tetronimo));
@@ -230,7 +238,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					// TODO: Need to implement bounary checks before performing the rotation
 					if (d_rot == D_0 || d_rot == D_180){
 						// Check bounds
-						if (x_min <= 1 || x_max >= 9)
+						if (x_min <= 1 || x_max >= FIELD_X-1 || y_max == FIELD_Y-1)
 							legal_move = false;
 
 						for (int i = 0; i < NUM_PIECES; i++){
