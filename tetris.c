@@ -171,7 +171,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	int y_min = min_y(tetronimo);
 	int x_max = max_x(tetronimo);
 	int x_min = min_x(tetronimo);
-
+	Coords origin = tetronimo->origin;
 	// Perform the actual movement
 	switch(t_type){
 		// I Piece
@@ -179,12 +179,40 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 		{
 			switch(dir){
 				case M_ROT_RIGHT:
-					// TODO: Need to implement bounary checks before performing the rotation
-					tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_RIGHT);
-					break;
 				case M_ROT_LEFT:
 					// TODO: Need to implement bounary checks before performing the rotation
-					tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_LEFT);
+					if (d_rot == D_0 || d_rot == D_180){
+						// Check bounds
+						if (x_min <= 1 || x_max >= 9)
+							legal_move = false;
+
+						for (int i = 0; i < NUM_PIECES; i++){
+							// Ignore the overlapping piece
+							if (i != 2){
+								x = origin.x + i - 3;
+								y = origin.y + 2;
+								if (play_field[y][x]){
+									legal_move = false;
+									break;
+								}
+							}
+						}
+					} else { // D_90, D_270
+						for (int i = 0; i < NUM_PIECES; i++){
+							// Ignore the overlapping piece
+							if (i != 2){
+								x = origin.x - 1;
+								y = origin.y + i;
+								if (play_field[y][x]){
+									legal_move = false;
+									break;
+								}
+							}
+						}
+
+					}
+					if (legal_move)
+						tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_RIGHT);
 					break;
 				case M_DOWN:
 					if (d_rot == D_0 || d_rot == D_180){
