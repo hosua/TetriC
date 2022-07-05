@@ -48,36 +48,16 @@ int min_y(Tetronimo* tetronimo){
 
 const char* T_Type_to_str(T_Type t_type){
 	switch(t_type){
-		case T_NONE:
-			return "T_NONE";
-			break;
-		case T_ORIGIN:
-			return "T_ORIGIN";
-			break;
-		case T_O:
-			return "T_O";
-			break;
-		case T_I:
-			return "T_I";
-			break;
-		case T_S:
-			return "T_S";
-			break;
-		case T_Z:
-			return "T_Z";
-			break;
-		case T_L:
-			return "T_L";
-			break;
-		case T_J:
-			return "T_J";
-			break;
-		case T_T:
-			return "T_T";
-			break;
-		default:
-			return "Unknown T_Type";
-			break;
+		case T_NONE: return "T_NONE"; break;
+		case T_ORIGIN: return "T_ORIGIN"; break;
+		case T_O: return "T_O"; break;
+		case T_I: return "T_I"; break;
+		case T_S: return "T_S"; break;
+		case T_Z: return "T_Z"; break;
+		case T_L: return "T_L"; break;
+		case T_J: return "T_J"; break;
+		case T_T: return "T_T"; break;
+		default: return "Unknown T_Type"; break;
 	}
 	return "Unknown T_Type";
 }
@@ -87,7 +67,7 @@ const char* T_Type_to_str(T_Type t_type){
 // enum order: T_NONE T_ORIGIN T_O T_I T_S T_Z T_L T_J T_T
 Tetronimo* rand_Piece(){
 	T_Type lower = T_O;
-	T_Type upper = T_I;
+	T_Type upper = T_S;
 	T_Type rand_t_type = rand() % (upper + 1 - lower ) + lower; 
 	Tetronimo* tetronimo = new_Piece(rand_t_type);
 	return tetronimo;
@@ -116,32 +96,73 @@ void set_Piece(Tetronimo* tetronimo){
 		// I-Piece
 		case T_I:
 			switch(d_rot){
-				case D_0:
-				case D_180:
+				// Vertical
+				case D_0: case D_180:
 					for (int i = 0; i < NUM_PIECES; i++){
 						tetronimo->pieces[i].x = origin.x - 1;
 						tetronimo->pieces[i].y = origin.y + i;
 					}
 					break;
-				case D_90:
-				case D_270:
+				// Horizontal
+				case D_90: case D_270:
 					for (int i = 0; i < NUM_PIECES; i++){
 						tetronimo->pieces[i].x = origin.x + i - 3;
 						tetronimo->pieces[i].y = origin.y + 2;
 					}
 					break;
+				default:
+					fprintf(stderr, "Error: Invalid degree of rotation\n");
+					break;
 			}	
 			break;
 		case T_O:
-			// All degrees of rotation result in the same piece for O
+			// All degrees of rotation result in the same layout for O-Pieces
+			// 2 0
+			// 3 1
 			tetronimo->pieces[0].x = origin.x - 1;
 			tetronimo->pieces[0].y = origin.y + 1;
 			tetronimo->pieces[1].x = origin.x - 1;
 			tetronimo->pieces[1].y = origin.y + 2;
+
 			tetronimo->pieces[2].x = origin.x - 2;
 			tetronimo->pieces[2].y = origin.y + 1;
 			tetronimo->pieces[3].x = origin.x - 2;
 			tetronimo->pieces[3].y = origin.y + 2;
+			break;
+		case T_S:
+			switch(d_rot){
+				//   0
+				//   1 2
+				//     3
+				case D_0: case D_180:
+					tetronimo->pieces[0].x = origin.x - 1;
+					tetronimo->pieces[0].y = origin.y;
+					tetronimo->pieces[1].x = origin.x - 1;
+					tetronimo->pieces[1].y = origin.y + 1;
+
+					tetronimo->pieces[2].x = origin.x;
+					tetronimo->pieces[2].y = origin.y + 1;
+					tetronimo->pieces[3].x = origin.x;
+					tetronimo->pieces[3].y = origin.y + 2;
+				break;
+				//
+				//   1 0
+				// 3 2 
+				case D_90: case D_270:
+					tetronimo->pieces[0].x = origin.x;
+					tetronimo->pieces[0].y = origin.y + 1;
+					tetronimo->pieces[1].x = origin.x - 1;
+					tetronimo->pieces[1].y = origin.y + 1;
+
+					tetronimo->pieces[2].x = origin.x - 1;
+					tetronimo->pieces[2].y = origin.y + 2;
+					tetronimo->pieces[3].x = origin.x - 2;
+					tetronimo->pieces[3].y = origin.y + 2;
+				break;
+				default:
+					fprintf(stderr, "Error: Invalid degree of rotation\n");
+					break;
+			}
 			break;
 		default:
 			printf("ERROR: Could not set invalid T_Type\n");
@@ -356,8 +377,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					fprintf(stderr, "Error: Unknown move\n");
 					break;
 			}
-			break;
 		}
+		break;
 		// O-Piece
 		case T_O:
 		{
@@ -446,14 +467,199 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					fprintf(stderr, "Error: Unknown move\n");
 					break;
 			}
-			break;
 		}
+		break;
+		// S-Piece
+		case T_S:
+		{
+			switch(move){
+				case M_ROT_RIGHT: // Fall through
+				case M_ROT_LEFT:
+					x = origin.x;
+					y = origin.y;
+					switch(d_rot){
+						//   0
+						//   1 2
+						//     3
+						case D_0: case D_180:
+							if (x_min == 0){
+								legal_move = false;
+								break;
+							}
+							if (play_field[y+2][x-2] || 
+									play_field[y+2][x-1]){
+								legal_move = false;
+							}
+							break;
+						//
+						//   1 0
+						// 3 2 
+						case D_90: case D_270:
+							if (play_field[y][x-1] || 
+									play_field[y+2][x]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move)
+						tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_RIGHT);
+					break;
+				case M_DOWN:
+					x = origin.x;
+					y = origin.y;
+					if (y_max == FIELD_Y-1){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//   0
+						//   1 2
+						//     3
+						case D_0: case D_180:
+							if (play_field[y+2][x-1] ||
+									play_field[y+3][x]){
+								legal_move = false;
+							}
+							break;
+						//
+						//   1 0
+						// 3 2 
+						case D_90: case D_270:
+							if (play_field[y+3][x-2] ||
+									play_field[y+3][x-1] ||
+									play_field[y+2][x]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move){
+						tetronimo->origin.y += 1;
+					} else {
+						// Only downward movement should determine if the piece will lock or not.
+						is_falling = false;
+					}
+					break;
+				case M_LEFT:
+					x = origin.x;
+					y = origin.y;
+					if (x_min == 0){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//   0
+						//   1 2
+						//     3
+						case D_0: case D_180:
+							if (play_field[y][x-2] ||
+									play_field[y+1][x-2] ||
+									play_field[y+2][x-1]){
+								legal_move = false;
+							}
+							break;
+						//
+						//   1 0
+						// 3 2 
+						case D_90: case D_270:
+							if (play_field[y-1][x-2] ||
+									play_field[y-2][x-3]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move)
+						tetronimo->origin.x -= 1;
+					break;
+				case M_RIGHT:
+					x = origin.x;
+					y = origin.y;
+					if (x_max == FIELD_X-1){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//   0
+						//   1 2
+						//     3
+						case D_0: case D_180:
+							if (play_field[y][x] ||
+									play_field[y+1][x+1] ||
+									play_field[y+2][x+1]){
+								legal_move = false;
+							}
+							break;
+						//
+						//   1 0
+						// 3 2 
+						case D_90: case D_270:
+							if (play_field[y+1][x+1] ||
+									play_field[y+2][x]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move)
+						tetronimo->origin.x += 1;
+
+					break;
+					// Upward movement will be in for now while I test things
+				case M_UP:
+					x = origin.x;
+					y = origin.y;
+					if (y_min == (FIELD_Y/2)-1){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//   0
+						//   1 2
+						//     3
+						case D_0: case D_180:
+							if (play_field[y-1][x-1] ||
+									play_field[y][x]){
+								legal_move = false;
+							}
+							break;
+						//
+						//   1 0
+						// 3 2 
+						case D_90: case D_270:
+							if (play_field[y][x] ||
+									play_field[y][x-1] ||
+									play_field[y+1][x-1]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move){
+						tetronimo->origin.y -= 1;
+					}
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown move\n");
+					break;
+			}
+
+		}
+		break;
 		default:
 			fprintf(stderr, "Error: Unknown T_Type in move_Tetronimo()\n");
 			break;
 	}
-
+	// Set piece coords in tetronimo struct
 	set_Piece(tetronimo);
-	set_Tetronimo(tetronimo);
+	// Set tetronimo to play_field
+	set_Tetronimo(tetronimo); 
 	return is_falling;
 }

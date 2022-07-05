@@ -70,6 +70,7 @@ typedef enum {
 	D_270 
 } D_ROT;
 
+// Gets the minimums and maximum x or y coordinates of a tetronimo
 int max_x(struct Tetronimo* tetronimo);
 int min_x(struct Tetronimo* tetronimo);
 int max_y(struct Tetronimo* tetronimo);
@@ -81,9 +82,9 @@ typedef struct Coords {
 
 typedef struct Tetronimo {
 	T_Type t_type;
-	Coords origin; // The pivot at which the piece will be rotated is (x,y)
+	Coords origin; // The origin is the point at which everything else will be drawn relative to
 	Coords pieces[4]; // The coordinates of each individual piece
-	D_ROT d_rot;
+	D_ROT d_rot; // The degrees of rotation of the tetronimo
 } Tetronimo;
 
 // Selects a random Piece constructor and returns it
