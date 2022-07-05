@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define SCREEN_X 800
 #define SCREEN_Y 550
@@ -57,6 +58,10 @@ typedef enum {
 	T_T
 } T_Type;
 
+const char* T_Type_to_str(T_Type t_type);
+
+
+
 // Degrees of rotation
 typedef enum { 
 	D_0, 
@@ -81,10 +86,11 @@ typedef struct Tetronimo {
 	D_ROT d_rot;
 } Tetronimo;
 
-Tetronimo* new_Piece();
+// Selects a random Piece constructor and returns it
+Tetronimo* rand_Piece();
 
-Tetronimo* new_I_Piece();
-
+// Piece constructor that takes its T_Type as a parameter
+Tetronimo* new_Piece(T_Type t_type);
 
 void set_Piece(Tetronimo* tetronimo);
 // Returns true or false indicating if the piece is still falling or not

@@ -2,6 +2,7 @@
 #include "input.h"
 
 // SDL uses ms timing, so I will too.
+// TODO: Eventually, higher levels should modify this tick value to increase difficulty.
 uint32_t _tick = 500;
 uint32_t _last_tick = 0;
 uint32_t _num_ticks_passed = 0;

@@ -30,10 +30,7 @@ int main(){
 	}
 	
 	ClearScreen(window, renderer);
-	Tetronimo* tetronimo = new_Piece();
-	RenderPlayField(window, renderer);
-	RenderBlocksByLine(window, renderer);
-	SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
+	Tetronimo* tetronimo = new_Piece(T_O);
 								 
 	for ( ;  ; ){
 		// Get user input
@@ -45,11 +42,11 @@ int main(){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				free(tetronimo);
-				tetronimo = new_Piece();
+				tetronimo = new_Piece(T_I);
 			}
 			// PrintPlayField();
 		}
-		RenderBlocksByLine(window, renderer);
+		RenderBlocks(window, renderer);
 		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
 	}
 	SDL_DestroyWindow(window);

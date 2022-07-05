@@ -11,22 +11,28 @@ void InputController(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetr
 			SDL_DestroyWindow(window);
 			SDL_Quit();
 			exit(0);
-		} else if (kb_state[SDL_SCANCODE_DOWN]){
+		}
+		if (kb_state[SDL_SCANCODE_DOWN]){
 			printf("Pressed down\n");
 			move_Tetronimo(window, renderer, tetronimo, M_DOWN);
-		} else if (kb_state[SDL_SCANCODE_UP]){
+		}
+		if (kb_state[SDL_SCANCODE_UP]){
 			printf("Pressed up\n");
 			move_Tetronimo(window, renderer, tetronimo, M_UP);
-		} else if (kb_state[SDL_SCANCODE_LEFT]){
+		}
+		if (kb_state[SDL_SCANCODE_LEFT]){
 			printf("Pressed left\n");
 			move_Tetronimo(window, renderer, tetronimo, M_LEFT);
-		} else if (kb_state[SDL_SCANCODE_RIGHT]){
+		}
+		if (kb_state[SDL_SCANCODE_RIGHT]){
 			printf("Pressed right\n");
 			move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
-		} else if (kb_state[SDL_SCANCODE_Z]){
+		}
+		if (kb_state[SDL_SCANCODE_Z]){
 			printf("Pressed z\n");
 			move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
-		} else if (kb_state[SDL_SCANCODE_X]){
+		}
+		if (kb_state[SDL_SCANCODE_X]){
 			printf("Pressed x\n");
 			move_Tetronimo(window, renderer, tetronimo, M_ROT_RIGHT);
 		}

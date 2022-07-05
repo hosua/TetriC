@@ -58,7 +58,7 @@ SDL_Rect* GetBlockLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL_Re
 	return blocks;
 }
 
-void RenderBlocksByLine(SDL_Window* window, SDL_Renderer* renderer){
+void RenderBlocks(SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* line;
 	size_t num_blocks = 0;
 	// Lines 0-19 inclusive in the play_field are off-screen and do not get rendered.
@@ -90,6 +90,9 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 		case T_I:
 			// printf("T_I\n");
 			SDL_SetRenderDrawColor(renderer, 24, 102, 204, 255);
+			break;
+		case T_O:
+			SDL_SetRenderDrawColor(renderer, 208, 255, 0, 255);
 			break;
 		default:
 			// printf("INVALID\n");
