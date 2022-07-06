@@ -45,7 +45,7 @@ void RenderPlayField(SDL_Window* window, SDL_Renderer* renderer){
 void PrintPlayField(){
 	for (int i = FIELD_Y/2; i < FIELD_Y; i++){
 		for (int j = 0; j < FIELD_X; j++)
-			printf("%i", play_field[i][j]);
+			printf("%01x", play_field[i][j]);
 		printf("\n");
 	}
 }
@@ -99,6 +99,11 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 			// Red
 			SDL_SetRenderDrawColor(renderer, 179, 2, 2, 255);
 			break;
+		case T_L:
+			// Teal 
+			SDL_SetRenderDrawColor(renderer, 4, 224, 224, 255);
+			break;
+
 		default:
 			// printf("INVALID\n");
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);

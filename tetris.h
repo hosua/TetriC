@@ -57,15 +57,15 @@ typedef enum {
 
 const char* T_Type_to_str(T_Type t_type);
 
-
-
 // Degrees of rotation
 typedef enum { 
 	D_0, 
 	D_90, 
 	D_180, 
 	D_270 
-} D_ROT;
+} D_Rot;
+
+const char* D_Rot_to_str(D_Rot d_rot);
 
 // Gets the minimums and maximum x or y coordinates of a tetronimo
 int max_x(struct Tetronimo* tetronimo);
@@ -81,7 +81,7 @@ typedef struct Tetronimo {
 	T_Type t_type;
 	Coords origin; // The origin is the point at which everything else will be drawn relative to
 	Coords pieces[4]; // The coordinates of each individual piece
-	D_ROT d_rot; // The degrees of rotation of the tetronimo
+	D_Rot d_rot; // The degrees of rotation of the tetronimo
 } Tetronimo;
 
 // Selects a random Piece constructor and returns it
@@ -90,10 +90,15 @@ Tetronimo* rand_Piece();
 // Piece constructor that takes its T_Type as a parameter
 Tetronimo* new_Piece(T_Type t_type);
 
+void print_Tetronimo_Coords(Tetronimo *tetronimo);
+
 void set_Piece(Tetronimo* tetronimo);
 // Returns true or false indicating if the piece is still falling or not
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
 // set_Tetronimo is a helper function for new and move, it shouldn't be called directly
 void set_Tetronimo(Tetronimo* tetronimo);
+
+uint8_t* GetLinesToClear(uint8_t *lines_to_clear);
+void ClearLines();
 
 #endif // TETRIS_H

@@ -6,9 +6,10 @@ I intend on making this clone as close to the original port on the NES as possib
 Graphics are rendered using SDL 2.0.
 
 ### To Do List
+- [ ] Make a Makefile
 - [ ] Make movement less clunky
 - [ ] Implement a UI
-- [ ] Implement line clearing
+- [x] Implement line clearing
 - [ ] Implement previous piece
 - [ ] Implement scoring system
 - [ ] Implement leveling system
@@ -20,12 +21,12 @@ Graphics are rendered using SDL 2.0.
 - [x] O-Piece
 - [x] S-Piece
 - [x] Z-Piece
-- [ ] L-Piece
+- [x] L-Piece
 - [ ] J-Piece
 - [ ] T-Piece
 
 This is a work in progress. There is still a lot to be done so I'm not going to bother 
 writing too much about it yet.
 
-![TetriC-alpha](images/TetriC-6.gif)
+![TetriC-alpha](images/TetriC-7.gif)
 
