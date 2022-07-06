@@ -92,13 +92,19 @@ Tetronimo* new_Piece(T_Type t_type);
 
 void print_Tetronimo_Coords(Tetronimo *tetronimo);
 
+
+// set_Piece() and set_Tetronimo() are helper functions and should not be called directly 
+// Sets the coordinates of the pieces array in a tetronimo struct
 void set_Piece(Tetronimo* tetronimo);
+// Sets the tetronimo to the play_field
+void set_Tetronimo(Tetronimo* tetronimo);
 // Returns true or false indicating if the piece is still falling or not
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
-// set_Tetronimo is a helper function for new and move, it shouldn't be called directly
-void set_Tetronimo(Tetronimo* tetronimo);
 
-uint8_t* GetLinesToClear(uint8_t *lines_to_clear);
+// Clears lines when a full one (or more) are detected
 void ClearLines();
 
+// Helper functions for ClearLines()
+uint8_t* GetLinesToClear(uint8_t *lines_to_clear);
+void ShiftLines(uint8_t y_min, uint8_t lines_cleared);
 #endif // TETRIS_H
