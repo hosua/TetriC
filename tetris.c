@@ -49,7 +49,6 @@ int min_y(Tetronimo* tetronimo){
 const char* T_Type_to_str(T_Type t_type){
 	switch(t_type){
 		case T_NONE: return "T_NONE"; break;
-		case T_ORIGIN: return "T_ORIGIN"; break;
 		case T_O: return "T_O"; break;
 		case T_I: return "T_I"; break;
 		case T_S: return "T_S"; break;
@@ -64,7 +63,7 @@ const char* T_Type_to_str(T_Type t_type){
 
 // Generate a random piece via RNG
 // For now we only have two pieces, but this will generate all random pieces once they are implemented
-// enum order: T_NONE T_ORIGIN T_O T_I T_S T_Z T_L T_J T_T
+// enum order: T_NONE T_O T_I T_S T_Z T_L T_J T_T
 Tetronimo* rand_Piece(){
 	T_Type lower = T_O;
 	T_Type upper = T_Z;
@@ -76,7 +75,7 @@ Tetronimo* rand_Piece(){
 Tetronimo* new_Piece(T_Type t_type){
 	Tetronimo* new_piece = (Tetronimo*)malloc(sizeof(Tetronimo));
 	new_piece->t_type = t_type;
-	new_piece->d_rot = D_0;
+	new_piece->d_rot = D_90;
 	new_piece->origin.x = SPAWN_X;
 	new_piece->origin.y = SPAWN_Y;
 
@@ -199,6 +198,20 @@ void set_Piece(Tetronimo* tetronimo){
 					break;
 			}
 			break;
+		case T_L:
+			switch(d_rot){
+				case D_0:
+					break;
+				case D_90:
+					break;
+				case D_180:
+					break;
+				case D_270:
+					break;
+				default:
+					fprintf(stderr, "Error: Invalid degree of rotation\n");
+					break;
+			}
 			break;
 		default:
 			printf("ERROR: Could not set invalid T_Type\n");
@@ -216,11 +229,6 @@ void set_Tetronimo(Tetronimo* tetronimo){
 		y = tetronimo->pieces[i].y;
 		play_field[y][x] = t_type;
 	}
-
-	// TODO: Debugging: Set the origin. Origin breaks gameplay so we need to turn this off when testing gameplay
-	// x = tetronimo->origin.x;
-	// y = tetronimo->origin.y;
-	// play_field[y][x] = T_ORIGIN;
 }
 
 // Returns the d_rot value of the tetronimo
@@ -601,8 +609,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 0
 						// 3 2 
 						case D_90: case D_270:
-							if (play_field[y-1][x-2] ||
-									play_field[y-2][x-3]){
+							if (play_field[y+1][x-2] ||
+									play_field[y+2][x-3]){
 								legal_move = false;
 							}
 							break;

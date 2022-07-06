@@ -83,11 +83,6 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 			// printf("T_NONE\n");
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			break;
-		// TODO: Origin should only show for debugging purposes
-		case T_ORIGIN:
-			// Pink
-			SDL_SetRenderDrawColor(renderer, 255, 84, 235, 255);
-			break;
 		case T_I:
 			// Blue
 			SDL_SetRenderDrawColor(renderer, 24, 102, 204, 255);

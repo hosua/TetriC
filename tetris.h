@@ -17,8 +17,8 @@
 #define SCREEN_Y 550
 #define FIELD_X 10
 #define FIELD_Y 40 // Note that only 10x20 tiles are visible to player.
-#define SPAWN_X 5 // The coordinates where the tetronimos spawn
-#define SPAWN_Y 20
+#define SPAWN_X 6 // The coordinates where the tetronimos spawn
+#define SPAWN_Y 17
 #define BLOCK_SIZE 25
 // Number of blocks per tetronimo
 #define NUM_PIECES 4 
@@ -43,12 +43,9 @@ typedef enum {
 extern uint8_t play_field[FIELD_Y][FIELD_X];
 
 // Each type of tetromino. There are 7 pieces.
-// T_ORIGIN will just be for drawing the origin during debugging
 // Enums will automatically assign the next enumeration as +1 of the previous value
-// When checking for invalid moves, make the check if ( foo > T_ORIGIN )
 typedef enum { 
 	T_NONE, 
-	T_ORIGIN, 
 	T_O, 
 	T_I, 
 	T_S, 
