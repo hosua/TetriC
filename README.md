@@ -5,6 +5,15 @@ I intend on making this clone as close to the original port on the NES as possib
 
 Graphics are rendered using SDL 2.0.
 
+### To Do List
+- [ ] Make movement less clunky
+- [ ] Implement a UI
+- [ ] Implement scoring system
+- [ ] Implement leveling system
+- [ ] Implement line clearing
+- [ ] Implement a title screen
+- [ ] Implement a pause menu (or just the ability to pause)
+
 ### Pieces Implemented
 - [x] I-Piece
 - [x] O-Piece
