@@ -7,7 +7,7 @@ uint8_t play_field[FIELD_Y][FIELD_X] = {0};
 // The play field is numbers from lowest to greatest, top to bottom. So the bottom of the play field is not 0, it is 39.
 int max_x(Tetronimo* tetronimo){
 	int max = 0, x_pos = 0;
-	for (int i = 0; i < NUM_PIECES; i++){
+	for (int i = 0; i < TETRA; i++){
 		x_pos = tetronimo->pieces[i].x;
 		if (x_pos > max)
 			max = x_pos;
@@ -17,7 +17,7 @@ int max_x(Tetronimo* tetronimo){
 }
 int min_x(Tetronimo* tetronimo){
 	int min = INT32_MAX, x_pos = 0;
-	for (int i = 0; i < NUM_PIECES; i++){
+	for (int i = 0; i < TETRA; i++){
 		x_pos = tetronimo->pieces[i].x;
 		if (x_pos < min)
 			min = x_pos;
@@ -27,7 +27,7 @@ int min_x(Tetronimo* tetronimo){
 }
 int max_y(Tetronimo* tetronimo){
 	int max = 0, y_pos = 0;
-	for (int i = 0; i < NUM_PIECES; i++){
+	for (int i = 0; i < TETRA; i++){
 		y_pos = tetronimo->pieces[i].y;
 		if (y_pos > max)
 			max = y_pos;
@@ -37,7 +37,7 @@ int max_y(Tetronimo* tetronimo){
 }
 int min_y(Tetronimo* tetronimo){
 	int min = INT32_MAX, y_pos = 0;
-	for (int i = 0; i < NUM_PIECES; i++){
+	for (int i = 0; i < TETRA; i++){
 		y_pos = tetronimo->pieces[i].y;
 		if (y_pos < min)
 			min = y_pos;
@@ -97,14 +97,14 @@ void set_Piece(Tetronimo* tetronimo){
 			switch(d_rot){
 				// Vertical
 				case D_0: case D_180:
-					for (int i = 0; i < NUM_PIECES; i++){
+					for (int i = 0; i < TETRA; i++){
 						tetronimo->pieces[i].x = origin.x - 1;
 						tetronimo->pieces[i].y = origin.y + i;
 					}
 					break;
 				// Horizontal
 				case D_90: case D_270:
-					for (int i = 0; i < NUM_PIECES; i++){
+					for (int i = 0; i < TETRA; i++){
 						tetronimo->pieces[i].x = origin.x + i - 3;
 						tetronimo->pieces[i].y = origin.y + 2;
 					}
@@ -201,12 +201,33 @@ void set_Piece(Tetronimo* tetronimo){
 		case T_L:
 			switch(d_rot){
 				case D_0:
+					//   0
+					//   1
+					// 3 2
+					for (int i = 0; i < 3; i++){
+						tetronimo->pieces[i].x = origin.x;
+						tetronimo->pieces[i].y = origin.y + i;
+					}
+					tetronimo->pieces[3].x = origin.x - 2;
+					tetronimo->pieces[3].y = origin.y + 2;
 					break;
 				case D_90:
+					// 0
+					// 1 2 3
+					// 
+					for (int i = 1; i < TETRA; i++){
+						
+					}
 					break;
 				case D_180:
+					//   1 0
+					//   2
+					//   3
 					break;
 				case D_270:
+					//
+					// 0 1 2
+					//     3
 					break;
 				default:
 					fprintf(stderr, "Error: Invalid degree of rotation\n");
@@ -224,7 +245,7 @@ void set_Tetronimo(Tetronimo* tetronimo){
 	T_Type t_type = tetronimo->t_type;
 	int x = 0, y = 0;
 
-	for (int i = 0; i < NUM_PIECES; i++){
+	for (int i = 0; i < TETRA; i++){
 		x = tetronimo->pieces[i].x;
 		y = tetronimo->pieces[i].y;
 		play_field[y][x] = t_type;
@@ -258,7 +279,7 @@ D_ROT rotate_Tetronimo(Tetronimo* tetronimo, M_Direction move){
 
 void print_Tetronimo_Coords(Tetronimo *tetronimo){
 	Coords* coords = tetronimo->pieces;
-	for (int i = 0; i < NUM_PIECES; i++)
+	for (int i = 0; i < TETRA; i++)
 		printf("(%i, %i) ", coords[i].x, coords[i].y);
 	printf("\n");
 }
@@ -276,15 +297,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	print_Tetronimo_Coords(tetronimo);
 	int x = 0, y = 0;
 	// Unset the pieces
-	for (int i = 0; i < NUM_PIECES; i++){
+	for (int i = 0; i < TETRA; i++){
 		x = tetronimo->pieces[i].x;
 		y = tetronimo->pieces[i].y;
 		play_field[y][x] = T_NONE;
 	}
-	// TODO: Debugging: Unset the origin. Origin breaks gameplay so we need to turn this off when testing gameplay
-	// x =	tetronimo->origin.x;
-	// y =	tetronimo->origin.y;
-	// play_field[y][x] = T_NONE;
 
 	int y_max = max_y(tetronimo);
 	int y_min = min_y(tetronimo);
@@ -306,7 +323,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (x_min <= 1 || x_max >= FIELD_X-1 || y_max == FIELD_Y-1)
 							legal_move = false;
 
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							// Ignore the overlapping piece
 							if (i != 2){
 								x = origin.x + i - 3;
@@ -318,7 +335,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							}
 						}
 					} else { // D_90, D_270
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							// Ignore the overlapping piece
 							if (i != 2){
 								x = origin.x - 1;
@@ -340,7 +357,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (y_max == FIELD_Y-1 || play_field[y_max+1][x_max])
 							legal_move = false;
 					} else {
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (y == FIELD_Y-1 || play_field[y+1][x]){
@@ -360,7 +377,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 				case M_LEFT:
 					if (d_rot == D_0 || d_rot == D_180){
 						// Unset the move flag if it is illegal and break
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (x == 0 || play_field[y][x-1]){
@@ -380,7 +397,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 				case M_RIGHT:
 					if (d_rot == D_0 || d_rot == D_180){
 						// Unset the move flag if it is illegal and break
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (x == FIELD_X-1 || play_field[y][x+1]){
@@ -403,7 +420,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
 							legal_move = false;
 					} else {
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (y == (FIELD_Y/2)-1 || play_field[y-1][x]){
@@ -436,7 +453,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					// O-Piece:
 					// 2 0
 					// 3 1
-					for (int i = 0; i < NUM_PIECES; i++){
+					for (int i = 0; i < TETRA; i++){
 						if (i % 1 == 0 || i % 3 == 0){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
@@ -455,7 +472,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					break;
 				case M_LEFT:
 					// Unset the move flag if it is illegal and break
-					for (int i = 0; i < NUM_PIECES; i++){
+					for (int i = 0; i < TETRA; i++){
 						// Check only our 2 left pieces
 						if (i % 2 == 0 || i % 3 == 0){
 							x = tetronimo->pieces[i].x;
@@ -472,7 +489,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					break;
 				case M_RIGHT:
 					// Unset the move flag if it is illegal and break
-					for (int i = 0; i < NUM_PIECES; i++){
+					for (int i = 0; i < TETRA; i++){
 						// Check only our 2 left pieces
 						if (i == 0 || i % 1 == 0){
 							x = tetronimo->pieces[i].x;
@@ -493,7 +510,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
 							legal_move = false;
 					} else {
-						for (int i = 0; i < NUM_PIECES; i++){
+						for (int i = 0; i < TETRA; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
 							if (y == (FIELD_Y/2)-1 || play_field[y-1][x]){
@@ -793,8 +810,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 3 2 
 						//   1 0
 						case D_90: case D_270:
-							if (play_field[y+1][x] ||
-									play_field[y+2][x+1]){
+							if (play_field[y+1][x-3] ||
+									play_field[y+2][x-2]){
 								legal_move = false;
 							}
 							break;

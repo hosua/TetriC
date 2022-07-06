@@ -21,7 +21,7 @@
 #define SPAWN_Y 17
 #define BLOCK_SIZE 25
 // Number of blocks per tetronimo
-#define NUM_PIECES 4 
+#define TETRA 4 
 
 struct RGB_Color;
 struct Coords;
