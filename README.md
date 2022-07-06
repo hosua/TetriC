@@ -9,7 +9,7 @@ Graphics are rendered using SDL 2.0.
 - [ ] Make a Makefile
 - [ ] Make movement less clunky
 - [ ] Implement a UI
-- [x] Implement line clearing
+- [ ] Implement line clearing - BROKEN
 - [ ] Implement previous piece
 - [ ] Implement scoring system
 - [ ] Implement leveling system
