@@ -67,7 +67,7 @@ const char* T_Type_to_str(T_Type t_type){
 // enum order: T_NONE T_ORIGIN T_O T_I T_S T_Z T_L T_J T_T
 Tetronimo* rand_Piece(){
 	T_Type lower = T_O;
-	T_Type upper = T_S;
+	T_Type upper = T_Z;
 	T_Type rand_t_type = rand() % (upper + 1 - lower ) + lower; 
 	Tetronimo* tetronimo = new_Piece(rand_t_type);
 	return tetronimo;
@@ -163,6 +163,42 @@ void set_Piece(Tetronimo* tetronimo){
 					fprintf(stderr, "Error: Invalid degree of rotation\n");
 					break;
 			}
+			break;
+		case T_Z:
+			switch(d_rot){
+				//     0
+				//   2 1
+				//   3 
+				case D_0: case D_180:
+					tetronimo->pieces[0].x = origin.x;
+					tetronimo->pieces[0].y = origin.y;
+					tetronimo->pieces[1].x = origin.x;
+					tetronimo->pieces[1].y = origin.y + 1;
+
+					tetronimo->pieces[2].x = origin.x - 1;
+					tetronimo->pieces[2].y = origin.y + 1;
+					tetronimo->pieces[3].x = origin.x - 1;
+					tetronimo->pieces[3].y = origin.y + 2;
+				break;
+				//
+				// 3 2 
+				//   1 0
+				case D_90: case D_270:
+					tetronimo->pieces[0].x = origin.x;
+					tetronimo->pieces[0].y = origin.y + 2;
+					tetronimo->pieces[1].x = origin.x - 1;
+					tetronimo->pieces[1].y = origin.y + 2;
+
+					tetronimo->pieces[2].x = origin.x - 1;
+					tetronimo->pieces[2].y = origin.y + 1;
+					tetronimo->pieces[3].x = origin.x - 2;
+					tetronimo->pieces[3].y = origin.y + 1;
+				break;
+				default:
+					fprintf(stderr, "Error: Invalid degree of rotation\n");
+					break;
+			}
+			break;
 			break;
 		default:
 			printf("ERROR: Could not set invalid T_Type\n");
@@ -651,6 +687,189 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					break;
 			}
 
+		}
+		break;
+		// Z-Piece
+		case T_Z:
+		{
+			switch(move){
+				case M_ROT_RIGHT: // Fall through
+				case M_ROT_LEFT:
+					x = origin.x;
+					y = origin.y;
+					switch(d_rot){
+						//     0
+						//   2 1
+						//   3
+						case D_0: case D_180:
+							if (x_min == 0){
+								legal_move = false;
+							}
+							if (play_field[y+1][x-2] ||
+									play_field[y+2][x]){
+								legal_move = false;
+							}
+
+							break;
+						//
+						// 3 2 
+						//   1 0
+						case D_90: case D_270:
+							if (play_field[y][x] ||
+									play_field[y+1][x]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move)
+						tetronimo->d_rot = rotate_Tetronimo(tetronimo, M_ROT_RIGHT);
+					break;
+				case M_DOWN:
+					x = origin.x;
+					y = origin.y;
+					if (y_max == FIELD_Y-1){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//     0
+						//   2 1
+						//   3
+						case D_0: case D_180:
+							if (play_field[y+2][x] ||
+									play_field[y+3][x-1]){
+								legal_move = false;
+							}
+							break;
+						//
+						// 3 2 
+						//   1 0
+						case D_90: case D_270:
+							if (play_field[y+2][x-2] ||
+									play_field[y+3][x-1] ||
+									play_field[y+3][x]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move){
+						tetronimo->origin.y += 1;
+					} else {
+						// Only downward movement should determine if the piece will lock or not.
+						is_falling = false;
+					}
+					break;
+				case M_LEFT:
+					x = origin.x;
+					y = origin.y;
+					if (x_min == 0){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//     0
+						//   2 1
+						//   3
+						case D_0: case D_180:
+							if (play_field[y][x-1] ||
+									play_field[y+1][x-2] ||
+									play_field[y+2][x-2]){
+								legal_move = false;
+							}
+							break;
+						//
+						// 3 2 
+						//   1 0
+						case D_90: case D_270:
+							if (play_field[y+1][x] ||
+									play_field[y+2][x+1]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move)
+						tetronimo->origin.x -= 1;
+					break;
+				case M_RIGHT:
+					x = origin.x;
+					y = origin.y;
+					if (x_max == FIELD_X-1){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//     0
+						//   2 1
+						//   3
+						case D_0: case D_180:
+							if (play_field[y][x+1] ||
+									play_field[y+1][x+1] ||
+									play_field[y+2][x]){
+								legal_move = false;
+							}
+							break;
+						//
+						// 3 2 
+						//   1 0
+						case D_90: case D_270:
+							if (play_field[y+1][x] ||
+									play_field[y+2][x+1]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move)
+						tetronimo->origin.x += 1;
+
+					break;
+					// Upward movement will be in for now while I test things
+				case M_UP:
+					x = origin.x;
+					y = origin.y;
+					if (y_min == (FIELD_Y/2)-1){
+						legal_move = false;
+					}
+					switch(d_rot){
+						//     0
+						//   2 1
+						//   3
+						case D_0: case D_180:
+							if (play_field[y-1][x] ||
+									play_field[y][x-1]){
+								legal_move = false;
+							}
+							break;
+						//
+						// 3 2 
+						//   1 0
+						case D_90: case D_270:
+							if (play_field[y+1][x] ||
+									play_field[y][x-1] ||
+									play_field[y][x-2]){
+								legal_move = false;
+							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
+					}
+					if (legal_move){
+						tetronimo->origin.y -= 1;
+					}
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown move\n");
+					break;
+			}
 		}
 		break;
 		default:

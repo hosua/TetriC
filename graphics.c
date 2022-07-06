@@ -100,6 +100,10 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 			// Green
 			SDL_SetRenderDrawColor(renderer, 47, 247, 32, 255);
 			break;
+		case T_Z:
+			// Red
+			SDL_SetRenderDrawColor(renderer, 179, 2, 2, 255);
+			break;
 		default:
 			// printf("INVALID\n");
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);

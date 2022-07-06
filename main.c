@@ -34,7 +34,7 @@ int main(){
 	
 	ClearScreen(window, renderer);
 	Tetronimo* tetronimo = rand_Piece();
-	// Tetronimo* tetronimo = new_Piece(T_S);
+	// Tetronimo* tetronimo = new_Piece(T_Z);
 								 
 	for ( ;  ; ){
 		// Get user input
@@ -47,7 +47,7 @@ int main(){
 			if (!is_falling){
 				free(tetronimo);
 				tetronimo = rand_Piece();
-				// tetronimo = new_Piece(T_S);
+				// tetronimo = new_Piece(T_Z);
 			}
 			// PrintPlayField();
 		}
