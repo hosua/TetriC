@@ -8,9 +8,10 @@ Graphics are rendered using SDL 2.0.
 ### To Do List
 - [ ] Make movement less clunky
 - [ ] Implement a UI
+- [ ] Implement line clearing
+- [ ] Implement previous piece
 - [ ] Implement scoring system
 - [ ] Implement leveling system
-- [ ] Implement line clearing
 - [ ] Implement a title screen
 - [ ] Implement a pause menu (or just the ability to pause)
 
