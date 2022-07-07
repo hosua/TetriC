@@ -12,7 +12,7 @@ int max_x(Tetronimo* tetronimo){
 		if (x_pos > max)
 			max = x_pos;
 	}
-	printf("max_x: %i\n", max);
+	if (VERBOSE) printf("max_x: %i\n", max);
 	return max;
 }
 int min_x(Tetronimo* tetronimo){
@@ -22,7 +22,7 @@ int min_x(Tetronimo* tetronimo){
 		if (x_pos < min)
 			min = x_pos;
 	}
-	printf("min_x: %i\n", min);
+	if (VERBOSE) printf("min_x: %i\n", min);
 	return min;
 }
 int max_y(Tetronimo* tetronimo){
@@ -32,7 +32,7 @@ int max_y(Tetronimo* tetronimo){
 		if (y_pos > max)
 			max = y_pos;
 	}
-	printf("max_y: %i\n", max);
+	if (VERBOSE) printf("max_y: %i\n", max);
 	return max;
 }
 int min_y(Tetronimo* tetronimo){
@@ -42,7 +42,7 @@ int min_y(Tetronimo* tetronimo){
 		if (y_pos < min)
 			min = y_pos;
 	}
-	printf("min_y: %i\n", min);
+	if (VERBOSE) printf("min_y: %i\n", min);
 	return min;
 }
 
@@ -88,16 +88,24 @@ Tetronimo* new_Piece(T_Type t_type){
 	new_piece->d_rot = D_90;
 	new_piece->origin.x = SPAWN_X;
 	new_piece->origin.y = SPAWN_Y;
-
-	set_Piece(new_piece);
 	set_Tetronimo(new_piece);
 	return new_piece;
 }
 
+// Helper function for set_Tetronimo to set tetronimo onto the play_field;
+void set_To_Field(Tetronimo* tetronimo){
+	T_Type t_type = tetronimo->t_type;
+	int x = 0, y = 0;
 
-// Helper function, do not call set_Piece() directly.
-// Sets piece with respect to its origin and degree of rotation (This does not set the actual play_field)
-void set_Piece(Tetronimo* tetronimo){
+	for (int i = 0; i < TETRA; i++){
+		x = tetronimo->pieces[i].x;
+		y = tetronimo->pieces[i].y;
+		play_field[y][x] = t_type;
+	}
+}
+
+// Sets Tetronimo with respect to its origin and degree of rotation, then calls set_To_Field()
+void set_Tetronimo(Tetronimo* tetronimo){
 	Coords origin = tetronimo->origin;
 	T_Type t_type = tetronimo->t_type;
 	D_Rot d_rot = tetronimo->d_rot;
@@ -123,7 +131,7 @@ void set_Piece(Tetronimo* tetronimo){
 					fprintf(stderr, "Error: Invalid degree of rotation\n");
 					break;
 			}	
-			break;
+		break;
 		case T_O:
 			// All degrees of rotation result in the same layout for O-Pieces
 			// 2 0
@@ -137,7 +145,7 @@ void set_Piece(Tetronimo* tetronimo){
 			tetronimo->pieces[2].y = origin.y + 1;
 			tetronimo->pieces[3].x = origin.x - 2;
 			tetronimo->pieces[3].y = origin.y + 2;
-			break;
+		break;
 		case T_S:
 			switch(d_rot){
 				//   0
@@ -172,7 +180,7 @@ void set_Piece(Tetronimo* tetronimo){
 					fprintf(stderr, "Error: Invalid degree of rotation\n");
 					break;
 			}
-			break;
+		break;
 		case T_Z:
 			switch(d_rot){
 				//     0
@@ -207,7 +215,7 @@ void set_Piece(Tetronimo* tetronimo){
 					fprintf(stderr, "Error: Invalid degree of rotation\n");
 					break;
 			}
-			break;
+		break;
 		case T_L:
 			switch(d_rot){
 				case D_0:
@@ -258,7 +266,7 @@ void set_Piece(Tetronimo* tetronimo){
 					fprintf(stderr, "Error: Invalid degree of rotation\n");
 					break;
 			}
-			break;
+		break;
 		case T_J:
 			switch(d_rot){
 				case D_0:
@@ -310,22 +318,62 @@ void set_Piece(Tetronimo* tetronimo){
 					break;
 			}
 			break;
+		case T_T:
+			switch(d_rot){
+				case D_0:
+					//   0
+					// 3 1
+					//   2
+					for (int i = 0; i <= 2; i++){
+						tetronimo->pieces[i].x = origin.x - 1;
+						tetronimo->pieces[i].y = origin.y + i;
+					}
+					tetronimo->pieces[3].x = origin.x - 2;
+					tetronimo->pieces[3].y = origin.y + 1;
+					break;
+				case D_90:
+					//   3
+					// 0 1 2
+					// 
+					for (int i = 0; i <= 2; i++){
+						tetronimo->pieces[i].x = origin.x + i - 2;
+						tetronimo->pieces[i].y = origin.y + 1;
+					}
+					tetronimo->pieces[3].x = origin.x - 1;
+					tetronimo->pieces[3].y = origin.y;
+					break;
+				case D_180:
+					//   0 
+					//   1 3
+					//   2
+					for (int i = 0; i <= 2; i++){
+						tetronimo->pieces[i].x = origin.x - 1;
+						tetronimo->pieces[i].y = origin.y + i;
+					}
+					tetronimo->pieces[3].x = origin.x;
+					tetronimo->pieces[3].y = origin.y + 1;
+					break;
+				case D_270:
+					//
+					// 0 1 2
+					//   3
+					for (int i = 0; i <= 2; i++){
+						tetronimo->pieces[i].x = origin.x + i - 2;
+						tetronimo->pieces[i].y = origin.y + 1;
+					}
+					tetronimo->pieces[3].x = origin.x - 1;
+					tetronimo->pieces[3].y = origin.y + 2;
+					break;
+				default:
+					fprintf(stderr, "Error: Invalid degree of rotation\n");
+					break;
+			}
+			break;
 		default:
 			printf("ERROR: Could not set invalid T_Type\n");
 			break;
 	}
-}
-
-// Sets the tetronimo onto the play_field;
-void set_Tetronimo(Tetronimo* tetronimo){
-	T_Type t_type = tetronimo->t_type;
-	int x = 0, y = 0;
-
-	for (int i = 0; i < TETRA; i++){
-		x = tetronimo->pieces[i].x;
-		y = tetronimo->pieces[i].y;
-		play_field[y][x] = t_type;
-	}
+	set_To_Field(tetronimo);
 }
 
 // Returns the d_rot value of the tetronimo
@@ -429,8 +477,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	bool legal_move = true;
 	T_Type t_type = tetronimo->t_type;
 	D_Rot d_rot = tetronimo->d_rot;
-	printf("d_rot: %s\n", D_Rot_to_str(d_rot));
-	print_Tetronimo_Coords(tetronimo);
+	if (VERBOSE){
+		printf("T_Type: %s\n", T_Type_to_str(t_type));
+		printf("D_Rot: %s\n", D_Rot_to_str(d_rot));
+		print_Tetronimo_Coords(tetronimo);
+	}
+
 	int x = 0, y = 0;
 	// Unset the pieces
 	for (int i = 0; i < TETRA; i++){
@@ -444,7 +496,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	int x_max = max_x(tetronimo);
 	int x_min = min_x(tetronimo);
 	Coords origin = tetronimo->origin;
-	printf("T_Type: %s\n", T_Type_to_str(t_type));
 	// Perform the actual movement
 	switch(t_type){
 		// I-Piece
@@ -550,7 +601,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						tetronimo->origin.x += 1;
 					}
 					break;
-					// Upward movement will be in for now while I test things
 				case M_UP:
 					if (d_rot == D_0 || d_rot == D_180){
 						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
@@ -640,7 +690,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						tetronimo->origin.x += 1;
 
 					break;
-					// Upward movement will be in for now while I test things
 				case M_UP:
 					if (d_rot == D_0 || d_rot == D_180){
 						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
@@ -809,7 +858,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						tetronimo->origin.x += 1;
 
 					break;
-					// Upward movement will be in for now while I test things
 				case M_UP:
 					x = origin.x;
 					y = origin.y;
@@ -996,7 +1044,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						tetronimo->origin.x += 1;
 
 					break;
-					// Upward movement will be in for now while I test things
 				case M_UP:
 					x = origin.x;
 					y = origin.y;
@@ -1339,7 +1386,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						tetronimo->origin.x += 1;
 
 					break;
-					// Upward movement will be in for now while I test things
 				case M_UP:
 					switch(d_rot){
 						case D_0:
@@ -1715,7 +1761,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						tetronimo->origin.x += 1;
 
 					break;
-					// Upward movement will be in for now while I test things
 				case M_UP:
 					switch(d_rot){
 						case D_0:
@@ -1786,34 +1831,332 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 			}
 		}
 		break;
+		case T_T:
+		{
+			switch(move){
+				case M_ROT_LEFT: // Fall through case
+				case M_ROT_RIGHT:
+					if ((d_rot == D_180 && x_min == 0) || 
+							(d_rot == D_0 && x_max == FIELD_X-1) ||
+							(d_rot == D_90 && y_max == FIELD_Y-1)){
+						legal_move = false;
+					}
+					x = origin.x;
+					y = origin.y;
+					switch(d_rot){
+						case D_0:
+							//   0
+							// 3 1
+							//   2
+							if (play_field[y+1][x])
+								legal_move = false;
+							break;
+						case D_90:
+							//   3
+							// 0 1 2
+							// 
+							if (play_field[y+2][x-1])
+								legal_move = false;
+							break;
+						case D_180:
+							//   0 
+							//   1 3
+							//   2
+							if (play_field[y+1][x-2])
+								legal_move = false;
+							break;
+						case D_270:
+							//
+							// 0 1 2
+							//   3
+							if (play_field[y][x-1])
+								legal_move = false;
+							break;
+
+					}
+					if (legal_move)
+						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					break;
+				case M_DOWN:
+					if (y_max == FIELD_Y-1){
+						is_falling = false;
+						break;
+					}
+					switch(d_rot){
+						case D_0:
+							//   0
+							// 3 1
+							//   2
+							for (int i = 2; i <= 3; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y+1][x]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+						case D_90:
+							//   3
+							// 0 1 2
+							// 
+							for (int i = 0; i <= 2; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y+1][x]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+						case D_180:
+							//   0 
+							//   1 3
+							//   2
+							for (int i = 2; i <= 3; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y+1][x]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+						case D_270:
+							//
+							// 0 1 2
+							//   3
+							for (int i = 2; i <= 3; i++){
+								if (i != 1){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y+1][x]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+					}
+
+					if (legal_move){
+						tetronimo->origin.y += 1;
+					} else {
+						// Only downward movement should determine if the piece will lock or not.
+						is_falling = false;
+					}
+					break;
+				case M_LEFT:
+					if (x_min == 0){
+						legal_move = false;
+						break;
+					}
+					switch(d_rot){
+						case D_0:
+							//   0
+							// 3 1
+							//   2
+							for (int i = 0; i < TETRA; i++){
+								if (i != 1){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y][x-1]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+						case D_90:
+							//   3
+							// 0 1 2
+							// 
+							for (int i = 0; i < TETRA; i++){
+								if (i != 1 || i != 2){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y][x-1]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+						case D_180:
+							//   0 
+							//   1 3
+							//   2
+							for (int i = 0; i <= 2; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y][x-1]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+						case D_270:
+							//
+							// 0 1 2
+							//   3
+							for (int i = 0; i < TETRA; i++){
+								if (i != 1 || i != 2){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y][x-1]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+					}
+					if (legal_move)
+						tetronimo->origin.x -= 1;
+					break;
+				case M_RIGHT:
+					if (x_max == FIELD_X-1){
+						legal_move = false;
+						break;
+					}
+					switch(d_rot){
+						case D_0:
+							//   0
+							// 3 1
+							//   2
+							for (int i = 0; i <= 2; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y][x+1]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+						case D_90:
+							//   3
+							// 0 1 2
+							// 
+							for (int i = 2; i <= 3; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y][x+1]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+						case D_180:
+							//   0 
+							//   1 3
+							//   2
+							for (int i = 0; i < TETRA; i++){
+								if (i != 1){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y][x+1]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+						case D_270:
+							//
+							// 0 1 2
+							//   3
+							for (int i = 2; i <= 3; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y][x+1]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+					}
+					if (legal_move)
+						tetronimo->origin.x += 1;
+
+					break;
+				case M_UP:
+					switch(d_rot){
+						case D_0:
+							//   0
+							// 3 1
+							//   2
+							for (int i = 0; i <= 3; i++){
+								if (i != 1){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y-1][x]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+						case D_90:
+							//   3
+							// 0 1 2
+							// 
+							for (int i = 0; i < TETRA; i++){
+								if (i != 1){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y-1][x]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+						case D_180:
+							//   0 
+							//   1 3
+							//   2
+							for (int i = 0; i <= 3; i++){
+								if (i != 1){
+									x = tetronimo->pieces[i].x;
+									y = tetronimo->pieces[i].y;
+									if (play_field[y-1][x]){
+										legal_move = false;
+										break;
+									}
+								}
+							}
+							break;
+						case D_270:
+							//
+							// 0 1 2
+							//   3
+							for (int i = 0; i <= 2; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y-1][x]){
+									legal_move = false;
+									break;
+								}
+							}
+							break;
+					}
+					if (legal_move){
+						tetronimo->origin.y -= 1;
+					}
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown move\n");
+					break;
+			}
+		}
+		break;
 		default:
 			fprintf(stderr, "Error: Unknown T_Type in move_Tetronimo()\n");
 			break;
 	}
 	// Set piece coords in tetronimo struct
-	set_Piece(tetronimo);
-	// Set tetronimo to play_field
 	set_Tetronimo(tetronimo); 
+	// Set tetronimo to play_field
+	set_To_Field(tetronimo);
 	return is_falling;
-}
-
-
-void init_test_1(){
-	for (int y = 37; y <= FIELD_Y-1; y++){
-		for (int x = 0; x < FIELD_X-1; x++){
-			play_field[y][x] = 2;
-		}
-	}
-}
-
-void init_test_2(){
-	for (int y = 30; y <= FIELD_Y-1; y++){
-		if (y != 38)
-			for (int x = 0; x < FIELD_X-1; x++){
-				play_field[y][x] = 2;
-			}
-	}
-	for (int x = 4; x <= 8; x++){
-		play_field[38][x] = 3;
-	}
 }

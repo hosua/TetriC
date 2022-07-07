@@ -13,7 +13,7 @@ bool TickCounter(){
 	if (curr_tick > _last_tick + _tick){
 		_num_ticks_passed++;	
 		_last_tick += _tick;
-		printf("Tick: %i\n", _num_ticks_passed);
+		if (VERBOSE) printf("Tick: %i\n", _num_ticks_passed);
 		return true;
 	}
 	return false;

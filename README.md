@@ -23,7 +23,7 @@ Graphics are rendered using SDL 2.0.
 - [x] Z-Piece
 - [x] L-Piece
 - [x] J-Piece
-- [ ] T-Piece
+- [x] T-Piece
 
 This is a work in progress. There is still a lot to be done so I'm not going to bother 
 writing too much about it yet.

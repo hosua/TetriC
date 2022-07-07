@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define VERBOSE true
 #define SCREEN_X 800
 #define SCREEN_Y 550
 #define FIELD_X 10
@@ -92,26 +93,21 @@ Tetronimo* new_Piece(T_Type t_type);
 
 void print_Tetronimo_Coords(Tetronimo *tetronimo);
 
-
-// set_Piece() and set_Tetronimo() are helper functions and should not be called directly 
-// Sets the coordinates of the pieces array in a tetronimo struct
-void set_Piece(Tetronimo* tetronimo);
-// Sets the tetronimo to the play_field
-void set_Tetronimo(Tetronimo* tetronimo);
 // Returns true or false indicating if the piece is still falling or not
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
+
+// set_To_Field() and set_Tetronimo() are helper functions for move_Tetronimo() and should not be called directly 
+// Sets the coordinates of the pieces array in a tetronimo struct
+void set_Tetronimo(Tetronimo* tetronimo);
+// Sets the tetronimo to the play_field
+void set_To_Field(Tetronimo* tetronimo);
 
 // Checks for full lines and clears them 
 void CheckLines();
 
-// CheckLines() helpers
+// CheckLines() helper functions
 void ShiftLine(uint8_t y);
 void ClearLine(uint8_t y);
 bool* GetLinesToClear();
 
-
-// Testing
-void init_test_1();
-
-void init_test_2();
 #endif // TETRIS_H

@@ -48,7 +48,7 @@ int main(){
 			if (!is_falling){
 				free(tetronimo);
 				tetronimo = rand_Piece();
-				// tetronimo = new_Piece(T_L);
+				// tetronimo = new_Piece(T_J);
 				CheckLines();
 			}
 			// PrintPlayField();

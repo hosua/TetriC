@@ -107,7 +107,10 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 			// Teal 
 			SDL_SetRenderDrawColor(renderer, 4, 224, 224, 255);
 			break;
-
+		case T_T:
+			// Pink
+			SDL_SetRenderDrawColor(renderer, 255, 71, 252, 255);
+			break;
 		default:
 			// printf("INVALID\n");
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
