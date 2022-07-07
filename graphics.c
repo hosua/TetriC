@@ -100,6 +100,10 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 			SDL_SetRenderDrawColor(renderer, 179, 2, 2, 255);
 			break;
 		case T_L:
+			// Orange
+			SDL_SetRenderDrawColor(renderer, 255, 187, 0, 255);
+			break;
+		case T_J:
 			// Teal 
 			SDL_SetRenderDrawColor(renderer, 4, 224, 224, 255);
 			break;

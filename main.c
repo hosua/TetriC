@@ -31,10 +31,11 @@ int main(){
 		printf("Error initializing SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
-	
+
+	// init_test_2();	
 	ClearScreen(window, renderer);
 	Tetronimo* tetronimo = rand_Piece();
-	// Tetronimo* tetronimo = new_Piece(T_L);
+	// Tetronimo* tetronimo = new_Piece(T_J);
 								 
 	for ( ;  ; ){
 		// Get user input
@@ -48,7 +49,7 @@ int main(){
 				free(tetronimo);
 				tetronimo = rand_Piece();
 				// tetronimo = new_Piece(T_L);
-				ClearLines();
+				CheckLines();
 			}
 			// PrintPlayField();
 		}

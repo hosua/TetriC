@@ -101,10 +101,17 @@ void set_Tetronimo(Tetronimo* tetronimo);
 // Returns true or false indicating if the piece is still falling or not
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
 
-// Clears lines when a full one (or more) are detected
-void ClearLines();
+// Checks for full lines and clears them 
+void CheckLines();
 
-// Helper functions for ClearLines()
-uint8_t* GetLinesToClear(uint8_t *lines_to_clear);
-void ShiftLines(uint8_t y_min, uint8_t lines_cleared);
+// CheckLines() helpers
+void ShiftLine(uint8_t y);
+void ClearLine(uint8_t y);
+bool* GetLinesToClear();
+
+
+// Testing
+void init_test_1();
+
+void init_test_2();
 #endif // TETRIS_H
