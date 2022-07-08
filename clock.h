@@ -10,4 +10,5 @@ extern uint32_t _last_tick;
 extern uint32_t _num_ticks_passed;
 
 // Returns true if a tick occurred;
-bool TickCounter();
+bool TickTimer();
+bool InputTimer();

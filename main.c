@@ -39,11 +39,21 @@ int main(){
 								 
 	for ( ;  ; ){
 		// Get user input
-		InputController(window, renderer, tetronimo);
+		SDL_Event event; 
+		SDL_PollEvent(&event);
+		SetKeyArray(event, window);
+
+		RotationHandler(event, window, renderer, tetronimo);
+
 		ClearScreen(window, renderer);
 		RenderPlayField(window, renderer);
+		
+		if (InputTimer()){
+			PrintKeys();
+			MovementHandler(window, renderer, tetronimo);
+		}
 
-		if (TickCounter()){
+		if (TickTimer()){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				free(tetronimo);
