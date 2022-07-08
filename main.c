@@ -7,7 +7,7 @@
 // and then this variable is set to true again.
 bool is_falling = false;
 
-int main(){
+int main(int argc, char **argv){
 	// seed the RNG
 	srand(time(0));
 
