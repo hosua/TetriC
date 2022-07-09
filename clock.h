@@ -1,6 +1,14 @@
+#ifndef CLOCK_H
+#define CLOCK_H
+
+#ifdef WIN32
+#include <windows.h>
+#endif // WIN32
+
+
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL.h>
-// #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 
 #include <stdbool.h>
@@ -19,3 +27,4 @@ bool InputTimer();
 // Cross platform microseconds sleep
 void sleep_us(int microseconds);
 
+#endif // CLOCK_H

@@ -33,7 +33,6 @@ int main(int argc, char **argv){
 		exit(1);
 	}
 	
-	SDL_Rect rect;
 	SDL_Texture *texture = NULL;
 	
 	// The points accrued from holding down
@@ -84,8 +83,6 @@ int main(int argc, char **argv){
 				}
 				down_points = 0;
 			}
-			// printf("FPS: %f\n", 1.0f/_fps);
-			// PrintPlayField();
 		}
 
 		// Render the field
@@ -95,8 +92,8 @@ int main(int argc, char **argv){
 		// Render the UI elements
 		RenderUI(buf, buf_max, window, renderer, texture, font);
 		// Present the renderings to the screen
-		SDL_RenderPresent(renderer); 
 		SDL_DestroyTexture(texture);
+		SDL_RenderPresent(renderer); 
 		sleep_us(16667);
 		// Calculate FPS
 		uint64_t end = SDL_GetPerformanceCounter();
