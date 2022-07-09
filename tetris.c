@@ -2,9 +2,21 @@
 #include "tetris.h"
 
 uint32_t _lines_cleared = 0;
+uint32_t _player_score = 0;
+uint8_t _curr_level = 0;
+uint8_t _lines_until_level = 0;
+float _fps = 0.0f;
 
 // 10x40 (However only 10x20 is visible to the player)
 uint8_t play_field[FIELD_Y][FIELD_X] = {0};
+
+void QuitGame(SDL_Window* window){
+	printf("Game over!\n"
+		   "You cleared %i lines before losing.\n"
+		   "Your final score was: %i\n", _lines_cleared, _player_score);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
 
 // The play field is numbers from lowest to greatest, top to bottom. So the bottom of the play field is not 0, it is 39.
 int max_x(Tetronimo* tetronimo){
@@ -154,27 +166,79 @@ void ClearLine(uint8_t y_min){
 	}
 }
 // Clears and shifts lines whenever a full one is detected
-void CheckLines(){
+uint8_t CheckLines(){
+	uint8_t lines_cleared = 0;
 	bool* line_numbers = GetLinesToClear();
 	for (int y = FIELD_Y-1; y >= FIELD_Y/2; y--){
 		if (line_numbers[y]){
 			ClearLine(y);
+			lines_cleared++;
 			y++;
 			line_numbers = GetLinesToClear();
 		}
 	}
 	free(line_numbers);
+	return lines_cleared;
 }
 
 bool IsPlayerDead(){
-	for (int x = 0; x < FIELD_X; x++){
-		if (play_field[(FIELD_Y/2)-1][x]){
-			printf("Game over!\n"
-				   "You cleared %i lines before losing.\n", _lines_cleared);
+	for (int x = 0; x < FIELD_X; x++)
+		if (play_field[(FIELD_Y/2)-1][x])
 			return true;
-		}
-	}
 	return false;
+}
+
+uint8_t GetLinesUntilNextLevel(uint8_t level){
+	uint8_t lines_left = 0;
+	switch(level){
+		case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
+			lines_left = (level + 1) * 10;
+			break;
+		case 10: case 11: case 12: case 13: case 14: case 15:
+			lines_left = 100;
+			break;
+		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24: case 25:
+			break;
+		default: 
+			lines_left = 200;
+			break;
+	}
+	printf("Lines until next level: %i\n", lines_left);
+	return lines_left;
+}
+
+void LevelHandler(uint8_t* lines_left){
+	switch(_curr_level){
+
+	}
+}
+
+// Calculates and returns the score accrued from the lines cleared in a turn 
+// (This function does not include points that are added from soft dropping a piece)
+uint16_t CalcScore(uint8_t lines_cleared, uint8_t level){
+	uint16_t calculated_score = 0;
+	switch(lines_cleared){
+		case 0:
+			calculated_score = 0;
+			break;
+		case 1:
+			calculated_score = 40 * (level + 1);
+			break;
+		case 2:
+			calculated_score = 100 * (level + 1);
+			break;
+		case 3:
+			calculated_score = 300 * (level + 1);
+			break;
+		case 4:
+			calculated_score = 1200 * (level + 1);
+			break;
+		default:
+			fprintf(stderr, "Error: More than 4 lines were deleted in a single turn, this shouldn't be possible\n");
+			calculated_score = 0;
+			break;
+	}
+	return calculated_score;
 }
 
 // Sets Tetronimo with respect to its origin and degree of rotation, then calls set_To_Field()
@@ -516,8 +580,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 		case T_I:
 		{
 			switch(move){
-				case M_ROT_RIGHT: // Fall through
-				case M_ROT_LEFT:
+				case M_ROT_RIGHT: case M_ROT_LEFT:
 					switch(d_rot){
 						//     0
 						//     1

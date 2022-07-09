@@ -35,51 +35,74 @@ int main(int argc, char **argv){
 	
 	SDL_Rect rect;
 	SDL_Texture *texture = NULL;
-	// init_test_2();	
+	
+	// The points accrued from holding down
+	uint8_t down_points = 0;
 	ClearScreen(window, renderer);
 	Tetronimo* tetronimo = rand_Piece();
-	// Char buffer for rendering text
-	char buf[255];
-	uint8_t buf_max = sizeof(buf);
 	// Tetronimo* tetronimo = new_Piece(T_I);
+	
+	// Char buffer for rendering text
+	char buf[128];
+	uint8_t buf_max = sizeof(buf);
+	uint8_t lines_cleared_this_turn = 0;
+
+	_lines_until_level = GetLinesUntilNextLevel(_curr_level);
+
 	for ( ; ; ){
+		uint64_t start = SDL_GetPerformanceCounter();
 		// Get user input
 		SDL_Event event; 
 		SDL_PollEvent(&event);
-		SetKeyArray(event, window);
-
-		RotationHandler(event, window, renderer, tetronimo);
-
 		ClearScreen(window, renderer);
-		RenderPlayField(window, renderer);
+		SetKeyArray(event, window);
+		MovementHandler(event, window, renderer, tetronimo);
+
 		
 		if (InputTimer()){
-			MovementHandler(window, renderer, tetronimo);
+			DownwardMovementHandler(&down_points, window, renderer, tetronimo);
 		}
 
-		if (TickTimer()){
+		if (LevelTimer(_curr_level)){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				if (IsPlayerDead()){
-					break;
+					QuitGame(window);
 				}
-				CheckLines();
+				lines_cleared_this_turn = CheckLines();
+				_lines_until_level -= lines_cleared_this_turn;
 				free(tetronimo);
 				tetronimo = rand_Piece();
-				// tetronimo = new_Piece(T_I);
+				
+				_player_score += CalcScore(lines_cleared_this_turn, _curr_level);
+				_player_score += down_points;
+
+				if (_lines_until_level == 0){
+					// Level up
+					_curr_level++;
+					_lines_until_level = GetLinesUntilNextLevel(_curr_level);
+				}
+				down_points = 0;
 			}
+			// printf("FPS: %f\n", 1.0f/_fps);
 			// PrintPlayField();
 		}
-		
-		RenderBlocks(window, renderer);
 
-		snprintf(buf, buf_max,
-				"Lines cleared: %i", _lines_cleared);
-		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, buf, font, &texture, &rect);
-		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		// Render the field
+		RenderPlayField(window, renderer);
+		// Render Tetronimos	
+		RenderBlocks(window, renderer);
+		// Render the UI elements
+		RenderUI(buf, buf_max, window, renderer, texture, font);
+		// Present the renderings to the screen
+		SDL_RenderPresent(renderer); 
 		SDL_DestroyTexture(texture);
-		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle.
+		sleep_us(16667);
+		// Calculate FPS
+		uint64_t end = SDL_GetPerformanceCounter();
+		_fps = (end - start) / (float)SDL_GetPerformanceFrequency();
 	}
+
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }

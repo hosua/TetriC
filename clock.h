@@ -13,5 +13,9 @@ extern uint32_t _input_tick;
 extern uint32_t _last_input_tick;
 
 // Returns true if a tick occurred;
-bool TickTimer();
+bool LevelTimer(uint8_t level);
 bool InputTimer();
+
+// Cross platform microseconds sleep
+void sleep_us(int microseconds);
+

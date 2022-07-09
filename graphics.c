@@ -145,3 +145,34 @@ void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
     rect->w = text_width;
     rect->h = text_height;
 }
+
+void RenderUI(char* buf, uint16_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
+		SDL_Texture* texture, TTF_Font* font){
+	SDL_Rect rect;
+
+	snprintf(buf, buf_max,
+			"Level: %i", _curr_level);
+	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 1), buf, font, &texture, &rect);
+
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+	snprintf(buf, buf_max,
+			"Score: %i", _player_score);
+	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 2), buf, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+	snprintf(buf, buf_max,
+			"Lines until next level: %i", _lines_until_level);
+	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 3), buf, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+	snprintf(buf, buf_max,
+			"Total lines cleared: %i", _lines_cleared);
+	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 4), buf, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+	snprintf(buf, buf_max,
+			"FPS: %f", 1.0f/_fps);
+	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 20), buf, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+}

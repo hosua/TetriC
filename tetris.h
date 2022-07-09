@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define VERBOSE false
+#define VERBOSE true 
 #define SCREEN_X 800
 #define SCREEN_Y 550
 #define FIELD_X 10
@@ -24,7 +24,16 @@
 // Number of blocks per tetronimo
 #define TETRA 4 
 
+
+// First 20 (the top 20) lines respective to the y-axis are not visible.
+// 10x40 actual, 10x20 visible
+extern uint8_t play_field[FIELD_Y][FIELD_X];
+
 extern uint32_t _lines_cleared;
+extern uint32_t _player_score;
+extern uint8_t _curr_level;
+extern uint8_t _lines_until_level;
+extern float _fps;
 
 struct RGB_Color;
 struct Coords;
@@ -40,10 +49,6 @@ typedef enum {
 	M_ROT_RIGHT, 
 	M_ROT_LEFT 
 } M_Direction;
-
-// First 20 (the top 20) lines respective to the y-axis are not visible.
-// 10x40 actual, 10x20 visible
-extern uint8_t play_field[FIELD_Y][FIELD_X];
 
 // Each type of tetromino. There are 7 pieces.
 // Enums will automatically assign the next enumeration as +1 of the previous value
@@ -108,10 +113,17 @@ void set_Tetronimo(Tetronimo* tetronimo);
 void set_To_Field(Tetronimo* tetronimo);
 
 // Checks for full lines and clears them 
-void CheckLines();
+uint8_t CheckLines();
 
+uint16_t CalcScore(uint8_t lines_cleared, uint8_t level);
 // CheckLines() helper functions
 void ClearLine(uint8_t y);
 bool* GetLinesToClear();
+
+// Returns the number of lines that need to be cleared for the next level up
+uint8_t GetLinesUntilNextLevel(uint8_t level);
+
+// Exit the game and display the final score
+void QuitGame(SDL_Window* window);
 
 #endif // TETRIS_H

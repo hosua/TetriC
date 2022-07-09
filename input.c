@@ -11,9 +11,8 @@ void SetKeyArray(SDL_Event event, SDL_Window* window){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
 	if (kb_state[SDL_SCANCODE_ESCAPE]){
-		printf("Exiting... Goodbye!\n");
-		SDL_DestroyWindow(window);
-		SDL_Quit();
+		printf("Player quit the game.\n");
+		QuitGame(window);
 		exit(0);
 	}
 
@@ -50,18 +49,19 @@ const char* K_Name_to_str(K_Name k_name){
 
 // Checks the keys array and moves the piece depending on if the key is set or not
 // Holding down is the only key that we should handle repeats for. All other keys will happen 1:1 with key presses.
-void MovementHandler(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
-	if(keys[K_DOWN]) move_Tetronimo(window, renderer, tetronimo, M_DOWN);
-	// if(keys[K_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
-	// if(keys[K_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
-	// if(keys[K_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
+void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
+	if(keys[K_DOWN]){ 
+		move_Tetronimo(window, renderer, tetronimo, M_DOWN);
+		(*down_points)++;
+	}
 }
 
-// Since we don't want repeated movement for rotations, they must be implemented separately.
-void RotationHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
+// All other movement will be 1:1
+void MovementHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
-	if (event.type == SDL_KEYDOWN && !event.key.repeat){
+	if (event.type == SDL_KEYDOWN){
+	// if (event.type == SDL_KEYDOWN && !event.key.repeat){
 		// if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
 		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
 		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);

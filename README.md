@@ -15,12 +15,11 @@ Graphics are rendered using SDL 2.0.
 ### To Do List
 - [ ] Make a Makefile
 - [X] Make movement less clunky
-- [ ] Implement a UI
-- [ ] Implement player death
+- [X] Implement player death
 - [X] Implement line clearing
 - [ ] Implement previous piece
-- [ ] Implement scoring system
-- [ ] Implement leveling system
+- [X] Implement scoring system
+- [X] Implement leveling system
 - [ ] Implement a title screen
 - [ ] Implement a pause menu (or just the ability to pause)
 
