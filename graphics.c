@@ -50,7 +50,7 @@ void PrintPlayField(){
 	}
 }
 
-SDL_Rect* GetBlockLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL_Renderer* renderer){
+SDL_Rect* GetBlocksInLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
 	for (int i = 0; i < FIELD_X; i++){
 		blocks[(*num_blocks)++] = GetRect((i+1), (y+1) - FIELD_Y/2);	
@@ -63,7 +63,7 @@ void RenderBlocks(SDL_Window* window, SDL_Renderer* renderer){
 	size_t num_blocks = 0;
 	// Lines 0-19 inclusive in the play_field are off-screen and do not get rendered.
 	for (int y = FIELD_Y/2; y < FIELD_Y; y++){
-		line = GetBlockLine(y, &num_blocks, window, renderer);
+		line = GetBlocksInLine(y, &num_blocks, window, renderer);
 		for (int x = 0; x < num_blocks; x++){
 			T_Type t_type = play_field[y][x];
 			SetRenderColorByType(t_type, renderer);

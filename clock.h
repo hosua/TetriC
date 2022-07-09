@@ -9,6 +9,9 @@ extern uint32_t _tick;
 extern uint32_t _last_tick;
 extern uint32_t _num_ticks_passed;
 
+extern uint32_t _input_tick;
+extern uint32_t _last_input_tick;
+
 // Returns true if a tick occurred;
 bool TickTimer();
 bool InputTimer();

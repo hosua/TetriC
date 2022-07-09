@@ -113,14 +113,20 @@ void set_Tetronimo(Tetronimo* tetronimo){
 		// I-Piece
 		case T_I:
 			switch(d_rot){
-				// Vertical
+				//     0
+				//     1
+				//     2
+				//     3
 				case D_0: case D_180:
 					for (int i = 0; i < TETRA; i++){
 						tetronimo->pieces[i].x = origin.x - 1;
 						tetronimo->pieces[i].y = origin.y + i;
 					}
 					break;
-				// Horizontal
+				//   
+				//
+				// 0 1 2 3
+				//
 				case D_90: case D_270:
 					for (int i = 0; i < TETRA; i++){
 						tetronimo->pieces[i].x = origin.x + i - 3;
@@ -427,12 +433,11 @@ bool* GetLinesToClear(){
 	bool *line_numbers = calloc(FIELD_Y, sizeof(bool));
 
 	for (int y = 0; y < FIELD_Y; y++){
-		bool full_line = true;		
 		line_numbers[y] = LineIsFull(y);
 	}
-	for (int i = 0; i < FIELD_Y; i++){
-		if (line_numbers[i]){
-			printf("Line %i will be cleared.\n", i);
+	for (int y = 0; y < FIELD_Y; y++){
+		if (line_numbers[y]){
+			printf("Line %i will be cleared.\n", y);
 		}
 	}
 	return line_numbers;
@@ -444,10 +449,12 @@ void ClearLine(uint8_t y){
 	}
 }
 // TODO: Shifting the lines isn't as straightforward as I originally thought
-void ShiftLine(uint8_t y){
-	for (int x = 0; x < FIELD_X; x++){
-		play_field[y+1][x] = play_field[y][x];
-		play_field[y][x] = T_NONE;
+void ShiftLine(uint8_t y_min){
+	for (int y = y_min; y >= FIELD_Y/2; y--){
+		for (int x = 0; x < FIELD_X; x++){
+			play_field[y+1][x] = play_field[y][x];
+			play_field[y][x] = T_NONE;
+		}
 	}
 }
 // TODO: This is not right lol
@@ -457,9 +464,12 @@ void CheckLines(){
 	printf("\n");
 	for (int y = FIELD_Y-1; y >= FIELD_Y/2; y--){
 		printf("%i ", line_numbers[y]);
-		if (LineIsFull(y)){
+		if (line_numbers[y]){
 			ClearLine(y);
 			ShiftLine(y+1);
+			free(line_numbers);
+			line_numbers = GetLinesToClear();
+			y = FIELD_Y-1;
 		}
 	}
 	printf("\n");
@@ -504,55 +514,74 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 			switch(move){
 				case M_ROT_RIGHT: // Fall through
 				case M_ROT_LEFT:
-					// TODO: Need to implement bounary checks before performing the rotation
-					if (d_rot == D_0 || d_rot == D_180){
-						// Check bounds
-						if (x_min <= 1 || x_max >= FIELD_X-1 || y_max == FIELD_Y-1)
-							legal_move = false;
+					switch(d_rot){
+						//     0
+						//     1
+						//     2
+						//     3
+						case D_0: case D_180:
+							// Check bounds
+							if (x_min <= 1 || x_max >= FIELD_X-1 || y_max == FIELD_Y-1)
+								legal_move = false;
 
-						for (int i = 0; i < TETRA; i++){
-							// Ignore the overlapping piece
-							if (i != 2){
-								x = origin.x + i - 3;
-								y = origin.y + 2;
-								if (play_field[y][x]){
-									legal_move = false;
-									break;
+							for (int i = 0; i < TETRA; i++){
+								// Ignore the overlapping piece
+								if (i != 2){
+									x = origin.x + i - 3;
+									y = origin.y + 2;
+									if (play_field[y][x]){
+										legal_move = false;
+										break;
+									}
 								}
 							}
-						}
-					} else { // D_90, D_270
-						for (int i = 0; i < TETRA; i++){
-							// Ignore the overlapping piece
-							if (i != 2){
-								x = origin.x - 1;
-								y = origin.y + i;
-								if (play_field[y][x]){
-									legal_move = false;
-									break;
+							break;
+						//
+						//
+						// 0 1 2 3
+						//
+						case D_90: case D_270:
+							for (int i = 0; i < TETRA; i++){
+								if (i != 2){
+									x = origin.x - 1;
+									y = origin.y + i;
+									if (play_field[y][x]){
+										legal_move = false;
+										break;
+									}
 								}
 							}
-						}
-
+							break;
 					}
+					
 					// We are technically rotating it right for both left and right, but it doesn't matter for the I-Piece.
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					break;
 				case M_DOWN:
-					if (d_rot == D_0 || d_rot == D_180){
-						if (y_max == FIELD_Y-1 || play_field[y_max+1][x_max])
-							legal_move = false;
-					} else {
-						for (int i = 0; i < TETRA; i++){
-							x = tetronimo->pieces[i].x;
-							y = tetronimo->pieces[i].y;
-							if (y == FIELD_Y-1 || play_field[y+1][x]){
+					switch(d_rot){
+						//     0
+						//     1
+						//     2
+						//     3
+						case D_0: case D_180:
+							if (y_max == FIELD_Y-1 || play_field[y_max+1][x_max])
 								legal_move = false;
-								break;
+							break;
+						//
+						//
+						// 0 1 2 3
+						//
+						case D_90: case D_270:
+							for (int i = 0; i < TETRA; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (y == FIELD_Y-1 || play_field[y+1][x]){
+									legal_move = false;
+									break;
+								}
 							}
-						}
-
+							break;
 					}
 					if (legal_move){
 						tetronimo->origin.y += 1;
@@ -562,58 +591,88 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					break;
 				case M_LEFT:
-					if (d_rot == D_0 || d_rot == D_180){
-						// Unset the move flag if it is illegal and break
-						for (int i = 0; i < TETRA; i++){
-							x = tetronimo->pieces[i].x;
-							y = tetronimo->pieces[i].y;
-							if (x == 0 || play_field[y][x-1]){
-								legal_move = false;
-								break;
+					switch(d_rot){
+						//     0
+						//     1
+						//     2
+						//     3
+						case D_0: case D_180:
+							for (int i = 0; i < TETRA; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (x == 0 || play_field[y][x-1]){
+									legal_move = false;
+									break;
+								}
 							}
-						}
-						// Piece is horizontal, which means we only need to check one unit to the left of the left-most piece.
-					} else { 						
-						if (x_min == 0 || play_field[y_max][x_min-1])
-							legal_move = false;
+							break;
+						//
+						//
+						// 0 1 2 3
+						//
+						case D_90: case D_270:
+							if (x_min == 0 || play_field[y_max][x_min-1])
+								legal_move = false;
+							break;
 					}
 					if (legal_move){
 						tetronimo->origin.x -= 1;
 					}
 					break;
 				case M_RIGHT:
-					if (d_rot == D_0 || d_rot == D_180){
-						// Unset the move flag if it is illegal and break
-						for (int i = 0; i < TETRA; i++){
-							x = tetronimo->pieces[i].x;
-							y = tetronimo->pieces[i].y;
-							if (x == FIELD_X-1 || play_field[y][x+1]){
-								legal_move = false;
-								break;
+					switch(d_rot){
+						//     0
+						//     1
+						//     2
+						//     3
+						case D_0: case D_180:
+							// Unset the move flag if it is illegal and break
+							for (int i = 0; i < TETRA; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (x == FIELD_X-1 || play_field[y][x+1]){
+									legal_move = false;
+									break;
+								}
 							}
-						}
-						// Piece is horizontal, which means we only need to check one unit to the right of the right-most piece.
-					} else { 						
-						if (x_max == FIELD_X-1 || play_field[y_max][x_max+1])
-							legal_move = false;
+							break;
+						//
+						//
+						// 0 1 2 3
+						//
+						case D_90: case D_270:
+							if (x_max == FIELD_X-1 || play_field[y_max][x_max+1])
+								legal_move = false;
+							break;
 					}
 					if (legal_move){
 						tetronimo->origin.x += 1;
 					}
 					break;
 				case M_UP:
-					if (d_rot == D_0 || d_rot == D_180){
-						if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
-							legal_move = false;
-					} else {
-						for (int i = 0; i < TETRA; i++){
-							x = tetronimo->pieces[i].x;
-							y = tetronimo->pieces[i].y;
-							if (y == (FIELD_Y/2)-1 || play_field[y-1][x]){
+					switch(d_rot){
+						//     0
+						//     1
+						//     2
+						//     3
+						case D_0: case D_180:
+							if (y_min == FIELD_Y/2 || play_field[y_min-1][x_max])
 								legal_move = false;
-								break;
+							break;
+						//
+						//
+						// 0 1 2 3
+						//
+						case D_90: case D_270:
+							for (int i = 0; i < TETRA; i++){
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (y == (FIELD_Y/2)-1 || play_field[y-1][x]){
+									legal_move = false;
+									break;
+								}
 							}
-						}
+							break;
 
 					}
 					if (legal_move){

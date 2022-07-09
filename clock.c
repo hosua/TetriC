@@ -20,10 +20,11 @@ bool TickTimer(){
 	return false;
 }
 
-uint32_t _input_tick = 40;
+uint32_t _input_tick = 50;
+
 uint32_t _last_input_tick = 0;
 
-// Input Timer should only have an effect on positional movement, and not rotation.
+// Input Timer will only have an effect on downward movement.
 bool InputTimer(){
 	uint32_t curr_tick = SDL_GetTicks();
 	if (curr_tick > _last_input_tick + _input_tick){

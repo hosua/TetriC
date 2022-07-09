@@ -1,1 +1,1 @@
-nvim -p main.c *tetris.* graphics.* input.* clock.* 
+nvim -p main.c *tetris.* graphics.* input.* clock.* test.*

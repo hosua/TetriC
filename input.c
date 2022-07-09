@@ -49,14 +49,12 @@ const char* K_Name_to_str(K_Name k_name){
 }
 
 // Checks the keys array and moves the piece depending on if the key is set or not
-// K_LEFT, K_DOWN, K_UP, KEY_RIGHT, K_Z, K_X 
-// We need to be careful to only execute this every few ms, or else movement will be too fast.
-// Bonus points for making it scale so that players can change this value to suit them
+// Holding down is the only key that we should handle repeats for. All other keys will happen 1:1 with key presses.
 void MovementHandler(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
-	if(keys[K_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
 	if(keys[K_DOWN]) move_Tetronimo(window, renderer, tetronimo, M_DOWN);
-	if(keys[K_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
-	if(keys[K_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
+	// if(keys[K_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
+	// if(keys[K_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
+	// if(keys[K_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
 }
 
 // Since we don't want repeated movement for rotations, they must be implemented separately.
@@ -64,6 +62,9 @@ void RotationHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
 	if (event.type == SDL_KEYDOWN && !event.key.repeat){
+		if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
+		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
+		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
 		if (kb_state[SDL_SCANCODE_Z]) move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
 		if (kb_state[SDL_SCANCODE_X]) move_Tetronimo(window, renderer, tetronimo, M_ROT_RIGHT);
 	}

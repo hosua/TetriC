@@ -3,6 +3,8 @@
 #include "input.h"
 #include "clock.h"
 
+#include "test.h"
+
 // Variable to determine if a piece is still falling. If one is not falling, a new piece is spawned.
 // and then this variable is set to true again.
 bool is_falling = false;
@@ -32,10 +34,10 @@ int main(int argc, char **argv){
 		exit(1);
 	}
 
-	// init_test_2();	
+	init_test_3();	
 	ClearScreen(window, renderer);
-	Tetronimo* tetronimo = rand_Piece();
-	// Tetronimo* tetronimo = new_Piece(T_J);
+	// Tetronimo* tetronimo = rand_Piece();
+	Tetronimo* tetronimo = new_Piece(T_I);
 								 
 	for ( ;  ; ){
 		// Get user input
@@ -49,7 +51,6 @@ int main(int argc, char **argv){
 		RenderPlayField(window, renderer);
 		
 		if (InputTimer()){
-			PrintKeys();
 			MovementHandler(window, renderer, tetronimo);
 		}
 
@@ -57,8 +58,8 @@ int main(int argc, char **argv){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				free(tetronimo);
-				tetronimo = rand_Piece();
-				// tetronimo = new_Piece(T_J);
+				// tetronimo = rand_Piece();
+				tetronimo = new_Piece(T_I);
 				CheckLines();
 			}
 			// PrintPlayField();
