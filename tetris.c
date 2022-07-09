@@ -443,22 +443,19 @@ bool* GetLinesToClear(){
 	return line_numbers;
 }
 
-void ClearLine(uint8_t y){
-	for (int x = 0; x < FIELD_X; x++){
-		play_field[y][x] = T_NONE;
+void ClearLine(uint8_t y_min){
+	if (y_min >= FIELD_Y || y_min <= 0){
+		fprintf(stderr, "Error: ClearLine exceeded play_field boundaries\n");
+		return;
 	}
-}
-// TODO: Shifting the lines isn't as straightforward as I originally thought
-void ShiftLine(uint8_t y_min){
 	for (int y = y_min; y >= FIELD_Y/2; y--){
 		for (int x = 0; x < FIELD_X; x++){
-			play_field[y+1][x] = play_field[y][x];
-			play_field[y][x] = T_NONE;
+			play_field[y][x] = play_field[y-1][x];
+			play_field[y-1][x] = T_NONE;
 		}
 	}
 }
-// TODO: This is not right lol
-// Clear lines when a full one (or more) is detected
+// Clears and shifts lines whenever a full one is detected
 void CheckLines(){
 	bool* line_numbers = GetLinesToClear();
 	printf("\n");
@@ -466,10 +463,8 @@ void CheckLines(){
 		printf("%i ", line_numbers[y]);
 		if (line_numbers[y]){
 			ClearLine(y);
-			ShiftLine(y+1);
-			free(line_numbers);
+			y++;
 			line_numbers = GetLinesToClear();
-			y = FIELD_Y-1;
 		}
 	}
 	printf("\n");

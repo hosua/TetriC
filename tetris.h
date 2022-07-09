@@ -106,7 +106,6 @@ void set_To_Field(Tetronimo* tetronimo);
 void CheckLines();
 
 // CheckLines() helper functions
-void ShiftLine(uint8_t y);
 void ClearLine(uint8_t y);
 bool* GetLinesToClear();
 

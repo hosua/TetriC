@@ -34,10 +34,10 @@ int main(int argc, char **argv){
 		exit(1);
 	}
 
-	init_test_3();	
+	// init_test_2();	
 	ClearScreen(window, renderer);
-	// Tetronimo* tetronimo = rand_Piece();
-	Tetronimo* tetronimo = new_Piece(T_I);
+	Tetronimo* tetronimo = rand_Piece();
+	// Tetronimo* tetronimo = new_Piece(T_I);
 								 
 	for ( ;  ; ){
 		// Get user input
@@ -57,10 +57,10 @@ int main(int argc, char **argv){
 		if (TickTimer()){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
-				free(tetronimo);
-				// tetronimo = rand_Piece();
-				tetronimo = new_Piece(T_I);
 				CheckLines();
+				free(tetronimo);
+				tetronimo = rand_Piece();
+				// tetronimo = new_Piece(T_I);
 			}
 			// PrintPlayField();
 		}
