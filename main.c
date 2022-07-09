@@ -78,6 +78,7 @@ int main(int argc, char **argv){
 				"Lines cleared: %i", _lines_cleared);
 		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, buf, font, &texture, &rect);
 		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		SDL_DestroyTexture(texture);
 		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle.
 	}
 	SDL_DestroyWindow(window);
