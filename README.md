@@ -1,4 +1,11 @@
 # TetriC
+
+```
+Controls:
+← ↓ ↑ → : movement
+z x : rotate
+```
+
 A Tetris clone written in C. 
 
 I intend on making this clone as close to the original port on the NES as possible.
