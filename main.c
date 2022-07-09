@@ -34,19 +34,19 @@ int main(int argc, char **argv){
 	}
 	
 	SDL_Texture *texture = NULL;
-	
+	init_test_2();	
 	// The points accrued from holding down
 	uint8_t down_points = 0;
 	ClearScreen(window, renderer);
-	Tetronimo* tetronimo = rand_Piece();
-	// Tetronimo* tetronimo = new_Piece(T_I);
+	// Tetronimo* tetronimo = rand_Piece();
+	Tetronimo* tetronimo = new_Piece(T_I);
 	
 	// Char buffer for rendering text
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
 	uint8_t lines_cleared_this_turn = 0;
 
-	_lines_until_level = GetLinesUntilNextLevel(_curr_level);
+	GetLinesUntilNextLevel(_curr_level);
 
 	for ( ; ; ){
 		uint64_t start = SDL_GetPerformanceCounter();
@@ -72,6 +72,7 @@ int main(int argc, char **argv){
 				_lines_until_level -= lines_cleared_this_turn;
 				free(tetronimo);
 				tetronimo = rand_Piece();
+				// tetronimo = new_Piece(T_I);
 				
 				_player_score += CalcScore(lines_cleared_this_turn, _curr_level);
 				_player_score += down_points;
@@ -79,7 +80,7 @@ int main(int argc, char **argv){
 				if (_lines_until_level == 0){
 					// Level up
 					_curr_level++;
-					_lines_until_level = GetLinesUntilNextLevel(_curr_level);
+					GetLinesUntilNextLevel(_curr_level);
 				}
 				down_points = 0;
 			}

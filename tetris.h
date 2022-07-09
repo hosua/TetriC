@@ -120,8 +120,8 @@ uint16_t CalcScore(uint8_t lines_cleared, uint8_t level);
 void ClearLine(uint8_t y);
 bool* GetLinesToClear();
 
-// Returns the number of lines that need to be cleared for the next level up
-uint8_t GetLinesUntilNextLevel(uint8_t level);
+// Sets global lines until next level for every level up
+void GetLinesUntilNextLevel(uint8_t level);
 
 // Exit the game and display the final score
 void QuitGame(SDL_Window* window);

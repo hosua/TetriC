@@ -188,29 +188,23 @@ bool IsPlayerDead(){
 	return false;
 }
 
-uint8_t GetLinesUntilNextLevel(uint8_t level){
-	uint8_t lines_left = 0;
+void GetLinesUntilNextLevel(uint8_t level){
+	printf("Level %i\n", level);
 	switch(level){
 		case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
-			lines_left = (level + 1) * 10;
+			_lines_until_level = (level + 1) * 10;
 			break;
 		case 10: case 11: case 12: case 13: case 14: case 15:
-			lines_left = 100;
+			_lines_until_level = 100;
 			break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24: case 25:
+			_lines_until_level = (level - 5) * 10;
 			break;
 		default: 
-			lines_left = 200;
+			_lines_until_level = 200;
 			break;
 	}
-	printf("Lines until next level: %i\n", lines_left);
-	return lines_left;
-}
-
-void LevelHandler(uint8_t* lines_left){
-	switch(_curr_level){
-
-	}
+	printf("Lines until next level: %i\n", _lines_until_level);
 }
 
 // Calculates and returns the score accrued from the lines cleared in a turn 
