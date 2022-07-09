@@ -39,6 +39,9 @@ int main(int argc, char **argv){
 	// init_test_2();	
 	ClearScreen(window, renderer);
 	Tetronimo* tetronimo = rand_Piece();
+	// Char buffer for rendering text
+	char buf[255];
+	uint8_t buf_max = sizeof(buf);
 	// Tetronimo* tetronimo = new_Piece(T_I);
 	for ( ;  ; ){
 		// Get user input
@@ -65,14 +68,14 @@ int main(int argc, char **argv){
 			}
 			// PrintPlayField();
 		}
-
+		
 		RenderBlocks(window, renderer);
-		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, "Lines cleared: ", font, &texture, &rect);
+
+		snprintf(buf, buf_max,
+				"Lines cleared: %i", _lines_cleared);
+		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, buf, font, &texture, &rect);
 		SDL_RenderCopy(renderer, texture, NULL, &rect);
-		RenderNumber(renderer, (BLOCK_SIZE * 18), BLOCK_SIZE, _lines_cleared, font, &texture, &rect);
-		SDL_RenderCopy(renderer, texture, NULL, &rect);
-		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
-	
+		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle.
 	}
 	SDL_DestroyWindow(window);
 	SDL_Quit();

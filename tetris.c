@@ -106,6 +106,66 @@ void set_To_Field(Tetronimo* tetronimo){
 	}
 }
 
+void print_Tetronimo_Coords(Tetronimo *tetronimo){
+	Coords* coords = tetronimo->pieces;
+	for (int i = 0; i < TETRA; i++)
+		printf("(%i, %i) ", coords[i].x, coords[i].y);
+	printf("\n");
+}
+
+
+bool LineIsFull(uint8_t y){
+	bool is_full = true;
+	for (int x = 0; x < FIELD_X; x++){
+		if(!play_field[y][x]){
+			is_full = false;
+			break;
+		}
+	}
+	return is_full;
+}
+// Returns an array of the indicies of the lines to clear. If a line's value is 0, then it is
+// not a line to clear.
+// Helper function for CheckLines()
+bool* GetLinesToClear(){
+	// If lines[i] == 1; then it is a line we are clearing. 
+	bool *line_numbers = calloc(FIELD_Y, sizeof(bool));
+
+	for (int y = 0; y < FIELD_Y; y++)
+		line_numbers[y] = LineIsFull(y);
+
+	return line_numbers;
+}
+
+// Clears and shifts all lines above the cleared line down once
+// Helper function for CheckLines()
+void ClearLine(uint8_t y_min){
+	// Increment global lines cleared counter
+	_lines_cleared++;
+	if (y_min >= FIELD_Y || y_min <= 0){
+		fprintf(stderr, "Error: ClearLine exceeded play_field boundaries\n");
+		return;
+	}
+	for (int y = y_min; y >= FIELD_Y/2; y--){
+		for (int x = 0; x < FIELD_X; x++){
+			play_field[y][x] = play_field[y-1][x];
+			play_field[y-1][x] = T_NONE;
+		}
+	}
+}
+// Clears and shifts lines whenever a full one is detected
+void CheckLines(){
+	bool* line_numbers = GetLinesToClear();
+	for (int y = FIELD_Y-1; y >= FIELD_Y/2; y--){
+		if (line_numbers[y]){
+			ClearLine(y);
+			y++;
+			line_numbers = GetLinesToClear();
+		}
+	}
+	free(line_numbers);
+}
+
 // Sets Tetronimo with respect to its origin and degree of rotation, then calls set_To_Field()
 void set_Tetronimo(Tetronimo* tetronimo){
 	Coords origin = tetronimo->origin;
@@ -407,69 +467,6 @@ D_Rot rotate_Tetronimo(Tetronimo* tetronimo, M_Direction move){
 			break;
 	}
 	return d_rot;
-}
-
-void print_Tetronimo_Coords(Tetronimo *tetronimo){
-	Coords* coords = tetronimo->pieces;
-	for (int i = 0; i < TETRA; i++)
-		printf("(%i, %i) ", coords[i].x, coords[i].y);
-	printf("\n");
-}
-
-
-bool LineIsFull(uint8_t y){
-	bool is_full = true;
-	for (int x = 0; x < FIELD_X; x++){
-		if(!play_field[y][x]){
-			is_full = false;
-			break;
-		}
-	}
-	return is_full;
-}
-// Returns an array of the indicies of the lines to clear. If a line's value is 0, then it is
-// not a line to clear.
-// Helper function for CheckLines()
-bool* GetLinesToClear(){
-	// If lines[i] == 1; then it is a line we are clearing. 
-	bool *line_numbers = calloc(FIELD_Y, sizeof(bool));
-
-	for (int y = 0; y < FIELD_Y; y++)
-		line_numbers[y] = LineIsFull(y);
-
-	return line_numbers;
-}
-
-// Clears and shifts all lines above the cleared line down once
-// Helper function for CheckLines()
-void ClearLine(uint8_t y_min){
-	// Increment global lines cleared counter
-	_lines_cleared++;
-	if (y_min >= FIELD_Y || y_min <= 0){
-		fprintf(stderr, "Error: ClearLine exceeded play_field boundaries\n");
-		return;
-	}
-	for (int y = y_min; y >= FIELD_Y/2; y--){
-		for (int x = 0; x < FIELD_X; x++){
-			play_field[y][x] = play_field[y-1][x];
-			play_field[y-1][x] = T_NONE;
-		}
-	}
-}
-// Clears and shifts lines whenever a full one is detected
-void CheckLines(){
-	bool* line_numbers = GetLinesToClear();
-	printf("\n");
-	for (int y = FIELD_Y-1; y >= FIELD_Y/2; y--){
-		if (line_numbers[y]){
-			ClearLine(y);
-			printf("Cleared line %i\n", y);
-			y++;
-			line_numbers = GetLinesToClear();
-		}
-	}
-	printf("\n");
-	free(line_numbers);
 }
 
 // Move tetronimo handles actually moving the pieces to their respective coordinates, as well as checking if a move 

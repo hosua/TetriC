@@ -28,5 +28,5 @@ Graphics are rendered using SDL 2.0.
 This is a work in progress. There is still a lot to be done so I'm not going to bother 
 writing too much about it yet.
 
-![TetriC-alpha](images/TetriC-7.gif)
+![TetriC-alpha](images/TetriC-8.gif)
 

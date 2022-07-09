@@ -62,7 +62,7 @@ void RotationHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
 	if (event.type == SDL_KEYDOWN && !event.key.repeat){
-		if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
+		// if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
 		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
 		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
 		if (kb_state[SDL_SCANCODE_Z]) move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
