@@ -14,12 +14,28 @@ SDL_Rect GetRect(uint8_t x, uint8_t y){
 
 // Int to string conversion;
 char* to_string(int n){
+	if (n == 0)
+		return "0";
 	int places = 0;
 	for (int m = n ; m; m /= 10, places++);
 	char* output = (char*)malloc(places+1);
 	output[places] = '\0';
 	for ( ; n; n /= 10, places--)
 		output[places-1] = (n % 10) + '0';
+	return output;
+}
+
+char* GetLinesClearedStr(){
+	char* num_str = to_string(_lines_cleared);
+	const char* pre = "Lines cleared:";	
+	char* output = (char*)malloc(14 + strlen(num_str) + 1);	
+	char* op = output;
+	for (const char* pp = pre; *pp; pp++){
+		*op++ = *pp;
+	}
+	*op++ = ' ';
+	// Reminder: Do not use strcat with any string literals
+	strcat(op, num_str);
 	return output;
 }
 
@@ -122,4 +138,24 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer){
 void ClearScreen(SDL_Window* window, SDL_Renderer* renderer){
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
+}
+
+
+// Text stuff
+void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
+        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
+    int text_width;
+    int text_height;
+    SDL_Surface *surface;
+    SDL_Color textColor = {255, 255, 255, 0};
+
+    surface = TTF_RenderText_Solid(font, text, textColor);
+    *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    text_width = surface->w;
+    text_height = surface->h;
+    SDL_FreeSurface(surface);
+    rect->x = x;
+    rect->y = y;
+    rect->w = text_width;
+    rect->h = text_height;
 }

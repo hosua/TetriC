@@ -1,6 +1,8 @@
 #include "graphics.h"
 #include "tetris.h"
 
+uint32_t _lines_cleared = 0;
+
 // 10x40 (However only 10x20 is visible to the player)
 uint8_t play_field[FIELD_Y][FIELD_X] = {0};
 
@@ -427,23 +429,22 @@ bool LineIsFull(uint8_t y){
 }
 // Returns an array of the indicies of the lines to clear. If a line's value is 0, then it is
 // not a line to clear.
-// Helper function for ClearLines()
+// Helper function for CheckLines()
 bool* GetLinesToClear(){
 	// If lines[i] == 1; then it is a line we are clearing. 
 	bool *line_numbers = calloc(FIELD_Y, sizeof(bool));
 
-	for (int y = 0; y < FIELD_Y; y++){
+	for (int y = 0; y < FIELD_Y; y++)
 		line_numbers[y] = LineIsFull(y);
-	}
-	for (int y = 0; y < FIELD_Y; y++){
-		if (line_numbers[y]){
-			printf("Line %i will be cleared.\n", y);
-		}
-	}
+
 	return line_numbers;
 }
 
+// Clears and shifts all lines above the cleared line down once
+// Helper function for CheckLines()
 void ClearLine(uint8_t y_min){
+	// Increment global lines cleared counter
+	_lines_cleared++;
 	if (y_min >= FIELD_Y || y_min <= 0){
 		fprintf(stderr, "Error: ClearLine exceeded play_field boundaries\n");
 		return;
@@ -460,9 +461,9 @@ void CheckLines(){
 	bool* line_numbers = GetLinesToClear();
 	printf("\n");
 	for (int y = FIELD_Y-1; y >= FIELD_Y/2; y--){
-		printf("%i ", line_numbers[y]);
 		if (line_numbers[y]){
 			ClearLine(y);
+			printf("Cleared line %i\n", y);
 			y++;
 			line_numbers = GetLinesToClear();
 		}
@@ -547,6 +548,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								}
 							}
 							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
 					}
 					
 					// We are technically rotating it right for both left and right, but it doesn't matter for the I-Piece.
@@ -576,6 +580,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 									break;
 								}
 							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
 							break;
 					}
 					if (legal_move){
@@ -609,6 +616,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							if (x_min == 0 || play_field[y_max][x_min-1])
 								legal_move = false;
 							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
 					}
 					if (legal_move){
 						tetronimo->origin.x -= 1;
@@ -639,6 +649,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							if (x_max == FIELD_X-1 || play_field[y_max][x_max+1])
 								legal_move = false;
 							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
+							break;
 					}
 					if (legal_move){
 						tetronimo->origin.x += 1;
@@ -667,6 +680,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 									break;
 								}
 							}
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown rotation\n");
 							break;
 
 					}

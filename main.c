@@ -24,21 +24,23 @@ int main(int argc, char **argv){
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	TTF_Init();
-	TTF_Font* font = TTF_OpenFont(FONT_PATH, 25);
+	TTF_Font* font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
 	if (!font){
 		fprintf(stderr, "Error: Font not found\n");
 		exit(EXIT_FAILURE);
 	}
 	if (SDL_Init(SDL_INIT_EVERYTHING)){
-		printf("Error initializing SDL: %s\n", SDL_GetError());
+		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
-
+	
+	SDL_Rect rect;
+	SDL_Texture *texture = NULL;
 	// init_test_2();	
 	ClearScreen(window, renderer);
 	Tetronimo* tetronimo = rand_Piece();
+	char *lines_cleared_buffer = NULL;
 	// Tetronimo* tetronimo = new_Piece(T_I);
-								 
 	for ( ;  ; ){
 		// Get user input
 		SDL_Event event; 
@@ -64,8 +66,15 @@ int main(int argc, char **argv){
 			}
 			// PrintPlayField();
 		}
+		lines_cleared_buffer = GetLinesClearedStr();
+
 		RenderBlocks(window, renderer);
+		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, lines_cleared_buffer, font, &texture, &rect);
+		SDL_RenderCopy(renderer, texture, NULL, &rect);
 		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
+	
+		// Don't forget to clear char* buffers from memory
+		free(lines_cleared_buffer);
 	}
 	SDL_DestroyWindow(window);
 	SDL_Quit();

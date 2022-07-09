@@ -24,6 +24,8 @@
 // Number of blocks per tetronimo
 #define TETRA 4 
 
+extern uint32_t _lines_cleared;
+
 struct RGB_Color;
 struct Coords;
 struct Tetronimo;
