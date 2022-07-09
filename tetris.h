@@ -98,6 +98,9 @@ void print_Tetronimo_Coords(Tetronimo *tetronimo);
 // Returns true or false indicating if the piece is still falling or not
 bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
 
+// Returns true if the player lost
+bool IsPlayerDead();
+
 // set_To_Field() and set_Tetronimo() are helper functions for move_Tetronimo() and should not be called directly 
 // Sets the coordinates of the pieces array in a tetronimo struct
 void set_Tetronimo(Tetronimo* tetronimo);

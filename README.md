@@ -9,6 +9,7 @@ Graphics are rendered using SDL 2.0.
 - [ ] Make a Makefile
 - [X] Make movement less clunky
 - [ ] Implement a UI
+- [ ] Implement player death
 - [X] Implement line clearing
 - [ ] Implement previous piece
 - [ ] Implement scoring system

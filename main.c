@@ -43,7 +43,7 @@ int main(int argc, char **argv){
 	char buf[255];
 	uint8_t buf_max = sizeof(buf);
 	// Tetronimo* tetronimo = new_Piece(T_I);
-	for ( ;  ; ){
+	for ( ; ; ){
 		// Get user input
 		SDL_Event event; 
 		SDL_PollEvent(&event);
@@ -61,6 +61,9 @@ int main(int argc, char **argv){
 		if (TickTimer()){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
+				if (IsPlayerDead()){
+					break;
+				}
 				CheckLines();
 				free(tetronimo);
 				tetronimo = rand_Piece();

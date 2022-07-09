@@ -166,6 +166,17 @@ void CheckLines(){
 	free(line_numbers);
 }
 
+bool IsPlayerDead(){
+	for (int x = 0; x < FIELD_X; x++){
+		if (play_field[(FIELD_Y/2)-1][x]){
+			printf("Game over!\n"
+				   "You cleared %i lines before losing.\n", _lines_cleared);
+			return true;
+		}
+	}
+	return false;
+}
+
 // Sets Tetronimo with respect to its origin and degree of rotation, then calls set_To_Field()
 void set_Tetronimo(Tetronimo* tetronimo){
 	Coords origin = tetronimo->origin;
