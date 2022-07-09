@@ -1319,12 +1319,10 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							// 0 1 2
 							// 3    
 							for (int i = 1; i <= 3; i++){
-								if (i != 2){
-									x = tetronimo->pieces[i].x;
-									y = tetronimo->pieces[i].y;
-									if (play_field[y+1][x])
-										legal_move = false;
-								}
+								x = tetronimo->pieces[i].x;
+								y = tetronimo->pieces[i].y;
+								if (play_field[y+1][x])
+									legal_move = false;
 							}	
 							break;
 					}
