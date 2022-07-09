@@ -7,7 +7,7 @@ Graphics are rendered using SDL 2.0.
 
 ### To Do List
 - [ ] Make a Makefile
-- [ ] Make movement less clunky
+- [X] Make movement less clunky
 - [ ] Implement a UI
 - [X] Implement line clearing
 - [ ] Implement previous piece
