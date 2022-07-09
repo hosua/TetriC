@@ -86,7 +86,7 @@ bool InputTimer(){
  */
 void sleep_us(int microseconds){
     #ifdef WIN32
-        Sleep(microseconds*1000);
+        Sleep(microseconds/1000);
     #elif _POSIX_C_SOURCE >= 199309L
         struct timespec ts;
         ts.tv_sec = microseconds / 1000000;
