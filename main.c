@@ -39,7 +39,6 @@ int main(int argc, char **argv){
 	// init_test_2();	
 	ClearScreen(window, renderer);
 	Tetronimo* tetronimo = rand_Piece();
-	char *lines_cleared_buffer = NULL;
 	// Tetronimo* tetronimo = new_Piece(T_I);
 	for ( ;  ; ){
 		// Get user input
@@ -66,15 +65,14 @@ int main(int argc, char **argv){
 			}
 			// PrintPlayField();
 		}
-		lines_cleared_buffer = GetLinesClearedStr();
 
 		RenderBlocks(window, renderer);
-		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, lines_cleared_buffer, font, &texture, &rect);
+		RenderText(renderer, (BLOCK_SIZE * 12), BLOCK_SIZE, "Lines cleared: ", font, &texture, &rect);
+		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		RenderNumber(renderer, (BLOCK_SIZE * 18), BLOCK_SIZE, _lines_cleared, font, &texture, &rect);
 		SDL_RenderCopy(renderer, texture, NULL, &rect);
 		SDL_RenderPresent(renderer); // Only call RenderPresent once per cycle!
 	
-		// Don't forget to clear char* buffers from memory
-		free(lines_cleared_buffer);
 	}
 	SDL_DestroyWindow(window);
 	SDL_Quit();

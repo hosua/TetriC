@@ -28,6 +28,8 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer);
 void ClearScreen(SDL_Window* window, SDL_Renderer* renderer);
 void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
         TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
+void RenderNumber(SDL_Renderer *renderer, int x, int y, int num_to_render,
+        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 
 
 #endif // GRAPHICS_H
