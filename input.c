@@ -16,23 +16,23 @@ void SetKeyArray(SDL_Event event, SDL_Window* window){
 		exit(0);
 	}
 
-	if (kb_state[SDL_SCANCODE_LEFT]) keys[0] = true;
-	else keys[0] = false;
+	if (kb_state[SDL_SCANCODE_LEFT]) keys[K_LEFT] = true;
+	else keys[K_LEFT] = false;
 
-	if (kb_state[SDL_SCANCODE_DOWN]) keys[1] = true;
-	else keys[1] = false;
+	if (kb_state[SDL_SCANCODE_DOWN]) keys[K_DOWN] = true;
+	else keys[K_DOWN] = false;
 
-	if (kb_state[SDL_SCANCODE_UP]) keys[2] = true;
-	else keys[2] = false;
+	if (kb_state[SDL_SCANCODE_UP]) keys[K_UP] = true;
+	else keys[K_UP] = false;
 
-	if (kb_state[SDL_SCANCODE_RIGHT]) keys[3] = true;
-	else keys[3] = false;
+	if (kb_state[SDL_SCANCODE_RIGHT]) keys[K_RIGHT] = true;
+	else keys[K_RIGHT] = false;
 
-	if (kb_state[SDL_SCANCODE_Z]) keys[4] = true;
-	else keys[4] = false;
+	if (kb_state[SDL_SCANCODE_Z]) keys[K_Z] = true;
+	else keys[K_Z] = false;
 
-	if (kb_state[SDL_SCANCODE_X]) keys[5] = true;
-	else keys[5] = false;
+	if (kb_state[SDL_SCANCODE_X]) keys[K_X] = true;
+	else keys[K_X] = false;
 }
 
 const char* K_Name_to_str(K_Name k_name){
@@ -48,23 +48,30 @@ const char* K_Name_to_str(K_Name k_name){
 }
 
 // Checks the keys array and moves the piece depending on if the key is set or not
-// Holding down is the only key that we should handle repeats for. All other keys will happen 1:1 with key presses.
 void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
 	if(keys[K_DOWN]){ 
 		move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 		(*down_points)++;
 	}
+	if (keys[K_LEFT]){
+		move_Tetronimo(window, renderer, tetronimo, M_LEFT);
+		keys[K_LEFT] = false;
+	}
+	if (keys[K_RIGHT]){
+		move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
+		keys[K_RIGHT] = false;
+	}
 }
+
 
 // All other movement will be 1:1
 void MovementHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
-	if (event.type == SDL_KEYDOWN){
-	// if (event.type == SDL_KEYDOWN && !event.key.repeat){
+	if (event.type == SDL_KEYDOWN && !event.key.repeat){
 		// if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
-		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
-		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
+		// if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
+		// if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
 		if (kb_state[SDL_SCANCODE_Z]) move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
 		if (kb_state[SDL_SCANCODE_X]) move_Tetronimo(window, renderer, tetronimo, M_ROT_RIGHT);
 	}

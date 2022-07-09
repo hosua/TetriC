@@ -10,11 +10,14 @@ A Tetris clone written in C.
 
 I intend on making this clone as close to the original port on the NES as possible.
 
-Graphics are rendered using SDL 2.0.
+Graphics are rendered using SDL 2.0, so if you want to compile this from source you will need to download
+the SDL2 library files for your OS.
+
+This is a work in progress. 
 
 ### To Do List
 - [ ] Make a Makefile
-- [X] Make movement less clunky
+- [X] Make movement less clunky - Not perfect yet
 - [X] Implement player death
 - [X] Implement line clearing
 - [ ] Implement previous piece
@@ -31,9 +34,6 @@ Graphics are rendered using SDL 2.0.
 - [x] L-Piece
 - [x] J-Piece
 - [x] T-Piece
-
-This is a work in progress. There is still a lot to be done so I'm not going to bother 
-writing too much about it yet.
 
 ![TetriC-alpha](images/TetriC-8.gif)
 
