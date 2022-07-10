@@ -165,6 +165,7 @@ void RenderUI(char* buf, uint8_t buf_max, SDL_Window* window, SDL_Renderer* rend
 	snprintf(buf, buf_max,
 			"Level: %i", _curr_level);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 1), buf, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
