@@ -89,14 +89,15 @@ int main(int argc, char **argv){
 
 		_fps = elapsed;
 		// Render the field
-		RenderPlayField(window, renderer);
+		// RenderPlayField(5, 1, window, renderer);
 		// Render Tetronimos	
-		RenderBlocks(window, renderer);
+		RenderBlocks(8, 0, window, renderer);
 		// Render the UI elements
-		RenderUI(buf, buf_max, window, 
+		RenderUI((BLOCK_SIZE * 8), 0, buf, buf_max, window, 
 				renderer, texture, font);
-		RenderStats(buf, buf_max, (BLOCK_SIZE * 12), (BLOCK_SIZE * 6), 
-				renderer, texture, font);
+		
+		RenderStatsUI(3, 1, BLOCK_SIZE/1.8f, buf, buf_max,
+				font, texture, window, renderer);
 		// Present the renderings to the screen
 		SDL_RenderPresent(renderer); 
 

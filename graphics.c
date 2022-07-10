@@ -20,15 +20,14 @@ SDL_Rect* GetFieldLine(uint8_t x, uint8_t y, SDL_Window* window, SDL_Renderer* r
 	return rect_arr;
 }
 
-void RenderPlayField(SDL_Window* window, SDL_Renderer* renderer){
+void RenderPlayField(uint16_t x, uint16_t y, SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* line;
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	for (int i = 0; i < FIELD_Y/2; i++){
-		line = GetFieldLine(0, (i+1), window, renderer);
+		line = GetFieldLine(x+0, (y+i+1), window, renderer);
 		SDL_RenderDrawRects(renderer, line, FIELD_X);
 		free(line);
 	}
-	// SDL_RenderPresent(renderer);
 }
 
 void PrintPlayField(){
@@ -39,20 +38,77 @@ void PrintPlayField(){
 	}
 }
 
-SDL_Rect* GetBlocksInLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL_Renderer* renderer){
+SDL_Rect* GetBlocksInLine(uint16_t dx, uint16_t dy, uint16_t y, size_t* num_blocks, SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
 	for (int i = 0; i < FIELD_X; i++){
-		blocks[(*num_blocks)++] = GetRect((i+1), (y+1) - FIELD_Y/2, BLOCK_SIZE);	
+		blocks[(*num_blocks)++] = GetRect((dx+i+1), (dy+y+1) - FIELD_Y/2, BLOCK_SIZE);	
 	}
 	return blocks;
 }
 
-void RenderBlocks(SDL_Window* window, SDL_Renderer* renderer){
+SDL_Rect* GetTetronimoByOrigin(uint16_t x, uint16_t y, uint8_t block_size, Tetronimo* tetronimo, 
+		SDL_Window* window, SDL_Renderer* renderer){
+	SDL_Rect *blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * TETRA);
+	for (int i = 0; i < TETRA; i++){
+		blocks[i] = GetRect(x + tetronimo->pieces[i].x, y + tetronimo->pieces[i].y, block_size);
+	}
+	return blocks;
+}
+
+Tetronimo* draw_Piece(T_Type t_type, uint16_t x, uint16_t y){
+	Tetronimo* new_piece = (Tetronimo*)malloc(sizeof(Tetronimo));
+	new_piece->t_type = t_type;
+	new_piece->d_rot = D_90;
+	new_piece->origin.x = x;
+	new_piece->origin.y = y;
+	set_Tetronimo(new_piece);
+	return new_piece;
+}
+
+
+void RenderStatsUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, size_t buf_max,
+		TTF_Font* font, SDL_Texture* texture, SDL_Window* window, SDL_Renderer* renderer){
+	Tetronimo* tetronimo = NULL;
+	SDL_Rect rect;
+	SDL_Rect* rects = NULL;
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	// Lines 0-19 inclusive in the _play_field are off-screen and do not get rendered.
+	snprintf(buf, buf_max,
+			"Tetronimo");
+	RenderText(dx * block_size, dy * block_size * 1.5f, buf, renderer, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+	snprintf(buf, buf_max,
+			"Counter");
+	RenderText(dx * block_size, dy * 3.5f * block_size, buf, renderer, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+	uint8_t y;
+	for (int t_type = T_O; t_type <= T_T; t_type++){
+		y = (t_type * 2);
+		tetronimo = draw_Piece(t_type, dx, dy + y);
+		SetRenderColorByType(t_type, renderer);
+		rects = GetTetronimoByOrigin(dx, dy + y, block_size, tetronimo, window, renderer);
+
+		SDL_RenderFillRects(renderer, rects, TETRA);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		snprintf(buf, buf_max,
+				"%i", _piece_counter[t_type]);
+
+		RenderText((dx * 3) * block_size, (dy + t_type - 0.4f) * block_size * 4.0f, buf, renderer, font, &texture, &rect);
+		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		SDL_DestroyTexture(texture);
+		free(rects);
+	}
+}
+
+void RenderBlocks(uint16_t dx, uint16_t dy, 
+		SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* line;
 	size_t num_blocks = 0;
 	// Lines 0-19 inclusive in the _play_field are off-screen and do not get rendered.
 	for (int y = FIELD_Y/2; y < FIELD_Y; y++){
-		line = GetBlocksInLine(y, &num_blocks, window, renderer);
+		line = GetBlocksInLine(dx, dy, y, &num_blocks, window, renderer);
 		for (int x = 0; x < num_blocks; x++){
 			T_Type t_type = _play_field[y][x];
 			SetRenderColorByType(t_type, renderer);
@@ -113,10 +169,9 @@ void ClearScreen(SDL_Window* window, SDL_Renderer* renderer){
 	SDL_RenderClear(renderer);
 }
 
-
 // Text stuff
-void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
-        TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
+void RenderText(int x, int y, char *text,
+		SDL_Renderer *renderer, TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect) {
     int text_width;
     int text_height;
     SDL_Surface *surface;
@@ -133,62 +188,37 @@ void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
     rect->h = text_height;
 }
 
-
-void RenderStats(char* buf, uint8_t buf_max, uint16_t x, uint16_t y, SDL_Renderer* renderer,
-		SDL_Texture* texture, TTF_Font* font){
-	SDL_Rect rect;
-	snprintf(buf, buf_max,
-			"Tetronimo Counter");
-	RenderText(renderer, x, y, buf, font, &texture, &rect);
-	SDL_RenderCopy(renderer, texture, NULL, &rect);
-	SDL_DestroyTexture(texture);
-
-	for (uint8_t t_type = T_O; t_type <= T_T; t_type++){
-		snprintf(buf, buf_max,
-				"%s:", T_Type_to_str(t_type));
-		RenderText(renderer, x, y + (BLOCK_SIZE * t_type), buf, font, &texture, &rect);
-		SDL_RenderCopy(renderer, texture, NULL, &rect);
-		SDL_DestroyTexture(texture);
-
-		snprintf(buf, buf_max,
-				"%i", _piece_counter[t_type]);
-		RenderText(renderer, (x + BLOCK_SIZE), y + (BLOCK_SIZE * t_type), buf, font, &texture, &rect);
-		SDL_RenderCopy(renderer, texture, NULL, &rect);
-		SDL_DestroyTexture(texture);
-	}
-}
-
-void RenderUI(char* buf, uint8_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
+void RenderUI(uint16_t dx, uint16_t dy, char* buf, uint8_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
 		SDL_Texture* texture, TTF_Font* font){
 	SDL_Rect rect;
 	// After rendering a texture, you must always destroy it, otherwise it will leak memory
 	snprintf(buf, buf_max,
 			"Level: %i", _curr_level);
-	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 1), buf, font, &texture, &rect);
+	RenderText(dx + (BLOCK_SIZE * 12), dy + (BLOCK_SIZE * 1), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"Score: %i", _player_score);
-	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 2), buf, font, &texture, &rect);
+	RenderText(dx + (BLOCK_SIZE * 12), dy + (BLOCK_SIZE * 2), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"Lines until next level: %i", _lines_until_level);
-	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 3), buf, font, &texture, &rect);
+	RenderText(dx + (BLOCK_SIZE * 12), dy + (BLOCK_SIZE * 3), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"Total lines cleared: %i", _lines_cleared);
-	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 4), buf, font, &texture, &rect);
+	RenderText(dx + (BLOCK_SIZE * 12), dy + (BLOCK_SIZE * 4), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"FPS: %f", 1.0f/_fps);
-	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 20), buf, font, &texture, &rect);
+	RenderText(dx + (BLOCK_SIZE * 12), dy + (BLOCK_SIZE * 20), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 }

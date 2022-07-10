@@ -17,7 +17,7 @@ This is a work in progress.
 
 ### To Do List
 - [ ] Make a Makefile
-- [X] Make movement less clunky - Not perfect yet
+- [X] Make movement less clunky
 - [X] Implement player death
 - [X] Implement line clearing
 - [X] Implement tetronimo statistics
@@ -36,5 +36,5 @@ This is a work in progress.
 - [x] J-Piece
 - [x] T-Piece
 
-![TetriC-alpha](images/TetriC-10.gif)
+![TetriC-alpha](images/TetriC-11.gif)
 
