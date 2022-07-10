@@ -35,5 +35,5 @@ This is a work in progress.
 - [x] J-Piece
 - [x] T-Piece
 
-![TetriC-alpha](images/TetriC-8.gif)
+![TetriC-alpha](images/TetriC-9.gif)
 

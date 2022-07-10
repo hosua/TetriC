@@ -96,7 +96,8 @@ int main(int argc, char **argv){
 		RenderUI(buf, buf_max, window, renderer, texture, font);
 		// Present the renderings to the screen
 		SDL_RenderPresent(renderer); 
-		
+
+		// This causes issues when unfocusing on Linux	
 		// SDL_Delay(_tick);
 		// sleep_us(16667);
 		// Calculate FPS
