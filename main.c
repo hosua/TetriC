@@ -34,12 +34,12 @@ int main(int argc, char **argv){
 	}
 	
 	SDL_Texture *texture = NULL;
-	init_test_2();	
+	// init_test_2();	
 	// The points accrued from holding down
 	uint8_t down_points = 0;
 	ClearScreen(window, renderer);
-	// Tetronimo* tetronimo = rand_Piece();
-	Tetronimo* tetronimo = new_Piece(T_I);
+	Tetronimo* tetronimo = rand_Piece();
+	// Tetronimo* tetronimo = new_Piece(T_I);
 	
 	// Char buffer for rendering text
 	char buf[128];
