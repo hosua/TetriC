@@ -1,0 +1,919 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.3
+ 
+# Built for x86_64-pc-msys
+ 
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+ 
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+ 
+# This is free software: you are free to change and redistribute it.
+ 
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+
+ 
+# Make data base, printed on Sun Jul 10 15:29:44 2022
+ 
+
+ 
+# Variables
+ 
+
+ 
+# environment
+ 
+SYSTEMDRIVE = C:
+ 
+# environment
+ 
+LC_ALL = C
+ 
+# environment
+ 
+USERPROFILE = C:\Users\Hosua
+ 
+# environment
+ 
+LOCALAPPDATA = C:\Users\Hosua\AppData\Local
+ 
+# environment
+ 
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-40fabd5f-18fc-464d-a8b1-826e100159f7-sock
+ 
+# makefile (from 'Makefile', line 21)
+ 
+VPATH = $(DIRS)
+ 
+# environment
+ 
+VSCODE_CWD = C:\Users\Hosua\Desktop\Github\TetriC
+ 
+# environment
+ 
+SYSTEMROOT = C:\Windows
+ 
+# makefile (from 'Makefile', line 10)
+ 
+VERBOSE = TRUE
+ 
+# environment
+ 
+PROCESSOR_LEVEL = 25
+ 
+# environment
+ 
+PSMODULEPATH = C:\Users\Hosua\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+ 
+# default
+ 
+MAKE_COMMAND := make
+ 
+# automatic
+ 
+@D = $(patsubst %/,%,$(dir $@))
+ 
+# environment
+ 
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_2748_RIYOODMNTPGZPIVG
+ 
+# makefile (from 'Makefile', line 53)
+ 
+PSEP = $(strip $(SEP))
+ 
+# environment
+ 
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+ 
+# default
+ 
+.VARIABLES := 
+ 
+# automatic
+ 
+%D = $(patsubst %/,%,$(dir $%))
+ 
+# automatic
+ 
+^D = $(patsubst %/,%,$(dir $^))
+ 
+# environment
+ 
+VSCODE_LOG_STACK = false
+ 
+# automatic
+ 
+%F = $(notdir $%)
+ 
+# environment
+ 
+VSCODE_CODE_CACHE_PATH = C:\Users\Hosua\AppData\Roaming\Code\CachedData\30d9c6cd9483b2cc586687151bcbcd635f373630
+ 
+# environment
+ 
+LANG = C
+ 
+# default
+ 
+.LOADED := 
+ 
+# environment
+ 
+TMP = /c/Users/Hosua/AppData/Local/Temp
+ 
+# default
+ 
+.INCLUDE_DIRS = /usr/include /usr/include
+ 
+# makefile
+ 
+MAKEFLAGS = pqrR
+ 
+# environment
+ 
+ONEDRIVE = C:\Users\Hosua\OneDrive
+ 
+# makefile (from 'Makefile', line 3)
+ 
+SOURCEDIR := /c/Users/Hosua/Desktop/Github/TetriC/src
+ 
+# makefile
+ 
+CURDIR := /c/Users/Hosua/Desktop/Github/TetriC
+ 
+# environment
+ 
+VSCODE_PIPE_LOGGING = true
+ 
+# makefile (from 'Makefile', line 40)
+ 
+RMDIR = -RMDIR /S /Q
+ 
+# environment
+ 
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+ 
+# makefile (from 'Makefile', line 63)
+ 
+define generateRules
+ 
+$(1)/%.o: %.c
+ 
+	$(HIDE)@echo Building $$@
+ 
+	$(CC) $$(CCFLAGS) -c -g $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD
+ 
+endef
+ 
+# automatic
+ 
+*D = $(patsubst %/,%,$(dir $*))
+ 
+# makefile (from 'Makefile', line 13)
+ 
+DIRS = src
+ 
+# environment
+ 
+PROGRAMFILES = C:\Program Files
+ 
+# environment
+ 
+MFLAGS = -pqrR
+ 
+# default
+ 
+.SHELLFLAGS := -c
+ 
+# environment
+ 
+!C: = c:\Users\Hosua\Desktop\Github\TetriC
+ 
+# makefile (from 'Makefile', line 57)
+ 
+HIDE = 
+ 
+# environment
+ 
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+ 
+# automatic
+ 
++D = $(patsubst %/,%,$(dir $+))
+ 
+# makefile (from 'Makefile', line 1)
+ 
+MAKEFILE_LIST := Makefile
+ 
+# automatic
+ 
+@F = $(notdir $@)
+ 
+# makefile (from 'Makefile', line 2)
+ 
+PROJDIR := /c/Users/Hosua/Desktop/Github/TetriC
+ 
+# environment
+ 
+VSCODE_VERBOSE_LOGGING = true
+ 
+# environment
+ 
+VSCODE_PID = 2748
+ 
+# automatic
+ 
+?D = $(patsubst %/,%,$(dir $?))
+ 
+# makefile (from 'Makefile', line 18)
+ 
+INCLUDES = $(foreach dir, $(DIRS), $(addprefix -I, $(dir)))
+ 
+# makefile (from 'Makefile', line 35)
+ 
+CCFLAGS = -lSDL2 -lSDL2_ttf -g -Wall
+ 
+# automatic
+ 
+*F = $(notdir $*)
+ 
+# makefile (from 'Makefile', line 42)
+ 
+ERRIGNORE = 2>NUL || true
+ 
+# automatic
+ 
+<D = $(patsubst %/,%,$(dir $<))
+ 
+# environment
+ 
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+ 
+# default
+ 
+MAKE_HOST := x86_64-pc-msys
+ 
+# makefile (from 'Makefile', line 27)
+ 
+OBJS := src/clock.o src/graphics.o src/input.o src/main.o src/queue.o src/test.o src/tetris.o
+ 
+# environment
+ 
+PROGRAMDATA = C:\ProgramData
+ 
+# default
+ 
+SHELL := /bin/sh
+ 
+# environment
+ 
+HOMEPATH = \Users\Hosua
+ 
+# default
+ 
+MAKECMDGOALS := all
+ 
+# environment
+ 
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+ 
+# environment
+ 
+COMSPEC = C:\Windows\system32\cmd.exe
+ 
+# environment
+ 
+WINDIR = C:\Windows
+ 
+# environment
+ 
+MAKELEVEL := 0
+ 
+# makefile (from 'Makefile', line 41)
+ 
+MKDIR = -mkdir
+ 
+# default
+ 
+MAKE = $(MAKE_COMMAND)
+ 
+# environment
+ 
+PATH = /c/Windows/system32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Windows/System32/OpenSSH:/c/Users/Hosua/AppData/Local/Microsoft/WindowsApps:/mingw64/bin:/c/Program Files/Vim/vim82:/c/Program Files (x86)/Vim/vim82:/c/Users/Hosua/AppData/Local/Programs/Microsoft VS Code:/c/Program Files/Git/cmd:/usr/bin:/c/Users/Hosua/AppData/Local/Programs/Python/Python310/Scripts:/c/Users/Hosua/AppData/Local/Programs/Python/Python310:/c/Users/Hosua/AppData/Local/Microsoft/WindowsApps:/c/Users/Hosua/AppData/Local/Programs/Microsoft VS Code/bin
+ 
+# environment
+ 
+COMPUTERNAME = DESKTOP-4V5VLQ2
+ 
+# default
+ 
+MAKEFILES := 
+ 
+# automatic
+ 
+^F = $(notdir $^)
+ 
+# environment
+ 
+PROMPT = $P$G
+ 
+# environment
+ 
+LOGONSERVER = \\DESKTOP-4V5VLQ2
+ 
+# environment
+ 
+VSCODE_LOG_NATIVE = false
+ 
+# environment
+ 
+USERNAME = Hosua
+ 
+# environment
+ 
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+ 
+# automatic
+ 
+?F = $(notdir $?)
+ 
+# environment
+ 
+PROGRAMW6432 = C:\Program Files
+ 
+# environment
+ 
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+ 
+# automatic
+ 
++F = $(notdir $+)
+ 
+# environment
+ 
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+ 
+# environment
+ 
+USERDOMAIN = DESKTOP-4V5VLQ2
+ 
+# 'override' directive
+ 
+GNUMAKEFLAGS := 
+ 
+# environment
+ 
+OS = Windows_NT
+ 
+# makefile
+ 
+.DEFAULT_GOAL := all
+ 
+# makefile (from 'Makefile', line 39)
+ 
+RM = del /F /Q 
+ 
+# default
+ 
+MAKE_VERSION := 4.3
+ 
+# environment
+ 
+PROGRAMFILES(X86) = C:\Program Files (x86)
+ 
+# environment
+ 
+USERDOMAIN_ROAMINGPROFILE = DESKTOP-4V5VLQ2
+ 
+# environment
+ 
+NUMBER_OF_PROCESSORS = 1
+ 
+# environment
+ 
+PUBLIC = C:\Users\Public
+ 
+# environment
+ 
+APPDATA = C:\Users\Hosua\AppData\Roaming
+ 
+# environment
+ 
+HOMEDRIVE = C:
+ 
+# environment
+ 
+PROCESSOR_ARCHITECTURE = AMD64
+ 
+# makefile (from 'Makefile', line 15)
+ 
+TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
+ 
+# environment
+ 
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+ 
+# environment
+ 
+HOME = /home/Hosua
+ 
+# environment
+ 
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+ 
+# environment
+ 
+ELECTRON_RUN_AS_NODE = 1
+ 
+# environment
+ 
+TEMP = /c/Users/Hosua/AppData/Local/Temp
+ 
+# environment
+ 
+VSCODE_IPC_HOOK = \\.\pipe\dda8f4d0c5b470730e1373ba3b351fbc-1.68.1-main-sock
+ 
+# environment
+ 
+TERM = xterm-256color
+ 
+# default
+ 
+.RECIPEPREFIX := 
+ 
+# automatic
+ 
+<F = $(notdir $<)
+ 
+# makefile (from 'Makefile', line 30)
+ 
+DEPS = $(OBJS:.o=.d)
+ 
+# default
+ 
+SUFFIXES := 
+ 
+# environment
+ 
+ALLUSERSPROFILE = C:\ProgramData
+ 
+# makefile (from 'Makefile', line 7)
+ 
+TARGET = TetriC
+ 
+# environment
+ 
+SESSIONNAME = Console
+ 
+# default
+ 
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+ 
+# environment
+ 
+PROCESSOR_REVISION = 2100
+ 
+# makefile (from 'Makefile', line 33)
+ 
+CC = gcc
+ 
+# makefile (from 'Makefile', line 4)
+ 
+BUILDDIR := /c/Users/Hosua/Desktop/Github/TetriC/build
+ 
+# makefile (from 'Makefile', line 24)
+ 
+SOURCES = $(foreach dir,$(DIRS),$(wildcard $(dir)/*.c))
+ 
+# makefile (from 'Makefile', line 43)
+ 
+SEP = \\
+ 
+# environment
+ 
+PROCESSOR_IDENTIFIER = AMD64 Family 25 Model 33 Stepping 0, AuthenticAMD
+ 
+# variable set hash-table stats:
+ 
+# Load=116/1024=11%, Rehash=0, Collisions=19/175=11%
+ 
+
+ 
+# Pattern-specific Variable Values
+ 
+
+ 
+# No pattern-specific variable values.
+ 
+
+ 
+# Directories
+ 
+
+ 
+# src (device 1657597624, inode 844424930478414): 22 files, no impossibilities.
+ 
+# . (device 1657597624, inode 1125899906875093): 17 files, no impossibilities.
+ 
+
+ 
+# 39 files, no impossibilities in 2 directories.
+ 
+
+ 
+# Implicit Rules
+ 
+
+ 
+/c/Users/Hosua/Desktop/Github/TetriC/build/src/%.o: %.c
+ 
+#  recipe to execute (from 'Makefile', line 81):
+ 
+	@echo Building $@
+ 
+	gcc $(CCFLAGS) -c -g $(INCLUDES) -o $(subst /,$(PSEP),$@) $(subst /,$(PSEP),$<) -MMD
+ 
+
+ 
+# 1 implicit rules, 0 (0.0%) terminal.
+ 
+# Files
+ 
+
+ 
+# Not a target:
+ 
+src/input.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/input.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+# Not a target:
+ 
+src/clock.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+# Not a target:
+ 
+src/test.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+Makefile:
+ 
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-07-10 12:58:02.5899067
+ 
+#  File has been updated.
+ 
+#  Successfully updated.
+ 
+
+ 
+# Not a target:
+ 
+src/clock.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+clean:
+ 
+#  Phony target (prerequisite of .PHONY).
+ 
+#  Implicit rule search has not been done.
+ 
+#  File does not exist.
+ 
+#  File has not been updated.
+ 
+#  recipe to execute (from 'Makefile', line 88):
+ 
+	$(RMDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
+ 
+	$(RM) $(TARGET) $(ERRIGNORE)
+ 
+	@echo Cleaning done ! 
+ 
+
+ 
+# Not a target:
+ 
+src/test.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+# Not a target:
+ 
+src/graphics.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/main.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/queue.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+.DEFAULT:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+all: directories TetriC
+ 
+#  Phony target (prerequisite of .PHONY).
+ 
+#  Command line target.
+ 
+#  Implicit rule search has not been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Needs to be updated (-q is set).
+ 
+# variable set hash-table stats:
+ 
+# Load=0/32=0%, Rehash=0, Collisions=0/10=0%
+ 
+
+ 
+# Not a target:
+ 
+src/queue.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+# Not a target:
+ 
+src/graphics.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+# Not a target:
+ 
+src/tetris.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+# Not a target:
+ 
+src/tetris.o:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+directories:
+ 
+#  Phony target (prerequisite of .PHONY).
+ 
+#  Implicit rule search has not been done.
+ 
+#  Implicit/static pattern stem: ''
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Needs to be updated (-q is set).
+ 
+# automatic
+ 
+# @ := directories
+ 
+# automatic
+ 
+# * := 
+ 
+# automatic
+ 
+# < := 
+ 
+# automatic
+ 
+# + := 
+ 
+# automatic
+ 
+# % := 
+ 
+# automatic
+ 
+# ^ := 
+ 
+# automatic
+ 
+# ? := 
+ 
+# automatic
+ 
+# | := 
+ 
+# variable set hash-table stats:
+ 
+# Load=8/32=25%, Rehash=0, Collisions=1/18=6%
+ 
+#  recipe to execute (from 'Makefile', line 84):
+ 
+	$(MKDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
+ 
+
+ 
+TetriC: src/clock.o src/graphics.o src/input.o src/main.o src/queue.o src/test.o src/tetris.o
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+#  recipe to execute (from 'Makefile', line 74):
+ 
+	$(HIDE)@echo Linking $@
+ 
+	$(CC) $(OBJS) $(CCFLAGS) -o $(TARGET)
+ 
+
+ 
+# Not a target:
+ 
+.SUFFIXES:
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# Not a target:
+ 
+src/main.d:
+ 
+#  Implicit rule search has been done.
+ 
+#  File does not exist.
+ 
+#  File has been updated.
+ 
+#  Failed to be updated.
+ 
+
+ 
+.PHONY: all clean directories
+ 
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+ 
+#  File has not been updated.
+ 
+
+ 
+# files hash-table stats:
+ 
+# Load=22/1024=2%, Rehash=0, Collisions=2/56=4%
+ 
+# VPATH Search Paths
+ 
+
+ 
+# No 'vpath' search paths.
+ 
+
+ 
+# General ('VPATH' variable) search path:
+ 
+# src
+ 
+
+ 
+# strcache buffers: 1 (0) / strings = 61 / storage = 594 B / avg = 9 B
+ 
+# current buf: size = 8162 B / used = 594 B / count = 61 / avg = 9 B
+ 
+
+ 
+# strcache performance: lookups = 89 / hit rate = 31%
+ 
+# hash-table stats:
+ 
+# Load=61/8192=1%, Rehash=0, Collisions=1/89=1%
+ 
+# Finished Make data base on Sun Jul 10 15:29:45 2022
+ 
+
+ 
