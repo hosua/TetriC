@@ -45,9 +45,10 @@ int main(int argc, char **argv){
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
 	uint8_t lines_cleared_this_turn = 0;
+	float elapsed = 0.0f;
+	_fps = elapsed;
 
 	GetLinesUntilNextLevel(_curr_level);
-
 	for ( ; ; ){
 		uint64_t start = SDL_GetPerformanceCounter();
 		// Get user input
@@ -86,6 +87,7 @@ int main(int argc, char **argv){
 			}
 		}
 
+		_fps = elapsed;
 		// Render the field
 		RenderPlayField(window, renderer);
 		// Render Tetronimos	
@@ -95,10 +97,12 @@ int main(int argc, char **argv){
 		// Present the renderings to the screen
 		SDL_DestroyTexture(texture);
 		SDL_RenderPresent(renderer); 
-		sleep_us(16667);
+		
+		// SDL_Delay(_tick);
+		// sleep_us(16667);
 		// Calculate FPS
 		uint64_t end = SDL_GetPerformanceCounter();
-		_fps = (end - start) / (float)SDL_GetPerformanceFrequency();
+		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
 	}
 
 	SDL_DestroyWindow(window);

@@ -53,14 +53,14 @@ void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Rende
 		move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 		(*down_points)++;
 	}
+	/*
 	if (keys[K_LEFT]){
 		move_Tetronimo(window, renderer, tetronimo, M_LEFT);
-		keys[K_LEFT] = false;
 	}
 	if (keys[K_RIGHT]){
 		move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
-		keys[K_RIGHT] = false;
 	}
+	*/
 }
 
 
@@ -70,8 +70,8 @@ void MovementHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer
 
 	if (event.type == SDL_KEYDOWN && !event.key.repeat){
 		// if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
-		// if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
-		// if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
+		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
+		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
 		if (kb_state[SDL_SCANCODE_Z]) move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
 		if (kb_state[SDL_SCANCODE_X]) move_Tetronimo(window, renderer, tetronimo, M_ROT_RIGHT);
 	}
