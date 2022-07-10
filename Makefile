@@ -12,6 +12,8 @@ VERBOSE = TRUE
 # Create the list of directories
 DIRS = src
 
+OBJDIR = objs
+
 TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
 
 # Generate the GCC includes parameters by adding -I before each source folder
@@ -24,7 +26,7 @@ VPATH = $(DIRS)
 SOURCES = $(foreach dir,$(DIRS),$(wildcard $(dir)/*.c))
 
 # Define objects for all sources
-OBJS := $(subst $(SOURCEDIR),$(BUILDDIR),$(SOURCES:.c=.o))
+OBJS := $(subst $(DIRS),$(OBJDIR),$(SOURCES:.c=.o))
 
 # Define dependencies files for all objects
 DEPS = $(OBJS:.o=.d)
@@ -33,6 +35,11 @@ DEPS = $(OBJS:.o=.d)
 CC = gcc
 
 CCFLAGS = -lSDL2 -lSDL2_ttf -g -Wall
+
+$(OBJDIR)/%.o: %.c
+	@echo "COMPILING SOURCE $< INTO OBJECT $@"
+	@mkdir -p '$(@D)'
+	@$(CC) -c $(CCFLAGS) $< -o $@
 
 # OS specific part
 ifeq ($(OS),Windows_NT)
@@ -59,13 +66,6 @@ else
     HIDE = @
 endif
 
-# Define the function that will generate each rule
-define generateRules
-$(1)/%.o: %.c
-	$(HIDE)@echo Building $$@
-	$(CC) $$(CCFLAGS) -c -g $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD
-endef
-
 .PHONY: all clean directories 
 
 all: directories $(TARGET)
@@ -74,18 +74,12 @@ $(TARGET): $(OBJS)
 	$(HIDE)@echo Linking $@
 	$(CC) $(OBJS) $(CCFLAGS) -o $(TARGET)
 
-# Include dependencies
--include $(DEPS)
-
-# Generate rules
-$(foreach targetdir, $(TARGETDIRS), $(eval $(call generateRules, $(targetdir))))
-
 directories: 
 	$(MKDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
 
 # Remove all objects, dependencies and executable files generated during the build
 clean:
-	$(RMDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
+	$(RMDIR) $(subst /,$(PSEP),$(OBJDIR)) $(ERRIGNORE)
 	$(RM) $(TARGET) $(ERRIGNORE)
 	@echo Cleaning done ! 
 
