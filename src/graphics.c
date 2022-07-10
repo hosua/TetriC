@@ -19,16 +19,6 @@ SDL_Rect* GetFieldLine(uint8_t x, uint8_t y, SDL_Window* window, SDL_Renderer* r
 	return rect_arr;
 }
 
-void RenderPlayField(uint16_t x, uint16_t y, SDL_Window* window, SDL_Renderer* renderer){
-	SDL_Rect* line;
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	for (int i = 0; i < FIELD_Y/2; i++){
-		line = GetFieldLine(x+0, (y+i+1), window, renderer);
-		SDL_RenderDrawRects(renderer, line, FIELD_X);
-		free(line);
-	}
-}
-
 void PrintPlayField(){
 	for (int i = FIELD_Y/2; i < FIELD_Y; i++){
 		for (int j = 0; j < FIELD_X; j++)
@@ -231,6 +221,8 @@ void RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size_t
 	}
 }
 
+// void RenderGhost(uint8_t dx, uint8_t dy, 
+// 		SDL_Window* window, SDL_Renderer* renderer);  
 void RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max, 		
 		SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, TTF_Font* font){
 	SDL_Rect rect;

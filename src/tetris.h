@@ -129,6 +129,6 @@ bool* GetLinesToClear();
 void GetLinesUntilNextLevel(uint8_t level);
 
 // Exit the game and display the final score
-void QuitGame(SDL_Window* window);
+void QuitGame(SDL_Window* window, SDL_Renderer* renderer);
 
 #endif // TETRIS_H

@@ -11,11 +11,13 @@ uint16_t _tetronimo_counter[NUM_TETRONIMOS+1] = {0};
 // 10x40 (However only 10x20 is visible to the player)
 T_Type _play_field[FIELD_Y][FIELD_X] = {T_NONE};
 
-void QuitGame(SDL_Window* window){
+void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 	printf("Game over!\n"
 		   "You cleared %i lines before losing.\n"
 		   "Your final score was: %i\n", _lines_cleared, _player_score);
+	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	SDL_CloseAudio();
 	SDL_Quit();
 }
 

@@ -3,6 +3,7 @@
 #include "input.h"
 #include "clock.h"
 #include "queue.h"
+#include "sounds.h"
 
 #include "test.h"
 
@@ -13,6 +14,9 @@ bool is_falling = false;
 int main(int argc, char **argv){
 	// seed the RNG
 	srand(time(0));
+
+	int sound_res = 0;
+    int flags = MIX_INIT_MP3;
 
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
@@ -33,6 +37,12 @@ int main(int argc, char **argv){
 		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
+
+	if (flags != (sound_res = Mix_Init(flags))) {
+        printf("Could not initialize mixer (result: %d).\n", sound_res);
+        printf("Mix_Init: %s\n", Mix_GetError());
+        exit(1);
+    }
 	
 	SDL_Texture *texture = NULL;
 	// init_test_2();	
@@ -64,6 +74,13 @@ int main(int argc, char **argv){
 	float elapsed = 0.0f;
 	_fps = elapsed;
 
+	/* TODO: EXPERIMENTAL CODE */
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	Mix_Music* sfx_bgm = Mix_LoadMUS("sounds/trepak.mp3");
+	// Mix_Chunk* sfx_line_clear = Mix_LoadWAV("sounds/arcade-sound.wav");
+	Mix_PlayMusic(sfx_bgm, 1);
+	/* END EXPERIMENTAL CODE */
+
 	GetLinesUntilNextLevel(_curr_level);
 	for ( ; ; ){
 		uint64_t start = SDL_GetPerformanceCounter();
@@ -71,7 +88,7 @@ int main(int argc, char **argv){
 		SDL_Event event; 
 		SDL_PollEvent(&event);
 		ClearScreen(window, renderer);
-		SetKeyArray(event, window);
+		SetKeyArray(event, window, renderer);
 		MovementHandler(event, window, renderer, tetronimo);
 
 		
@@ -83,7 +100,7 @@ int main(int argc, char **argv){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				if (IsPlayerDead()){
-					QuitGame(window);
+					QuitGame(window, renderer);
 				}
 				lines_cleared_this_turn = CheckLines();
 				_lines_until_level -= lines_cleared_this_turn;
@@ -110,8 +127,6 @@ int main(int argc, char **argv){
 		}
 
 		_fps = elapsed;
-		// Render the field
-		// RenderPlayField(5, 1, window, renderer);
 		// Render Tetronimos	
 		RenderBlocks(8, 0, window, renderer);
 		// Render the UI elements
@@ -124,15 +139,10 @@ int main(int argc, char **argv){
 				queue, font, texture, window, renderer);
 		// Present the renderings to the screen
 		SDL_RenderPresent(renderer); 
-
-		// This causes issues when unfocusing on Linux	
-		// SDL_Delay(_tick);
-		// sleep_us(16667);
 		// Calculate FPS
 		uint64_t end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
 	}
-
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	// Mix_FreeChunk(sfx_line_clear);
+	QuitGame(window, renderer);
 }

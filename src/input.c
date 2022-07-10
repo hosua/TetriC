@@ -6,12 +6,12 @@
 // K_LEFT, K_DOWN, K_UP, KEY_RIGHT, K_Z, K_X 
 bool keys[NUM_KEYS] = {0};
 
-void SetKeyArray(SDL_Event event, SDL_Window* window){
+void SetKeyArray(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
 	if (kb_state[SDL_SCANCODE_ESCAPE]){
 		printf("Player quit the game.\n");
-		QuitGame(window);
+		QuitGame(window, renderer);
 		exit(0);
 	}
 

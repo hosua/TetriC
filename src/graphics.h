@@ -18,8 +18,7 @@ SDL_Rect* GetFieldLine(uint8_t x, uint8_t y,
 		SDL_Window* window, SDL_Renderer* renderer);
 SDL_Rect* GetBlocksInLine(uint16_t dx, uint16_t dy, uint16_t y, size_t* num_blocks, 
 		SDL_Window* window, SDL_Renderer* renderer);
-void RenderPlayField(uint16_t x, uint16_t y, 
-		SDL_Window* window, SDL_Renderer* renderer);
+
 void PrintPlayField();
 
 // Renders the each block in the play field 

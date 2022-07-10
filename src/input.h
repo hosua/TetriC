@@ -20,7 +20,7 @@ extern bool keys[NUM_KEYS];
 void PrintKeys();
 
 // Sets the key array to true or false depending on the key state
-void SetKeyArray(SDL_Event event, SDL_Window* window);
+void SetKeyArray(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer);
 
 // Checks the arrow states in the keys array and moves the piece depending on if the key is set or not. 
 void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo);
