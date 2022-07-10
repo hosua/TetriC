@@ -1,4 +1,5 @@
 output="TetriC"
-flags="-lSDL2 -lSDL2_ttf -g -I. -Wall"
+path="src"
+flags="-lSDL2 -lSDL2_ttf -g -I\"$path\" -Wall"
 
-gcc *.c $flags -o "$output" && ./"$output"
+gcc "$path"/*.c $flags -o "$output" && ./"$output"

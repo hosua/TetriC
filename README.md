@@ -16,7 +16,7 @@ the SDL2 library files for your OS.
 This is a work in progress. 
 
 ### To Do List
-- [ ] Make a Makefile
+- [X] Make a Makefile
 - [X] Make movement less clunky
 - [X] Implement player death
 - [X] Implement line clearing
