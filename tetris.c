@@ -92,7 +92,7 @@ const char* D_Rot_to_str(D_Rot d_rot){
 // enum order: T_NONE T_O T_I T_S T_Z T_L T_J T_T
 Tetronimo* rand_Piece(){
 	T_Type lower = T_O;
-	T_Type upper = T_J;
+	T_Type upper = T_T;
 	T_Type rand_t_type = rand() % (upper + 1 - lower ) + lower; 
 	_piece_counter[rand_t_type]++;
 	Tetronimo* tetronimo = new_Piece(rand_t_type);
