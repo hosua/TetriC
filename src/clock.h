@@ -12,6 +12,7 @@
 #include <SDL2/SDL_timer.h>
 
 #include <stdbool.h>
+#include "input.h"
 
 extern uint32_t _tick;
 extern uint32_t _last_tick;

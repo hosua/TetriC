@@ -1,4 +1,3 @@
-#include "graphics.h"
 #include "tetris.h"
 
 uint32_t _lines_cleared = 0;
@@ -7,7 +6,7 @@ uint8_t _curr_level = 0;
 uint8_t _lines_until_level = 0;
 float _fps = 0.0f;
 
-uint16_t _piece_counter[NUM_TETRONIMOS+1] = {0};
+uint16_t _tetronimo_counter[NUM_TETRONIMOS+1] = {0};
 
 // 10x40 (However only 10x20 is visible to the player)
 T_Type _play_field[FIELD_Y][FIELD_X] = {T_NONE};
@@ -90,24 +89,22 @@ const char* D_Rot_to_str(D_Rot d_rot){
 // Generate a random piece via RNG
 // For now we only have two pieces, but this will generate all random pieces once they are implemented
 // enum order: T_NONE T_O T_I T_S T_Z T_L T_J T_T
-Tetronimo* rand_Piece(){
+T_Type rand_T_Type(){
 	T_Type lower = T_O;
 	T_Type upper = T_T;
-	T_Type rand_t_type = rand() % (upper + 1 - lower ) + lower; 
-	_piece_counter[rand_t_type]++;
-	Tetronimo* tetronimo = new_Piece(rand_t_type);
-	return tetronimo;
+	T_Type t_type = rand() % (upper + 1 - lower ) + lower; 
+	return t_type;
 }
 
-Tetronimo* new_Piece(T_Type t_type){
-	Tetronimo* new_piece = (Tetronimo*)malloc(sizeof(Tetronimo));
-	new_piece->t_type = t_type;
-	new_piece->d_rot = D_90;
-	new_piece->origin.x = SPAWN_X;
-	new_piece->origin.y = SPAWN_Y;
-	set_Tetronimo(new_piece);
-	set_To_Field(new_piece);
-	return new_piece;
+Tetronimo* new_Tetronimo(T_Type t_type){
+	Tetronimo* tetronimo = (Tetronimo*)malloc(sizeof(Tetronimo));
+	tetronimo->t_type = t_type;
+	tetronimo->d_rot = D_90;
+	tetronimo->origin.x = SPAWN_X;
+	tetronimo->origin.y = SPAWN_Y;
+	set_Tetronimo(tetronimo);
+	set_To_Field(tetronimo);
+	return tetronimo;
 }
 
 // Helper function for set_Tetronimo to set tetronimo onto the _play_field;

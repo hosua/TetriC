@@ -1,0 +1,79 @@
+[
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/clock.o",
+   "src/clock.c"
+  ],
+  "file": "src/clock.c"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/graphics.o",
+   "src/graphics.c"
+  ],
+  "file": "src/graphics.c"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/input.o",
+   "src/input.c"
+  ],
+  "file": "src/input.c"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/main.o",
+   "src/main.c"
+  ],
+  "file": "src/main.c"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/queue.o",
+   "src/queue.c"
+  ],
+  "file": "src/queue.c"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/test.o",
+   "src/test.c"
+  ],
+  "file": "src/test.c"
+ },
+ {
+  "directory": "/home/hoswoo/Desktop/Programming/C/TetriC",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-o",
+   "src/tetris.o",
+   "src/tetris.c"
+  ],
+  "file": "src/tetris.c"
+ }
+]

@@ -1,5 +1,4 @@
 #include "clock.h"
-#include "input.h"
 
 uint32_t _tick = 17;
 uint32_t _last_tick = 0;

@@ -32,7 +32,7 @@ extern uint8_t _lines_until_level;
 extern float _fps;
 
 // global piece counter
-extern uint16_t _piece_counter[NUM_TETRONIMOS+1];
+extern uint16_t _tetronimo_counter[NUM_TETRONIMOS+1];
 // +1 to include T_NONE but we won't count T_NONE pieces
 
 struct RGB_Color;
@@ -97,11 +97,11 @@ typedef struct Tetronimo {
 	D_Rot d_rot; // The degrees of rotation of the tetronimo
 } Tetronimo;
 
-// Selects a random Piece constructor and returns it
-Tetronimo* rand_Piece();
+// Returns a random Tetronimo type
+T_Type rand_T_Type();
 
 // Piece constructor that takes its T_Type as a parameter
-Tetronimo* new_Piece(T_Type t_type);
+Tetronimo* new_Tetronimo(T_Type t_type);
 
 void print_Tetronimo_Coords(Tetronimo *tetronimo);
 

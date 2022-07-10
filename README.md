@@ -21,7 +21,7 @@ This is a work in progress.
 - [X] Implement player death
 - [X] Implement line clearing
 - [X] Implement tetronimo statistics
-- [ ] Implement previous piece
+- [X] Implement piece queue
 - [X] Implement scoring system
 - [X] Implement leveling system
 - [ ] Implement a title screen
@@ -36,5 +36,5 @@ This is a work in progress.
 - [x] J-Piece
 - [x] T-Piece
 
-![TetriC-alpha](images/TetriC-11.gif)
+![TetriC-alpha](images/TetriC-12.gif)
 

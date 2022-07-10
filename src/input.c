@@ -1,5 +1,4 @@
 #include "input.h"
-#include "tetris.h"
 
 // If keys[i] = 1, key is down, else it is up
 

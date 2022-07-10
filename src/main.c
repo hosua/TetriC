@@ -2,6 +2,7 @@
 #include "tetris.h"
 #include "input.h"
 #include "clock.h"
+#include "queue.h"
 
 #include "test.h"
 
@@ -38,8 +39,23 @@ int main(int argc, char **argv){
 	// The points accrued from holding down
 	uint8_t down_points = 0;
 	ClearScreen(window, renderer);
-	Tetronimo* tetronimo = rand_Piece();
-	// Tetronimo* tetronimo = new_Piece(T_I);
+	// Tetronimo* tetronimo = new_Tetronimo(rand_T_Type());
+	// Tetronimo* tetronimo = new_Tetronimo(T_I);
+	
+	// Queue
+	Queue queue = init_Queue();
+
+	// Fill queue with pieces
+	for (int i = 0; i < _queue_limit; i++){
+		enqueue(rand_T_Type(), &queue);
+	}
+	Tetronimo* tetronimo = new_Tetronimo(peek(queue));
+	dequeue(&queue);
+	enqueue(rand_T_Type(), &queue);
+
+	// enqueue(T_O, &queue);
+	// dequeue(&queue);
+	// printf("QUEUE\n");
 	
 	// Char buffer for rendering text
 	char buf[128];
@@ -72,8 +88,14 @@ int main(int argc, char **argv){
 				lines_cleared_this_turn = CheckLines();
 				_lines_until_level -= lines_cleared_this_turn;
 				free(tetronimo);
-				tetronimo = rand_Piece();
-				// tetronimo = new_Piece(T_I);
+
+				// dequeue a new piece from queue to spawn it, then enqueue another 
+				T_Type t_type = peek(queue);
+				tetronimo = new_Tetronimo(t_type);
+				_tetronimo_counter[t_type]++;
+				dequeue(&queue);
+				enqueue(rand_T_Type(), &queue);
+				// print_Queue(queue.head);
 				
 				_player_score += CalcScore(lines_cleared_this_turn, _curr_level);
 				_player_score += down_points;
@@ -93,11 +115,13 @@ int main(int argc, char **argv){
 		// Render Tetronimos	
 		RenderBlocks(8, 0, window, renderer);
 		// Render the UI elements
-		RenderUI((BLOCK_SIZE * 8), 0, buf, buf_max, window, 
+		RenderUI(20, 0, BLOCK_SIZE, buf, buf_max, window,
 				renderer, texture, font);
 		
 		RenderStatsUI(3, 1, BLOCK_SIZE/1.8f, buf, buf_max,
 				font, texture, window, renderer);
+		RenderQueue(30, 5, BLOCK_SIZE/1.8f, buf, buf_max, 3,
+				queue, font, texture, window, renderer);
 		// Present the renderings to the screen
 		SDL_RenderPresent(renderer); 
 
