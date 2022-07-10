@@ -11,6 +11,7 @@
 // and then this variable is set to true again.
 bool is_falling = false;
 
+
 int main(int argc, char **argv){
 	// seed the RNG
 	srand(time(0));
@@ -73,15 +74,9 @@ int main(int argc, char **argv){
 	uint8_t lines_cleared_this_turn = 0;
 	float elapsed = 0.0f;
 	_fps = elapsed;
-
-	/* TODO: EXPERIMENTAL CODE */
-	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-	Mix_Music* sfx_bgm = Mix_LoadMUS("sounds/trepak.mp3");
-	// Mix_Chunk* sfx_line_clear = Mix_LoadWAV("sounds/arcade-sound.wav");
-	Mix_PlayMusic(sfx_bgm, 1);
-	/* END EXPERIMENTAL CODE */
-
+	SFX_PlayBGM(50);
 	GetLinesUntilNextLevel(_curr_level);
+
 	for ( ; ; ){
 		uint64_t start = SDL_GetPerformanceCounter();
 		// Get user input
@@ -90,7 +85,8 @@ int main(int argc, char **argv){
 		ClearScreen(window, renderer);
 		SetKeyArray(event, window, renderer);
 		MovementHandler(event, window, renderer, tetronimo);
-
+		
+		MusicHandler(event);
 		
 		if (InputTimer()){
 			DownwardMovementHandler(&down_points, window, renderer, tetronimo);

@@ -11,5 +11,13 @@
 #include <string.h>
 #include <stdbool.h>
 
+extern bool _sfx_muted;
+void SFX_PlayBGM();
+void SFX_StopBGM(Mix_Music* bgm);
+void SFX_MuteBGM();
+void SFX_ResumeBGM();
+
+void SFX_ChangeMusicVol(uint8_t vol);
+
 
 #endif // SOUNDS_H

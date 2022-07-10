@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include "tetris.h"
+#include "sounds.h"
 
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL.h>
@@ -28,5 +29,7 @@ void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Rende
 // Handles rotation movement, ignores repeated keys.
 void MovementHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo);
 
+// Mutes and unmutes sounds;
+void MusicHandler(SDL_Event event);
 
 #endif // INPUT_H
