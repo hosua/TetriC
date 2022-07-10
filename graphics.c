@@ -12,19 +12,6 @@ SDL_Rect GetRect(uint8_t x, uint8_t y){
 	return rect;
 }
 
-// Int to string conversion, positive numbers only.
-char* to_string(uint32_t n){
-	if (n == 0)
-		return "0";
-	int places = 0;
-	for (int m = n ; m; m /= 10, places++);
-	char* output = (char*)malloc(places+1);
-	output[places] = '\0';
-	for ( ; n; n /= 10, places--)
-		output[places-1] = (n % 10) + '0';
-	return output;
-}
-
 SDL_Rect* GetFieldLine(uint8_t x, uint8_t y, SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* rect_arr = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
 	for (int i = 0; i < FIELD_X; i++){
@@ -149,30 +136,34 @@ void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
 void RenderUI(char* buf, uint16_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
 		SDL_Texture* texture, TTF_Font* font){
 	SDL_Rect rect;
-
+	// After rendering a texture, you must always destroy it, otherwise it will leak memory
 	snprintf(buf, buf_max,
 			"Level: %i", _curr_level);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 1), buf, font, &texture, &rect);
-
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"Score: %i", _player_score);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 2), buf, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"Lines until next level: %i", _lines_until_level);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 3), buf, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"Total lines cleared: %i", _lines_cleared);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 4), buf, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,
 			"FPS: %f", 1.0f/_fps);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 20), buf, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
 }

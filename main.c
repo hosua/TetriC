@@ -95,7 +95,6 @@ int main(int argc, char **argv){
 		// Render the UI elements
 		RenderUI(buf, buf_max, window, renderer, texture, font);
 		// Present the renderings to the screen
-		SDL_DestroyTexture(texture);
 		SDL_RenderPresent(renderer); 
 		
 		// SDL_Delay(_tick);
