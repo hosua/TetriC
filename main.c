@@ -93,7 +93,10 @@ int main(int argc, char **argv){
 		// Render Tetronimos	
 		RenderBlocks(window, renderer);
 		// Render the UI elements
-		RenderUI(buf, buf_max, window, renderer, texture, font);
+		RenderUI(buf, buf_max, window, 
+				renderer, texture, font);
+		RenderStats(buf, buf_max, (BLOCK_SIZE * 12), (BLOCK_SIZE * 6), 
+				renderer, texture, font);
 		// Present the renderings to the screen
 		SDL_RenderPresent(renderer); 
 

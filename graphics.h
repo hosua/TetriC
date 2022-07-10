@@ -12,7 +12,7 @@
 #define FONT_SIZE 30
 
 
-SDL_Rect GetRect(uint8_t x, uint8_t y);
+SDL_Rect GetRect(uint16_t x, uint16_t y, uint8_t block_size);
 SDL_Rect* GetFieldLine(uint8_t x, uint8_t y, SDL_Window* window, SDL_Renderer* renderer);
 SDL_Rect* GetBlocksInLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL_Renderer* renderer);
 void RenderPlayField(SDL_Window* window, SDL_Renderer* renderer);
@@ -25,7 +25,10 @@ void SetRenderColorByType(T_Type t_type, SDL_Renderer* renderer);
 void ClearScreen(SDL_Window* window, SDL_Renderer* renderer);
 void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
         TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
-void RenderUI(char* buf, uint16_t buf_max, SDL_Window* window, SDL_Renderer* renderer,
+void RenderUI(char* buf, uint8_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
+		SDL_Texture* texture, TTF_Font* font);
+
+void RenderStats(char* buf, uint8_t buf_max, uint16_t x, uint16_t y, SDL_Renderer* renderer,
 		SDL_Texture* texture, TTF_Font* font);
 
 

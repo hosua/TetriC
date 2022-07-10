@@ -20,6 +20,7 @@ This is a work in progress.
 - [X] Make movement less clunky - Not perfect yet
 - [X] Implement player death
 - [X] Implement line clearing
+- [X] Implement tetronimo statistics
 - [ ] Implement previous piece
 - [X] Implement scoring system
 - [X] Implement leveling system
@@ -35,5 +36,5 @@ This is a work in progress.
 - [x] J-Piece
 - [x] T-Piece
 
-![TetriC-alpha](images/TetriC-9.gif)
+![TetriC-alpha](images/TetriC-10.gif)
 

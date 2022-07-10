@@ -2,20 +2,20 @@
 #include "graphics.h"
 
 // Create and return a single rect
-SDL_Rect GetRect(uint8_t x, uint8_t y){
+SDL_Rect GetRect(uint16_t x, uint16_t y, uint8_t block_size){
 	SDL_Rect rect;
-	rect.x = x * BLOCK_SIZE;
-	rect.y = y * BLOCK_SIZE;
+	rect.x = x * block_size;
+	rect.y = y * block_size;
 
-	rect.w = BLOCK_SIZE;
-	rect.h = BLOCK_SIZE;
+	rect.w = block_size;
+	rect.h = block_size;
 	return rect;
 }
 
 SDL_Rect* GetFieldLine(uint8_t x, uint8_t y, SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* rect_arr = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
 	for (int i = 0; i < FIELD_X; i++){
-		rect_arr[i] = GetRect(x + (i+1), y);	
+		rect_arr[i] = GetRect(x + (i+1), y, BLOCK_SIZE);	
 	}
 	return rect_arr;
 }
@@ -34,7 +34,7 @@ void RenderPlayField(SDL_Window* window, SDL_Renderer* renderer){
 void PrintPlayField(){
 	for (int i = FIELD_Y/2; i < FIELD_Y; i++){
 		for (int j = 0; j < FIELD_X; j++)
-			printf("%01x", play_field[i][j]);
+			printf("%01x", _play_field[i][j]);
 		printf("\n");
 	}
 }
@@ -42,7 +42,7 @@ void PrintPlayField(){
 SDL_Rect* GetBlocksInLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
 	for (int i = 0; i < FIELD_X; i++){
-		blocks[(*num_blocks)++] = GetRect((i+1), (y+1) - FIELD_Y/2);	
+		blocks[(*num_blocks)++] = GetRect((i+1), (y+1) - FIELD_Y/2, BLOCK_SIZE);	
 	}
 	return blocks;
 }
@@ -50,11 +50,11 @@ SDL_Rect* GetBlocksInLine(uint8_t y, size_t* num_blocks, SDL_Window* window, SDL
 void RenderBlocks(SDL_Window* window, SDL_Renderer* renderer){
 	SDL_Rect* line;
 	size_t num_blocks = 0;
-	// Lines 0-19 inclusive in the play_field are off-screen and do not get rendered.
+	// Lines 0-19 inclusive in the _play_field are off-screen and do not get rendered.
 	for (int y = FIELD_Y/2; y < FIELD_Y; y++){
 		line = GetBlocksInLine(y, &num_blocks, window, renderer);
 		for (int x = 0; x < num_blocks; x++){
-			T_Type t_type = play_field[y][x];
+			T_Type t_type = _play_field[y][x];
 			SetRenderColorByType(t_type, renderer);
 			if (t_type == T_NONE)
 				SDL_RenderDrawRect(renderer, &line[x]);
@@ -133,14 +133,38 @@ void RenderText(SDL_Renderer *renderer, int x, int y, char *text,
     rect->h = text_height;
 }
 
-void RenderUI(char* buf, uint16_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
+
+void RenderStats(char* buf, uint8_t buf_max, uint16_t x, uint16_t y, SDL_Renderer* renderer,
+		SDL_Texture* texture, TTF_Font* font){
+	SDL_Rect rect;
+	snprintf(buf, buf_max,
+			"Tetronimo Counter");
+	RenderText(renderer, x, y, buf, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+
+	for (uint8_t t_type = T_O; t_type <= T_T; t_type++){
+		snprintf(buf, buf_max,
+				"%s:", T_Type_to_str(t_type));
+		RenderText(renderer, x, y + (BLOCK_SIZE * t_type), buf, font, &texture, &rect);
+		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		SDL_DestroyTexture(texture);
+
+		snprintf(buf, buf_max,
+				"%i", _piece_counter[t_type]);
+		RenderText(renderer, (x + BLOCK_SIZE), y + (BLOCK_SIZE * t_type), buf, font, &texture, &rect);
+		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		SDL_DestroyTexture(texture);
+	}
+}
+
+void RenderUI(char* buf, uint8_t buf_max, SDL_Window* window, SDL_Renderer* renderer, 
 		SDL_Texture* texture, TTF_Font* font){
 	SDL_Rect rect;
 	// After rendering a texture, you must always destroy it, otherwise it will leak memory
 	snprintf(buf, buf_max,
 			"Level: %i", _curr_level);
 	RenderText(renderer, (BLOCK_SIZE * 12), (BLOCK_SIZE * 1), buf, font, &texture, &rect);
-	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 
 	snprintf(buf, buf_max,

@@ -21,19 +21,19 @@
 #define SPAWN_X 6 // The coordinates where the tetronimos spawn
 #define SPAWN_Y 17
 #define BLOCK_SIZE 25
+#define NUM_TETRONIMOS 7
 // Number of blocks per tetronimo
 #define TETRA 4 
-
-
-// First 20 (the top 20) lines respective to the y-axis are not visible.
-// 10x40 actual, 10x20 visible
-extern uint8_t play_field[FIELD_Y][FIELD_X];
 
 extern uint32_t _lines_cleared;
 extern uint32_t _player_score;
 extern uint8_t _curr_level;
 extern uint8_t _lines_until_level;
 extern float _fps;
+
+// global piece counter
+extern uint16_t _piece_counter[NUM_TETRONIMOS+1];
+// +1 to include T_NONE but we won't count T_NONE pieces
 
 struct RGB_Color;
 struct Coords;
@@ -63,6 +63,11 @@ typedef enum {
 	T_T
 } T_Type;
 
+
+// First 20 (the top 20) lines respective to the y-axis are not visible.
+// 10x40 actual, 10x20 visible
+extern T_Type _play_field[FIELD_Y][FIELD_X];
+
 const char* T_Type_to_str(T_Type t_type);
 
 // Degrees of rotation
@@ -82,7 +87,7 @@ int max_y(struct Tetronimo* tetronimo);
 int min_y(struct Tetronimo* tetronimo);
 
 typedef struct Coords {
-	uint8_t x, y;
+	uint16_t x, y;
 } Coords;
 
 typedef struct Tetronimo {
@@ -109,7 +114,7 @@ bool IsPlayerDead();
 // set_To_Field() and set_Tetronimo() are helper functions for move_Tetronimo() and should not be called directly 
 // Sets the coordinates of the pieces array in a tetronimo struct
 void set_Tetronimo(Tetronimo* tetronimo);
-// Sets the tetronimo to the play_field
+// Sets the tetronimo to the _play_field
 void set_To_Field(Tetronimo* tetronimo);
 
 // Checks for full lines and clears them 
