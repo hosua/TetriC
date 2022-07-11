@@ -3,57 +3,23 @@ make: Entering directory '/c/Users/Hosua/Desktop/Github/TetriC'
  
 mkdir  \\c\\Users\\Hosua\\Desktop\\Github\\TetriC\\build\\src 2>NUL || true
  
-echo "COMPILING SOURCE src/clock.c INTO OBJECT objs/clock.o"
+gcc    -c -o src/clock.o src/clock.c
  
-mkdir -p 'objs'
+gcc    -c -o src/graphics.o src/graphics.c
  
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/clock.c -o objs/clock.o
+gcc    -c -o src/input.o src/input.c
  
-echo "COMPILING SOURCE src/graphics.c INTO OBJECT objs/graphics.o"
+gcc    -c -o src/main.o src/main.c
  
-mkdir -p 'objs'
+gcc    -c -o src/queue.o src/queue.c
  
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/graphics.c -o objs/graphics.o
+gcc    -c -o src/test.o src/test.c
  
-echo "COMPILING SOURCE src/input.c INTO OBJECT objs/input.o"
- 
-mkdir -p 'objs'
- 
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/input.c -o objs/input.o
- 
-echo "COMPILING SOURCE src/main.c INTO OBJECT objs/main.o"
- 
-mkdir -p 'objs'
- 
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/main.c -o objs/main.o
- 
-echo "COMPILING SOURCE src/queue.c INTO OBJECT objs/queue.o"
- 
-mkdir -p 'objs'
- 
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/queue.c -o objs/queue.o
- 
-echo "COMPILING SOURCE src/sounds.c INTO OBJECT objs/sounds.o"
- 
-mkdir -p 'objs'
- 
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/sounds.c -o objs/sounds.o
- 
-echo "COMPILING SOURCE src/test.c INTO OBJECT objs/test.o"
- 
-mkdir -p 'objs'
- 
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/test.c -o objs/test.o
- 
-echo "COMPILING SOURCE src/tetris.c INTO OBJECT objs/tetris.o"
- 
-mkdir -p 'objs'
- 
-gcc -c -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall src/tetris.c -o objs/tetris.o
+gcc    -c -o src/tetris.o src/tetris.c
  
 echo Linking TetriC
  
-gcc objs/clock.o objs/graphics.o objs/input.o objs/main.o objs/queue.o objs/sounds.o objs/test.o objs/tetris.o -lSDL2 -lSDL2_ttf -lSDL2_mixer -g -Wall -o TetriC
+gcc src/clock.o src/graphics.o src/input.o src/main.o src/queue.o src/test.o src/tetris.o -lSDL2 -lSDL2_ttf -g -Wall -o TetriC
  
 make: Leaving directory '/c/Users/Hosua/Desktop/Github/TetriC'
  

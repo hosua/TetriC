@@ -46,9 +46,10 @@ int main(int argc, char **argv){
     }
 	
 	SDL_Texture *texture = NULL;
-	// init_test_2();	
+	init_test_2();	
 	// The points accrued from holding down
 	uint8_t down_points = 0;
+	uint8_t curr_level = 0;
 	ClearScreen(window, renderer);
 	// Tetronimo* tetronimo = new_Tetronimo(rand_T_Type());
 	// Tetronimo* tetronimo = new_Tetronimo(T_I);
@@ -75,7 +76,7 @@ int main(int argc, char **argv){
 	float elapsed = 0.0f;
 	_fps = elapsed;
 	SFX_PlayBGM(50);
-	GetLinesUntilNextLevel(_curr_level);
+	GetLinesUntilNextLevel(curr_level);
 
 	for ( ; ; ){
 		uint64_t start = SDL_GetPerformanceCounter();
@@ -92,7 +93,7 @@ int main(int argc, char **argv){
 			DownwardMovementHandler(&down_points, window, renderer, tetronimo);
 		}
 
-		if (LevelTimer(_curr_level)){
+		if (LevelTimer(curr_level)){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
 				if (IsPlayerDead()){
@@ -110,13 +111,12 @@ int main(int argc, char **argv){
 				enqueue(rand_T_Type(), &queue);
 				// print_Queue(queue.head);
 				
-				_player_score += CalcScore(lines_cleared_this_turn, _curr_level);
+				_player_score += CalcScore(lines_cleared_this_turn, curr_level);
 				_player_score += down_points;
 
 				if (_lines_until_level == 0){
-					// Level up
-					_curr_level++;
-					GetLinesUntilNextLevel(_curr_level);
+					curr_level++;
+					GetLinesUntilNextLevel(curr_level);
 				}
 				down_points = 0;
 			}
@@ -126,8 +126,8 @@ int main(int argc, char **argv){
 		// Render Tetronimos	
 		RenderBlocks(8, 0, window, renderer);
 		// Render the UI elements
-		RenderUI(20, 0, BLOCK_SIZE, buf, buf_max, window,
-				renderer, texture, font);
+		RenderUI(20, 0, BLOCK_SIZE, buf, buf_max, curr_level, 
+				window, renderer, texture, font);
 		
 		RenderStatsUI(3, 1, BLOCK_SIZE/1.8f, buf, buf_max,
 				font, texture, window, renderer);

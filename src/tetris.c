@@ -2,7 +2,6 @@
 
 uint32_t _lines_cleared = 0;
 uint32_t _player_score = 0;
-uint8_t _curr_level = 0;
 uint8_t _lines_until_level = 0;
 float _fps = 0.0f;
 
@@ -156,7 +155,6 @@ bool* GetLinesToClear(){
 // Helper function for CheckLines()
 void ClearLine(uint8_t y_min){
 	// Increment global lines cleared counter
-	_lines_cleared++;
 	if (y_min >= FIELD_Y || y_min <= 0){
 		fprintf(stderr, "Error: ClearLine exceeded _play_field boundaries\n");
 		return;
@@ -167,6 +165,7 @@ void ClearLine(uint8_t y_min){
 			_play_field[y-1][x] = T_NONE;
 		}
 	}
+	_lines_cleared++;
 }
 // Clears and shifts lines whenever a full one is detected
 uint8_t CheckLines(){

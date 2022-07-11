@@ -35,7 +35,7 @@ void ClearScreen(SDL_Window* window, SDL_Renderer* renderer);
 void RenderText(int x, int y, char *text,
 		SDL_Renderer *renderer, TTF_Font *font, SDL_Texture **texture, SDL_Rect *rect);
 
-void RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max, 		
+void RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max, uint8_t curr_level,
 		SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, TTF_Font* font);
 
 void RenderQueue(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size_t buf_max, uint8_t num_to_display,

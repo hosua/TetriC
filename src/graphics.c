@@ -223,12 +223,12 @@ void RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size_t
 
 // void RenderGhost(uint8_t dx, uint8_t dy, 
 // 		SDL_Window* window, SDL_Renderer* renderer);  
-void RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max, 		
+void RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max, uint8_t curr_level,
 		SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, TTF_Font* font){
 	SDL_Rect rect;
 	// After rendering a texture, you must always destroy it, otherwise it will leak memory
 	snprintf(buf, buf_max,
-			"Level: %i", _curr_level);
+			"Level: %i", curr_level);
 	RenderText((dx * block_size), (dy * block_size) + (block_size * 1), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
