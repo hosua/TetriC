@@ -49,8 +49,7 @@ int main(int argc, char **argv){
 	// init_test_2();	
 	// The points accrued from holding down
 	uint8_t down_points = 0;
-	// Leveling seems to break at level 0 for some reason, so we'll just start it at 1+
-	uint8_t curr_level = 1;
+	uint8_t curr_level = 0;
 	ClearScreen(window, renderer);
 	
 	/* Sound stuff */
