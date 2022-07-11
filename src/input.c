@@ -34,18 +34,18 @@ void SetKeyArray(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer){
 	else keys[K_X] = false;
 }
 
-void MusicHandler(SDL_Event event){
+void VolumeController(SDL_Event event){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 	if (event.type == SDL_KEYDOWN && !event.key.repeat){
 		if (kb_state[SDL_SCANCODE_M]){
 			if (_sfx_muted){
 				_sfx_muted = false;
 				SFX_ResumeBGM();
-				printf("Muted SFX\n");
+				printf("Unmuted SFX\n");
 			} else {
 				_sfx_muted = true;
 				SFX_MuteBGM();
-				printf("Unmuted SFX\n");
+				printf("Muted SFX\n");
 			}
 		}
 	}

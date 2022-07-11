@@ -64,7 +64,6 @@ bool LevelTimer(uint8_t level){
 }
 
 uint32_t _input_tick = 50;
-
 uint32_t _last_input_tick = 0;
 
 // Input Timer will only have an effect on downward movement.
@@ -72,6 +71,20 @@ bool InputTimer(){
 	uint32_t curr_tick = SDL_GetTicks();
 	if (curr_tick > _last_input_tick + _input_tick){
 		_last_input_tick += _input_tick;
+		return true;
+	}
+	return false;
+}
+
+uint32_t _nudge_delay = 1000;
+uint32_t _last_nudge_tick = 0;
+
+// A timer to prevent the nudge sound from being spammed
+// Returns true if nudge timer bool should be reset
+bool NudgeTimer(){
+	uint32_t curr_tick = SDL_GetTicks();
+	if (curr_tick > _last_nudge_tick + _nudge_delay){
+		_last_nudge_tick += _nudge_delay;
 		return true;
 	}
 	return false;

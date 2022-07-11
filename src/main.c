@@ -49,33 +49,34 @@ int main(int argc, char **argv){
 	// init_test_2();	
 	// The points accrued from holding down
 	uint8_t down_points = 0;
-	uint8_t curr_level = 0;
+	// Leveling seems to break at level 0 for some reason, so we'll just start it at 1+
+	uint8_t curr_level = 1;
 	ClearScreen(window, renderer);
-	// Tetronimo* tetronimo = new_Tetronimo(rand_T_Type());
-	// Tetronimo* tetronimo = new_Tetronimo(T_I);
 	
-	// Queue
-	Queue queue = init_Queue();
+	/* Sound stuff */
+	// Loud sound effects into memory
+	SFX_LoadSoundBank();
+	SFX_PlayBGM("sfx/trepak.mp3", 50);
+	/* End sound stuff */
 
+	/* Queue stuff */
+	Queue queue = init_Queue();
 	// Fill queue with pieces
-	for (int i = 0; i < _queue_limit; i++){
+	for (int i = 0; i < _queue_limit; i++)
 		enqueue(rand_T_Type(), &queue);
-	}
+	// Get first piece from queue
 	Tetronimo* tetronimo = new_Tetronimo(peek(queue));
 	dequeue(&queue);
 	enqueue(rand_T_Type(), &queue);
-
-	// enqueue(T_O, &queue);
-	// dequeue(&queue);
-	// printf("QUEUE\n");
+	/* End queue stuff */
 	
 	// Char buffer for rendering text
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
 	uint8_t lines_cleared_this_turn = 0;
+
 	float elapsed = 0.0f;
 	_fps = elapsed;
-	SFX_PlayBGM(50);
 	GetLinesUntilNextLevel(curr_level);
 
 	for ( ; ; ){
@@ -87,19 +88,32 @@ int main(int argc, char **argv){
 		SetKeyArray(event, window, renderer);
 		MovementHandler(event, window, renderer, tetronimo);
 		
-		MusicHandler(event);
+		VolumeController(event);
 		
 		if (InputTimer()){
 			DownwardMovementHandler(&down_points, window, renderer, tetronimo);
 		}
-
+		// NudgeTimer() prevents the nudge sfx from being spammed
+		if (NudgeTimer()){
+			_should_nudge = true;
+		}
 		if (LevelTimer(curr_level)){
 			is_falling = move_Tetronimo(window, renderer, tetronimo, M_DOWN);
 			if (!is_falling){
-				if (IsPlayerDead()){
+				if (IsPlayerDead())
 					QuitGame(window, renderer);
-				}
+				
+
 				lines_cleared_this_turn = CheckLines();
+				if (!_sfx_muted){
+					if (lines_cleared_this_turn == 4)
+						SFX_PlaySFX(_sfx_tetris);
+					else if (lines_cleared_this_turn == 0)
+						SFX_PlaySFX(_sfx_lockpiece);
+					else
+						SFX_PlaySFX(_sfx_lineclear);
+				}
+
 				_lines_until_level -= lines_cleared_this_turn;
 				free(tetronimo);
 
@@ -115,6 +129,8 @@ int main(int argc, char **argv){
 				_player_score += down_points;
 
 				if (_lines_until_level == 0){
+					if (!_sfx_muted)
+						SFX_PlaySFX(_sfx_levelup);
 					curr_level++;
 					GetLinesUntilNextLevel(curr_level);
 				}

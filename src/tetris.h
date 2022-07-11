@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define VERBOSE true 
+#include "sounds.h"
+
+#define VERBOSE false
 #define SCREEN_X 800
 #define SCREEN_Y 550
 #define FIELD_X 10

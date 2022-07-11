@@ -25,6 +25,11 @@ extern uint32_t _last_input_tick;
 bool LevelTimer(uint8_t level);
 bool InputTimer();
 
+extern uint32_t _nudge_delay;
+extern uint32_t _last_nudge_tick;
+
+bool NudgeTimer();
+
 // Cross platform microseconds sleep
 void sleep_us(int microseconds);
 

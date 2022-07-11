@@ -30,6 +30,6 @@ void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Rende
 void MovementHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo);
 
 // Mutes and unmutes sounds;
-void MusicHandler(SDL_Event event);
+void VolumeController(SDL_Event event);
 
 #endif // INPUT_H

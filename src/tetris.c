@@ -14,6 +14,7 @@ void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 	printf("Game over!\n"
 		   "You cleared %i lines before losing.\n"
 		   "Your final score was: %i\n", _lines_cleared, _player_score);
+	SFX_FreeSFX();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_CloseAudio();
@@ -623,6 +624,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					// We are technically rotating it right for both left and right, but it doesn't matter for the I-Piece.
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_DOWN:
 					switch(d_rot){
@@ -689,6 +696,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.x -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				case M_RIGHT:
@@ -722,6 +734,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.x += 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				case M_UP:
@@ -755,6 +772,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
@@ -809,6 +831,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 
 					if (legal_move)
 						tetronimo->origin.x -= 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_RIGHT:
 					// Unset the move flag if it is illegal and break
@@ -825,6 +853,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x += 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 
 					break;
 				case M_UP:
@@ -844,6 +878,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
@@ -889,6 +928,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_DOWN:
 					x = origin.x;
@@ -960,6 +1005,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x -= 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_RIGHT:
 					x = origin.x;
@@ -993,6 +1044,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x += 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 
 					break;
 				case M_UP:
@@ -1027,6 +1084,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
@@ -1073,6 +1135,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_DOWN:
 					x = origin.x;
@@ -1117,7 +1185,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					y = origin.y;
 					if (x_min == 0){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						//     0
@@ -1145,13 +1212,18 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x -= 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_RIGHT:
 					x = origin.x;
 					y = origin.y;
 					if (x_max == FIELD_X-1){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						//     0
@@ -1179,6 +1251,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x += 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 
 					break;
 				case M_UP:
@@ -1214,6 +1292,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
@@ -1280,6 +1363,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_ROT_RIGHT:
 					if ((d_rot == D_180 && x_min == 0) || 
@@ -1333,6 +1422,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_DOWN:
 					if (y_max == FIELD_Y-1){
@@ -1396,7 +1491,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 				case M_LEFT:
 					if (x_min == 0){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						case D_0:
@@ -1452,11 +1546,16 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x -= 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_RIGHT:
 					if (x_max == FIELD_X-1){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						case D_0:
@@ -1519,6 +1618,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x += 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 
 					break;
 				case M_UP:
@@ -1581,6 +1686,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
@@ -1647,6 +1757,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_ROT_RIGHT:
 					if ((d_rot == D_180 && x_min == 0) || 
@@ -1700,6 +1816,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_DOWN:
 					if (y_max == FIELD_Y-1){
@@ -1765,7 +1887,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 				case M_LEFT:
 					if (x_min == 0){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						case D_0:
@@ -1827,11 +1948,16 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x -= 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_RIGHT:
 					if (x_max == FIELD_X-1){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						case D_0:
@@ -1894,6 +2020,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x += 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 
 					break;
 				case M_UP:
@@ -1958,6 +2090,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
@@ -2011,6 +2148,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_DOWN:
 					if (y_max == FIELD_Y-1){
@@ -2084,7 +2227,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 				case M_LEFT:
 					if (x_min == 0){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						case D_0:
@@ -2148,11 +2290,16 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x -= 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 					break;
 				case M_RIGHT:
 					if (x_max == FIELD_X-1){
 						legal_move = false;
-						break;
 					}
 					switch(d_rot){
 						case D_0:
@@ -2212,6 +2359,12 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move)
 						tetronimo->origin.x += 1;
+					else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
+					}
 
 					break;
 				case M_UP:
@@ -2277,6 +2430,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					}
 					if (legal_move){
 						tetronimo->origin.y -= 1;
+					} else {
+						if (!_sfx_muted && _should_nudge){
+							SFX_PlaySFX(_sfx_nudge);
+							_should_nudge = false;
+						}
 					}
 					break;
 				default:
