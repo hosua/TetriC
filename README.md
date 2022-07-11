@@ -17,26 +17,15 @@ the SDL2 library files for your OS.
 This is a work in progress. 
 
 ### To Do List
-- [X] Make a Makefile
-- [X] Make movement less clunky
-- [X] Implement player death
-- [X] Implement line clearing
-- [X] Implement tetronimo statistics
-- [X] Implement piece queue
-- [X] Implement scoring system
-- [X] Implement leveling system
 - [ ] Implement a title screen
+- [ ] Implement volume controller (instead of just on/off)
+- [ ] Implement ghost piece
 - [ ] Implement a pause menu (or just the ability to pause)
 
-### Pieces Implemented
-- [x] I-Piece
-- [x] O-Piece
-- [x] S-Piece
-- [x] Z-Piece
-- [x] L-Piece
-- [x] J-Piece
-- [x] T-Piece
+![TetriC-alpha](images/TetriC-13.gif)
 
-![TetriC-alpha](images/TetriC-12.gif)
-
-[trepak.mp3](https://archive.org/details/TrepakFromTheNutcracker)
+### Sounds
+[sxfr](https://sfxr.me/)
+[mixkit](https://mixkit.co/free-sound-effects/game/)
+[music](https://archive.org/details/TrepakFromTheNutcracker)
+[kenney.nl](https://kenney.nl/assets?q=audio)

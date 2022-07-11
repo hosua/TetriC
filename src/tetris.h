@@ -29,7 +29,7 @@
 
 extern uint32_t _lines_cleared;
 extern uint32_t _player_score;
-extern uint8_t _lines_until_level;
+extern int16_t _lines_until_level;
 extern float _fps;
 
 // global piece counter

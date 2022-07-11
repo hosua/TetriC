@@ -2,7 +2,7 @@
 
 uint32_t _lines_cleared = 0;
 uint32_t _player_score = 0;
-uint8_t _lines_until_level = 0;
+int16_t _lines_until_level = 0;
 float _fps = 0.0f;
 
 uint16_t _tetronimo_counter[NUM_TETRONIMOS+1] = {0};

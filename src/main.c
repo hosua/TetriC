@@ -113,7 +113,8 @@ int main(int argc, char **argv){
 					else
 						SFX_PlaySFX(_sfx_lineclear);
 				}
-
+				// The number of lines to carry over to the next level
+				uint8_t carry = lines_cleared_this_turn - _lines_until_level;
 				_lines_until_level -= lines_cleared_this_turn;
 				free(tetronimo);
 
@@ -128,11 +129,16 @@ int main(int argc, char **argv){
 				_player_score += CalcScore(lines_cleared_this_turn, curr_level);
 				_player_score += down_points;
 
-				if (_lines_until_level == 0){
+				if (_lines_until_level <= 0){
 					if (!_sfx_muted)
 						SFX_PlaySFX(_sfx_levelup);
 					curr_level++;
+					// Set _lines_until_level
 					GetLinesUntilNextLevel(curr_level);
+					// Carry over extra lines
+					if (carry){
+						_lines_until_level -= carry;
+					}
 				}
 				down_points = 0;
 			}
