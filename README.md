@@ -17,6 +17,8 @@ the SDL2 library files for your OS.
 This is a work in progress. 
 
 ### To Do List
+- [ ] Add level picker on game start
+- [ ] Add controls to UI
 - [ ] Implement a title screen
 - [ ] Implement volume controller (instead of just on/off)
 - [ ] Implement ghost piece
