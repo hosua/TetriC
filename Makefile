@@ -14,7 +14,7 @@ DIRS = src
 
 OBJDIR = objs
 
-TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
+TARGETDIRS = $(foreach dir, $(DIRS), $(dir))
 
 # Generate the GCC includes parameters by adding -I before each source folder
 INCLUDES = $(foreach dir, $(DIRS), $(addprefix -I, $(dir)))
