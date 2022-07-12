@@ -14,7 +14,6 @@ typedef struct Queue {
 	Node *tail;
 } Queue;
 
-
 Queue init_Queue();
 
 Node* new_Node(T_Type t_type);

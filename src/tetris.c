@@ -1,24 +1,30 @@
 #include "tetris.h"
+#include "clock.h"
 
-uint32_t _lines_cleared = 0;
-uint32_t _player_score = 0;
-int16_t _lines_until_level = 0;
-float _fps = 0.0f;
-
-uint16_t _tetronimo_counter[NUM_TETRONIMOS+1] = {0};
-
-// 10x40 (However only 10x20 is visible to the player)
-T_Type _play_field[FIELD_Y][FIELD_X] = {T_NONE};
+GameData* _game_data = NULL;
 
 void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 	printf("Game over!\n"
 		   "You cleared %i lines before losing.\n"
-		   "Your final score was: %i\n", _lines_cleared, _player_score);
+		   "Your final score was: %i\n", _game_data->lines_cleared, _game_data->player_score);
+	free(_clock);
 	SFX_FreeSFX();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_CloseAudio();
 	SDL_Quit();
+}
+void init_GameData(){
+	_game_data = (GameData*)malloc(sizeof(GameData));
+	_game_data->lines_cleared = 0;
+	_game_data->lines_until_level = 0;
+	_game_data->fps = 0;
+
+	for (int i = 1; i <= NUM_TETRONIMOS; i++)
+		_game_data->tetronimo_counter[i] = 0; 
+	
+	// for (int y = 0; y < FIELD_Y; y++)
+	// 	memset(_game_data->play_field[y], T_NONE, (FIELD_X-1) * sizeof(uint8_t));
 }
 
 // The play field is numbers from lowest to greatest, top to bottom. So the bottom of the play field is not 0, it is 39.
@@ -109,7 +115,7 @@ Tetronimo* new_Tetronimo(T_Type t_type){
 	return tetronimo;
 }
 
-// Helper function for set_Tetronimo to set tetronimo onto the _play_field;
+// Helper function for set_Tetronimo to set tetronimo onto the _game_data->play_field;
 void set_To_Field(Tetronimo* tetronimo){
 	T_Type t_type = tetronimo->t_type;
 	int x = 0, y = 0;
@@ -117,7 +123,7 @@ void set_To_Field(Tetronimo* tetronimo){
 	for (int i = 0; i < TETRA; i++){
 		x = tetronimo->pieces[i].x;
 		y = tetronimo->pieces[i].y;
-		_play_field[y][x] = t_type;
+		_game_data->play_field[y][x] = t_type;
 	}
 }
 
@@ -132,7 +138,7 @@ void print_Tetronimo_Coords(Tetronimo *tetronimo){
 bool LineIsFull(uint8_t y){
 	bool is_full = true;
 	for (int x = 0; x < FIELD_X; x++){
-		if(!_play_field[y][x]){
+		if(!_game_data->play_field[y][x]){
 			is_full = false;
 			break;
 		}
@@ -157,16 +163,16 @@ bool* GetLinesToClear(){
 void ClearLine(uint8_t y_min){
 	// Increment global lines cleared counter
 	if (y_min >= FIELD_Y || y_min <= 0){
-		fprintf(stderr, "Error: ClearLine exceeded _play_field boundaries\n");
+		fprintf(stderr, "Error: ClearLine exceeded _game_data->play_field boundaries\n");
 		return;
 	}
 	for (int y = y_min; y >= FIELD_Y/2; y--){
 		for (int x = 0; x < FIELD_X; x++){
-			_play_field[y][x] = _play_field[y-1][x];
-			_play_field[y-1][x] = T_NONE;
+			_game_data->play_field[y][x] = _game_data->play_field[y-1][x];
+			_game_data->play_field[y-1][x] = T_NONE;
 		}
 	}
-	_lines_cleared++;
+	_game_data->lines_cleared++;
 }
 // Clears and shifts lines whenever a full one is detected
 uint8_t CheckLines(){
@@ -186,28 +192,28 @@ uint8_t CheckLines(){
 
 bool IsPlayerDead(){
 	for (int x = 0; x < FIELD_X; x++)
-		if (_play_field[(FIELD_Y/2)-1][x])
+		if (_game_data->play_field[(FIELD_Y/2)-1][x])
 			return true;
 	return false;
 }
 
-void GetLinesUntilNextLevel(uint8_t level){
-	printf("Level %i\n", level);
-	switch(level){
+void GetLinesUntilNextLevel(){
+	printf("Level %i\n", _game_data->level);
+	switch(_game_data->level){
 		case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
-			_lines_until_level = (level + 1) * 10;
+			_game_data->lines_until_level = (_game_data->level + 1) * 10;
 			break;
 		case 10: case 11: case 12: case 13: case 14: case 15:
-			_lines_until_level = 100;
+			_game_data->lines_until_level = 100;
 			break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24: case 25:
-			_lines_until_level = (level - 5) * 10;
+			_game_data->lines_until_level = (_game_data->level - 5) * 10;
 			break;
 		default: 
-			_lines_until_level = 200;
+			_game_data->lines_until_level = 200;
 			break;
 	}
-	printf("Lines until next level: %i\n", _lines_until_level);
+	printf("Lines until next _game_data->level: %i\n", _game_data->lines_until_level);
 }
 
 // Calculates and returns the score accrued from the lines cleared in a turn 
@@ -563,7 +569,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	for (int i = 0; i < TETRA; i++){
 		x = tetronimo->pieces[i].x;
 		y = tetronimo->pieces[i].y;
-		_play_field[y][x] = T_NONE;
+		_game_data->play_field[y][x] = T_NONE;
 	}
 
 	int y_max = max_y(tetronimo);
@@ -593,7 +599,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 2){
 									x = origin.x + i - 3;
 									y = origin.y + 2;
-									if (_play_field[y][x]){
+									if (_game_data->play_field[y][x]){
 										legal_move = false;
 										break;
 									}
@@ -609,7 +615,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 2){
 									x = origin.x - 1;
 									y = origin.y + i;
-									if (_play_field[y][x]){
+									if (_game_data->play_field[y][x]){
 										legal_move = false;
 										break;
 									}
@@ -625,9 +631,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -638,7 +644,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//     2
 						//     3
 						case D_0: case D_180:
-							if (y_max == FIELD_Y-1 || _play_field[y_max+1][x_max])
+							if (y_max == FIELD_Y-1 || _game_data->play_field[y_max+1][x_max])
 								legal_move = false;
 							break;
 						//
@@ -649,7 +655,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i < TETRA; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (y == FIELD_Y-1 || _play_field[y+1][x]){
+								if (y == FIELD_Y-1 || _game_data->play_field[y+1][x]){
 									legal_move = false;
 									break;
 								}
@@ -676,7 +682,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i < TETRA; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (x == 0 || _play_field[y][x-1]){
+								if (x == 0 || _game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -687,7 +693,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 0 1 2 3
 						//
 						case D_90: case D_270:
-							if (x_min == 0 || _play_field[y_max][x_min-1])
+							if (x_min == 0 || _game_data->play_field[y_max][x_min-1])
 								legal_move = false;
 							break;
 						default:
@@ -697,9 +703,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.x -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -714,7 +720,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i < TETRA; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (x == FIELD_X-1 || _play_field[y][x+1]){
+								if (x == FIELD_X-1 || _game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -725,7 +731,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 0 1 2 3
 						//
 						case D_90: case D_270:
-							if (x_max == FIELD_X-1 || _play_field[y_max][x_max+1])
+							if (x_max == FIELD_X-1 || _game_data->play_field[y_max][x_max+1])
 								legal_move = false;
 							break;
 						default:
@@ -735,9 +741,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.x += 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -748,7 +754,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//     2
 						//     3
 						case D_0: case D_180:
-							if (y_min == FIELD_Y/2 || _play_field[y_min-1][x_max])
+							if (y_min == FIELD_Y/2 || _game_data->play_field[y_min-1][x_max])
 								legal_move = false;
 							break;
 						//
@@ -759,7 +765,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i < TETRA; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (y == (FIELD_Y/2)-1 || _play_field[y-1][x]){
+								if (y == (FIELD_Y/2)-1 || _game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -773,9 +779,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -802,7 +808,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (i % 1 == 0 || i % 3 == 0){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (_play_field[y+1][x] || y == FIELD_Y-1){
+							if (_game_data->play_field[y+1][x] || y == FIELD_Y-1){
 								legal_move = false;
 								break;
 							}
@@ -822,7 +828,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (i % 2 == 0 || i % 3 == 0){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (x == 0 || _play_field[y][x-1]){
+							if (x == 0 || _game_data->play_field[y][x-1]){
 								legal_move = false;
 								break;
 							}
@@ -832,9 +838,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x -= 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -845,7 +851,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						if (i == 0 || i % 1 == 0){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (x == FIELD_X-1 || _play_field[y][x+1]){
+							if (x == FIELD_X-1 || _game_data->play_field[y][x+1]){
 								legal_move = false;
 								break;
 							}
@@ -854,22 +860,22 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x += 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 
 					break;
 				case M_UP:
 					if (d_rot == D_0 || d_rot == D_180){
-						if (y_min == FIELD_Y/2 || _play_field[y_min-1][x_max])
+						if (y_min == FIELD_Y/2 || _game_data->play_field[y_min-1][x_max])
 							legal_move = false;
 					} else {
 						for (int i = 0; i < TETRA; i++){
 							x = tetronimo->pieces[i].x;
 							y = tetronimo->pieces[i].y;
-							if (y == (FIELD_Y/2)-1 || _play_field[y-1][x]){
+							if (y == (FIELD_Y/2)-1 || _game_data->play_field[y-1][x]){
 								legal_move = false;
 								break;
 							}
@@ -879,9 +885,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -908,8 +914,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								legal_move = false;
 								break;
 							}
-							if (_play_field[y+2][x-2] || 
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y+2][x-2] || 
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -917,8 +923,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 0
 						// 3 2 
 						case D_90: case D_270:
-							if (_play_field[y][x-1] || 
-									_play_field[y+2][x]){
+							if (_game_data->play_field[y][x-1] || 
+									_game_data->play_field[y+2][x]){
 								legal_move = false;
 							}
 							break;
@@ -929,9 +935,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -947,8 +953,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 2
 						//     3
 						case D_0: case D_180:
-							if (_play_field[y+2][x-1] ||
-									_play_field[y+3][x]){
+							if (_game_data->play_field[y+2][x-1] ||
+									_game_data->play_field[y+3][x]){
 								legal_move = false;
 							}
 							break;
@@ -956,9 +962,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 0
 						// 3 2 
 						case D_90: case D_270:
-							if (_play_field[y+3][x-2] ||
-									_play_field[y+3][x-1] ||
-									_play_field[y+2][x]){
+							if (_game_data->play_field[y+3][x-2] ||
+									_game_data->play_field[y+3][x-1] ||
+									_game_data->play_field[y+2][x]){
 								legal_move = false;
 							}
 							break;
@@ -984,9 +990,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 2
 						//     3
 						case D_0: case D_180:
-							if (_play_field[y][x-2] ||
-									_play_field[y+1][x-2] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x-2] ||
+									_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -994,8 +1000,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 0
 						// 3 2 
 						case D_90: case D_270:
-							if (_play_field[y+1][x-2] ||
-									_play_field[y+2][x-3]){
+							if (_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+2][x-3]){
 								legal_move = false;
 							}
 							break;
@@ -1006,9 +1012,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x -= 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1023,9 +1029,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 2
 						//     3
 						case D_0: case D_180:
-							if (_play_field[y][x] ||
-									_play_field[y+1][x+1] ||
-									_play_field[y+2][x+1]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y+1][x+1] ||
+									_game_data->play_field[y+2][x+1]){
 								legal_move = false;
 							}
 							break;
@@ -1033,8 +1039,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 0
 						// 3 2 
 						case D_90: case D_270:
-							if (_play_field[y+1][x+1] ||
-									_play_field[y+2][x]){
+							if (_game_data->play_field[y+1][x+1] ||
+									_game_data->play_field[y+2][x]){
 								legal_move = false;
 							}
 							break;
@@ -1045,9 +1051,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x += 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 
@@ -1063,8 +1069,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 2
 						//     3
 						case D_0: case D_180:
-							if (_play_field[y-1][x-1] ||
-									_play_field[y][x]){
+							if (_game_data->play_field[y-1][x-1] ||
+									_game_data->play_field[y][x]){
 								legal_move = false;
 							}
 							break;
@@ -1072,9 +1078,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   1 0
 						// 3 2 
 						case D_90: case D_270:
-							if (_play_field[y][x] ||
-									_play_field[y][x-1] ||
-									_play_field[y+1][x-1]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+1][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1085,9 +1091,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1114,8 +1120,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							if (x_min == 0){
 								legal_move = false;
 							}
-							if (_play_field[y+1][x-2] ||
-									_play_field[y+2][x]){
+							if (_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+2][x]){
 								legal_move = false;
 							}
 
@@ -1124,8 +1130,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 3 2 
 						//   1 0
 						case D_90: case D_270:
-							if (_play_field[y][x] ||
-									_play_field[y+1][x]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y+1][x]){
 								legal_move = false;
 							}
 							break;
@@ -1136,9 +1142,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1154,8 +1160,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   2 1
 						//   3
 						case D_0: case D_180:
-							if (_play_field[y+2][x] ||
-									_play_field[y+3][x-1]){
+							if (_game_data->play_field[y+2][x] ||
+									_game_data->play_field[y+3][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1163,9 +1169,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 3 2 
 						//   1 0
 						case D_90: case D_270:
-							if (_play_field[y+2][x-2] ||
-									_play_field[y+3][x-1] ||
-									_play_field[y+3][x]){
+							if (_game_data->play_field[y+2][x-2] ||
+									_game_data->play_field[y+3][x-1] ||
+									_game_data->play_field[y+3][x]){
 								legal_move = false;
 							}
 							break;
@@ -1191,9 +1197,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   2 1
 						//   3
 						case D_0: case D_180:
-							if (_play_field[y][x-1] ||
-									_play_field[y+1][x-2] ||
-									_play_field[y+2][x-2]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+2][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1201,8 +1207,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 3 2 
 						//   1 0
 						case D_90: case D_270:
-							if (_play_field[y+1][x-3] ||
-									_play_field[y+2][x-2]){
+							if (_game_data->play_field[y+1][x-3] ||
+									_game_data->play_field[y+2][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1213,9 +1219,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x -= 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1230,9 +1236,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   2 1
 						//   3
 						case D_0: case D_180:
-							if (_play_field[y][x+1] ||
-									_play_field[y+1][x+1] ||
-									_play_field[y+2][x]){
+							if (_game_data->play_field[y][x+1] ||
+									_game_data->play_field[y+1][x+1] ||
+									_game_data->play_field[y+2][x]){
 								legal_move = false;
 							}
 							break;
@@ -1240,8 +1246,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 3 2 
 						//   1 0
 						case D_90: case D_270:
-							if (_play_field[y+1][x] ||
-									_play_field[y+2][x+1]){
+							if (_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+2][x+1]){
 								legal_move = false;
 							}
 							break;
@@ -1252,9 +1258,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x += 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 
@@ -1271,8 +1277,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						//   2 1
 						//   3
 						case D_0: case D_180:
-							if (_play_field[y-1][x] ||
-									_play_field[y][x-1]){
+							if (_game_data->play_field[y-1][x] ||
+									_game_data->play_field[y][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1280,9 +1286,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 						// 3 2 
 						//   1 0
 						case D_90: case D_270:
-							if (_play_field[y+1][x] ||
-									_play_field[y][x-1] ||
-									_play_field[y][x-2]){
+							if (_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1293,9 +1299,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1323,9 +1329,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							// 3 0
 							//   1
 							//   2
-							if (_play_field[y+1][x] ||
-									_play_field[y+1][x-2] ||
-									_play_field[y+2][x-2]){
+							if (_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+2][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1333,9 +1339,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//     3
 							// 2 1 0
 							// 
-							if (_play_field[y][x-1] ||
-									_play_field[y][x-2] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y][x-2] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1343,9 +1349,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   1 
 							//   2
 							//   3 0
-							if (_play_field[y][x] ||
-									_play_field[y+1][x] ||
-									_play_field[y+1][x-2]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+1][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1353,9 +1359,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//
 							// 0 1 2
 							// 3    
-							if (_play_field[y][x-1] ||
-									_play_field[y+2][x] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+2][x] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1364,9 +1370,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1383,9 +1389,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							// 3 0
 							//   1
 							//   2
-							if (_play_field[y][x] ||
-									_play_field[y+1][x] ||
-									_play_field[y+1][x-2]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+1][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1393,9 +1399,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//     3
 							// 2 1 0
 							// 
-							if (_play_field[y][x-1] ||
-									_play_field[y+2][x] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+2][x] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1403,9 +1409,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   1 
 							//   2
 							//   3 0
-							if (_play_field[y+1][x] ||
-									_play_field[y+1][x-2] ||
-									_play_field[y+2][x-2]){
+							if (_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+2][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1413,9 +1419,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//
 							// 0 1 2
 							// 3    
-							if (_play_field[y][x-1] ||
-									_play_field[y][x-2] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y][x-2] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1423,9 +1429,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1442,7 +1448,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x])
+								if (_game_data->play_field[y+1][x])
 									legal_move = false;
 							}
 							break;
@@ -1453,7 +1459,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x])
+								if (_game_data->play_field[y+1][x])
 									legal_move = false;
 							}
 							break;
@@ -1463,8 +1469,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   3 0
 							x = origin.x;
 							y = origin.y;
-							if (_play_field[y+3][x] ||
-									_play_field[y+3][x-1]){
+							if (_game_data->play_field[y+3][x] ||
+									_game_data->play_field[y+3][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1475,7 +1481,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 1; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x])
+								if (_game_data->play_field[y+1][x])
 									legal_move = false;
 							}	
 							break;
@@ -1500,7 +1506,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 1; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x-1]){
+								if (_game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -1513,7 +1519,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x-1]){
+								if (_game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -1526,7 +1532,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 1; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x-1]){
+								if (_game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -1538,8 +1544,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							// 3    
 							x = origin.x;
 							y = origin.y;
-							if (_play_field[y+1][x-3] ||
-									_play_field[y+2][x-3]){
+							if (_game_data->play_field[y+1][x-3] ||
+									_game_data->play_field[y+2][x-3]){
 								legal_move = false;
 							}
 							break;
@@ -1547,9 +1553,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x -= 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1565,7 +1571,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -1579,7 +1585,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i == 0 || i == 3){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x+1]){
+									if (_game_data->play_field[y][x+1]){
 										legal_move = false;
 										break;
 									}
@@ -1594,7 +1600,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 3){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x+1]){
+									if (_game_data->play_field[y][x+1]){
 										legal_move = false;
 										break;
 									}
@@ -1608,7 +1614,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -1619,9 +1625,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x += 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 
@@ -1636,7 +1642,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i == 0 || i == 3){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y-1][x]){
+									if (_game_data->play_field[y-1][x]){
 										legal_move = false;
 										break;
 									}
@@ -1650,7 +1656,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 1; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y-1][x]){
+								if (_game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -1663,7 +1669,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 1; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y-1][x]){
+								if (_game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -1676,7 +1682,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y-1][x]){
+								if (_game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -1687,9 +1693,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1717,9 +1723,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   0
 							//   1
 							// 3 2
-							if (_play_field[y+1][x] ||
-									_play_field[y+2][x] ||
-									_play_field[y+1][x-2]){
+							if (_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+2][x] ||
+									_game_data->play_field[y+1][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1727,9 +1733,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							// 3
 							// 2 1 0
 							// 
-							if (_play_field[y][x-1] ||
-									_play_field[y+2][x-2] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+2][x-2] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1737,9 +1743,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   1 0
 							//   2
 							//   3
-							if (_play_field[y][x-2] ||
-									_play_field[y+1][x-2] ||
-									_play_field[y+1][x]){
+							if (_game_data->play_field[y][x-2] ||
+									_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+1][x]){
 								legal_move = false;
 							}
 							break;
@@ -1747,9 +1753,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//
 							// 0 1 2
 							//     3
-							if (_play_field[y][x] ||
-									_play_field[y][x-1] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1758,9 +1764,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1777,9 +1783,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   0
 							//   1
 							// 3 2
-							if (_play_field[y][x-2] ||
-									_play_field[y+1][x-2] ||
-									_play_field[y+1][x]){
+							if (_game_data->play_field[y][x-2] ||
+									_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+1][x]){
 								legal_move = false;
 							}
 							break;
@@ -1787,9 +1793,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							// 3
 							// 2 1 0
 							// 
-							if (_play_field[y][x] ||
-									_play_field[y][x-1] ||
-									_play_field[y+2][x-1]){
+							if (_game_data->play_field[y][x] ||
+									_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+2][x-1]){
 								legal_move = false;
 							}
 							break;
@@ -1797,9 +1803,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   1 0
 							//   2
 							//   3
-							if (_play_field[y+1][x-2] ||
-									_play_field[y+1][x] ||
-									_play_field[y+2][x]){
+							if (_game_data->play_field[y+1][x-2] ||
+									_game_data->play_field[y+1][x] ||
+									_game_data->play_field[y+2][x]){
 								legal_move = false;
 							}
 							break;
@@ -1807,9 +1813,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//
 							// 0 1 2
 							//     3
-							if (_play_field[y][x-1] ||
-									_play_field[y+2][x-1] ||
-									_play_field[y+2][x-2]){
+							if (_game_data->play_field[y][x-1] ||
+									_game_data->play_field[y+2][x-1] ||
+									_game_data->play_field[y+2][x-2]){
 								legal_move = false;
 							}
 							break;
@@ -1817,9 +1823,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1836,7 +1842,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x])
+								if (_game_data->play_field[y+1][x])
 									legal_move = false;
 							}
 							break;
@@ -1847,7 +1853,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x])
+								if (_game_data->play_field[y+1][x])
 									legal_move = false;
 							}
 							break;
@@ -1857,8 +1863,8 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   3
 							x = origin.x;
 							y = origin.y;
-							if (_play_field[y+3][x-1] ||
-									_play_field[y+1][x]){
+							if (_game_data->play_field[y+3][x-1] ||
+									_game_data->play_field[y+1][x]){
 								legal_move = false;
 							}
 							break;
@@ -1870,7 +1876,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y+1][x])
+									if (_game_data->play_field[y+1][x])
 										legal_move = false;
 								}
 							}	
@@ -1897,7 +1903,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x-1]){
+									if (_game_data->play_field[y][x-1]){
 										legal_move = false;
 										break;
 									}
@@ -1911,7 +1917,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x-1]){
+								if (_game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -1924,7 +1930,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 1; i < TETRA; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x-1]){
+								if (_game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -1938,7 +1944,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1 || i != 2){	
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x-1]){
+									if (_game_data->play_field[y][x-1]){
 										legal_move = false;
 										break;
 									}
@@ -1949,9 +1955,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x -= 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -1967,7 +1973,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i < 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -1981,7 +1987,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1 || i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x+1]){
+									if (_game_data->play_field[y][x+1]){
 										legal_move = false;
 										break;
 									}
@@ -1996,7 +2002,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x+1]){
+									if (_game_data->play_field[y][x+1]){
 										legal_move = false;
 										break;
 									}
@@ -2010,7 +2016,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i < TETRA; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -2021,9 +2027,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x += 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 
@@ -2038,7 +2044,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1 || i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y-1][x]){
+									if (_game_data->play_field[y-1][x]){
 										legal_move = false;
 										break;
 									}
@@ -2053,7 +2059,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y-1][x]){
+									if (_game_data->play_field[y-1][x]){
 										legal_move = false;
 										break;
 									}
@@ -2067,7 +2073,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 1; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y-1][x]){
+								if (_game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -2080,7 +2086,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y-1][x]){
+								if (_game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -2091,9 +2097,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -2120,28 +2126,28 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							//   0
 							// 3 1
 							//   2
-							if (_play_field[y+1][x])
+							if (_game_data->play_field[y+1][x])
 								legal_move = false;
 							break;
 						case D_90:
 							//   3
 							// 0 1 2
 							// 
-							if (_play_field[y+2][x-1])
+							if (_game_data->play_field[y+2][x-1])
 								legal_move = false;
 							break;
 						case D_180:
 							//   0 
 							//   1 3
 							//   2
-							if (_play_field[y+1][x-2])
+							if (_game_data->play_field[y+1][x-2])
 								legal_move = false;
 							break;
 						case D_270:
 							//
 							// 0 1 2
 							//   3
-							if (_play_field[y][x-1])
+							if (_game_data->play_field[y][x-1])
 								legal_move = false;
 							break;
 
@@ -2149,9 +2155,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->d_rot = rotate_Tetronimo(tetronimo, move);
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -2168,7 +2174,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x]){
+								if (_game_data->play_field[y+1][x]){
 									legal_move = false;
 									break;
 								}
@@ -2181,7 +2187,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x]){
+								if (_game_data->play_field[y+1][x]){
 									legal_move = false;
 									break;
 								}
@@ -2194,7 +2200,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y+1][x]){
+								if (_game_data->play_field[y+1][x]){
 									legal_move = false;
 									break;
 								}
@@ -2208,7 +2214,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y+1][x]){
+									if (_game_data->play_field[y+1][x]){
 										legal_move = false;
 										break;
 									}
@@ -2237,7 +2243,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x-1]){
+									if (_game_data->play_field[y][x-1]){
 										legal_move = false;
 										break;
 									}
@@ -2252,7 +2258,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1 || i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x-1]){
+									if (_game_data->play_field[y][x-1]){
 										legal_move = false;
 										break;
 									}
@@ -2266,7 +2272,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x-1]){
+								if (_game_data->play_field[y][x-1]){
 									legal_move = false;
 									break;
 								}
@@ -2280,7 +2286,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1 || i != 2){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x-1]){
+									if (_game_data->play_field[y][x-1]){
 										legal_move = false;
 										break;
 									}
@@ -2291,9 +2297,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x -= 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -2309,7 +2315,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -2322,7 +2328,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -2336,7 +2342,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y][x+1]){
+									if (_game_data->play_field[y][x+1]){
 										legal_move = false;
 										break;
 									}
@@ -2350,7 +2356,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 2; i <= 3; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y][x+1]){
+								if (_game_data->play_field[y][x+1]){
 									legal_move = false;
 									break;
 								}
@@ -2360,9 +2366,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move)
 						tetronimo->origin.x += 1;
 					else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 
@@ -2377,7 +2383,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y-1][x]){
+									if (_game_data->play_field[y-1][x]){
 										legal_move = false;
 										break;
 									}
@@ -2392,7 +2398,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y-1][x]){
+									if (_game_data->play_field[y-1][x]){
 										legal_move = false;
 										break;
 									}
@@ -2407,7 +2413,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 								if (i != 1){
 									x = tetronimo->pieces[i].x;
 									y = tetronimo->pieces[i].y;
-									if (_play_field[y-1][x]){
+									if (_game_data->play_field[y-1][x]){
 										legal_move = false;
 										break;
 									}
@@ -2421,7 +2427,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 							for (int i = 0; i <= 2; i++){
 								x = tetronimo->pieces[i].x;
 								y = tetronimo->pieces[i].y;
-								if (_play_field[y-1][x]){
+								if (_game_data->play_field[y-1][x]){
 									legal_move = false;
 									break;
 								}
@@ -2431,9 +2437,9 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 					if (legal_move){
 						tetronimo->origin.y -= 1;
 					} else {
-						if (!_sfx_muted && _should_nudge){
-							SFX_PlaySFX(_sfx_nudge);
-							_should_nudge = false;
+						if (!_sfx->muted && _sfx->should_nudge){
+							SFX_PlaySFX(_sfx->nudge);
+							_sfx->should_nudge = false;
 						}
 					}
 					break;
@@ -2449,7 +2455,7 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	}
 	// Set piece coords in tetronimo struct
 	set_Tetronimo(tetronimo); 
-	// Set tetronimo to _play_field
+	// Set tetronimo to _game_data->play_field
 	set_To_Field(tetronimo);
 	return is_falling;
 }

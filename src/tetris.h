@@ -26,14 +26,6 @@
 #define NUM_TETRONIMOS 7
 // Number of blocks per tetronimo
 #define TETRA 4 
-
-extern uint32_t _lines_cleared;
-extern uint32_t _player_score;
-extern int16_t _lines_until_level;
-extern float _fps;
-
-// global piece counter
-extern uint16_t _tetronimo_counter[NUM_TETRONIMOS+1];
 // +1 to include T_NONE but we won't count T_NONE pieces
 
 struct RGB_Color;
@@ -64,12 +56,23 @@ typedef enum {
 	T_T
 } T_Type;
 
-
-// First 20 (the top 20) lines respective to the y-axis are not visible.
-// 10x40 actual, 10x20 visible
-extern T_Type _play_field[FIELD_Y][FIELD_X];
-
 const char* T_Type_to_str(T_Type t_type);
+
+typedef struct GameData {
+	uint8_t level;
+	uint32_t lines_cleared;
+	uint32_t player_score;
+	int16_t lines_until_level;
+	float fps;
+	uint16_t tetronimo_counter[NUM_TETRONIMOS+1];
+	// First 20 (the top 20) lines respective to the y-axis are not visible.
+	// 10x40 (However only 10x20 is visible to the player)
+	T_Type play_field[FIELD_Y][FIELD_X];
+} GameData;
+
+extern GameData* _game_data;
+
+void init_GameData();
 
 // Degrees of rotation
 typedef enum { 
@@ -81,12 +84,6 @@ typedef enum {
 
 const char* D_Rot_to_str(D_Rot d_rot);
 
-// Gets the minimums and maximum x or y coordinates of a tetronimo
-int max_x(struct Tetronimo* tetronimo);
-int min_x(struct Tetronimo* tetronimo);
-int max_y(struct Tetronimo* tetronimo);
-int min_y(struct Tetronimo* tetronimo);
-
 typedef struct Coords {
 	uint16_t x, y;
 } Coords;
@@ -97,6 +94,12 @@ typedef struct Tetronimo {
 	Coords pieces[4]; // The coordinates of each individual piece
 	D_Rot d_rot; // The degrees of rotation of the tetronimo
 } Tetronimo;
+
+// Gets the minimums and maximum x or y coordinates of a tetronimo
+int max_x(Tetronimo* tetronimo);
+int min_x(Tetronimo* tetronimo);
+int max_y(Tetronimo* tetronimo);
+int min_y(Tetronimo* tetronimo);
 
 // Returns a random Tetronimo type
 T_Type rand_T_Type();
@@ -127,7 +130,7 @@ void ClearLine(uint8_t y);
 bool* GetLinesToClear();
 
 // Sets global lines until next level for every level up
-void GetLinesUntilNextLevel(uint8_t level);
+void GetLinesUntilNextLevel();
 
 // Exit the game and display the final score
 void QuitGame(SDL_Window* window, SDL_Renderer* renderer);

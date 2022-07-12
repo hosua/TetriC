@@ -11,7 +11,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-extern bool _sfx_muted;
 void SFX_PlayBGM(const char* bgm_path, int8_t bgm_vol);
 void SFX_StopBGM(Mix_Music* bgm);
 void SFX_MuteBGM();
@@ -19,17 +18,24 @@ void SFX_ResumeBGM();
 
 void SFX_MusicVol(uint8_t vol);
 
-// If _should_nudge is true, nudge sound will play and then it will be unset for _nudge_delay milleseconds.
-extern bool _should_nudge;
 
 #define NUM_SOUNDS 4
 
-extern Mix_Chunk* _sfx_lockpiece; 
-extern Mix_Chunk* _sfx_tetris; 
-extern Mix_Chunk* _sfx_menu; 
-extern Mix_Chunk* _sfx_lineclear;
-extern Mix_Chunk* _sfx_levelup;
-extern Mix_Chunk* _sfx_nudge;
+typedef struct SFX {
+	Mix_Chunk* lock_piece;
+	Mix_Chunk* line_clear;
+	Mix_Chunk* level_up;
+	Mix_Chunk* tetris;
+	Mix_Chunk* menu;
+	Mix_Chunk* nudge;
+
+	// If _should_nudge is true, nudge sound will play and then it will be unset for _nudge_delay milleseconds.
+	bool should_nudge;
+	bool muted;
+	int8_t bgm_vol;
+} SFX;
+
+extern SFX* _sfx;
 
 // Load all sfx into memory
 void SFX_LoadSoundBank();

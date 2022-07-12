@@ -38,12 +38,12 @@ void VolumeController(SDL_Event event){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 	if (event.type == SDL_KEYDOWN && !event.key.repeat){
 		if (kb_state[SDL_SCANCODE_M]){
-			if (_sfx_muted){
-				_sfx_muted = false;
+			if (_sfx->muted){
+				_sfx->muted = false;
 				SFX_ResumeBGM();
 				printf("Unmuted SFX\n");
 			} else {
-				_sfx_muted = true;
+				_sfx->muted = true;
 				SFX_MuteBGM();
 				printf("Muted SFX\n");
 			}

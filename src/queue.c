@@ -28,7 +28,6 @@ void enqueue(T_Type t_type, Queue* queue){
 		queue->tail->next = new_node;
 		queue->tail = new_node;
 	}
-	// printf("Enqueued: %s\n", T_Type_to_str(t_type));
 }
 
 // Dequeue from head
@@ -37,7 +36,6 @@ void dequeue(Queue* queue){
 	if (queue->head){
 		temp = queue->head;
 		queue->head = queue->head->next;
-		// printf("Dequeued: %s\n", T_Type_to_str(temp->t_type));
 	}
 	free(temp);
 }

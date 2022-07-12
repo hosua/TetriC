@@ -1,8 +1,34 @@
 #include "clock.h"
 
-uint32_t _tick = 17;
-uint32_t _last_tick = 0;
-uint32_t _num_ticks_passed = 0;
+// global clock
+Clock* _clock = NULL;
+// tick = 17, input_tick = 50, nudge delay = 1000, 
+void init_Clock(uint8_t tick, // The number of ms per game tick
+				uint8_t input_tick, // Used to slow down the repeat rate when holding down
+				uint16_t nudge_delay // Stops nudge sound from playing too often
+				){
+	_clock = (Clock*) malloc(sizeof(Clock));
+	_clock->tick = tick;
+	_clock->input_tick = input_tick;
+	_clock->nudge_delay = nudge_delay;
+	_clock->last_tick = 0;
+	_clock->num_ticks_passed = 0;
+	_clock->last_input_tick = 0;
+	_clock->last_nudge_tick = 0;
+}
+
+void print_ClockVals(){
+
+	printf("SDL_GetTicks: %i\n", SDL_GetTicks());
+	printf("tick: %i\n", _clock->tick);
+	printf("input tick: %i\n", _clock->input_tick);
+	printf("nudge delay: %i\n", _clock->nudge_delay);
+	printf("last tick: %i\n", _clock->last_tick);
+	printf("num ticks passed: %i\n", _clock->num_ticks_passed);
+	printf("last input tick: %i\n", _clock->last_input_tick);
+	printf("last nudge tick: %i\n", _clock->last_nudge_tick);
+
+}
 /* Level 	Frames per Gridcell
  * 00 		48
  * 01 		43
@@ -20,6 +46,15 @@ uint32_t _num_ticks_passed = 0;
  * 19–28 	2
  * 29+ 		1
  */
+
+/*
+ *
+ * extern uint32_t _clock->tick;
+ * extern uint32_t _clock->last_tick;
+ * extern uint32_t _num_ticks_passed;
+ * extern uint32_t _clock->input_tick;
+ * extern uint32_t _clock->last_input_tick;
+*/
 
 // Returns true if a level tick has passed, false if not.
 // Each tick is roughtly 1/60 seconds
@@ -54,37 +89,31 @@ bool LevelTimer(uint8_t level){
 			fpg = 1;
 			break;
 	}
-	if (curr_tick > _last_tick + (_tick * fpg)){
-		_num_ticks_passed++;	
-		_last_tick += (_tick * fpg);
-		if (VERBOSE) printf("Tick: %i\n", _num_ticks_passed);
+	if (curr_tick > _clock->last_tick + (_clock->tick * fpg)){
+		_clock->num_ticks_passed++;	
+		_clock->last_tick += (_clock->tick * fpg);
+		if (VERBOSE) printf("Tick: %i\n", _clock->num_ticks_passed);
 		return true;
 	}
 	return false;
 }
-
-uint32_t _input_tick = 50;
-uint32_t _last_input_tick = 0;
 
 // Input Timer will only have an effect on downward movement.
 bool InputTimer(){
 	uint32_t curr_tick = SDL_GetTicks();
-	if (curr_tick > _last_input_tick + _input_tick){
-		_last_input_tick += _input_tick;
+	if (curr_tick > _clock->last_input_tick + _clock->input_tick){
+		_clock->last_input_tick += _clock->input_tick;
 		return true;
 	}
 	return false;
 }
-
-uint32_t _nudge_delay = 1000;
-uint32_t _last_nudge_tick = 0;
 
 // A timer to prevent the nudge sound from being spammed
 // Returns true if nudge timer bool should be reset
 bool NudgeTimer(){
 	uint32_t curr_tick = SDL_GetTicks();
-	if (curr_tick > _last_nudge_tick + _nudge_delay){
-		_last_nudge_tick += _nudge_delay;
+	if (curr_tick > _clock->last_nudge_tick + _clock->nudge_delay){
+		_clock->last_nudge_tick += _clock->nudge_delay;
 		return true;
 	}
 	return false;

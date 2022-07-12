@@ -14,21 +14,30 @@
 #include <stdbool.h>
 #include "input.h"
 
-extern uint32_t _tick;
-extern uint32_t _last_tick;
-extern uint32_t _num_ticks_passed;
+typedef struct Clock {
+	uint8_t tick;
+	uint32_t last_tick;
+	uint32_t num_ticks_passed;
 
-extern uint32_t _input_tick;
-extern uint32_t _last_input_tick;
+	uint8_t input_tick;
+	uint32_t last_input_tick;
+
+	uint16_t nudge_delay;
+	uint16_t last_nudge_tick;
+} Clock;
+
+extern Clock* _clock;
+void print_ClockVals();
+
+bool NudgeTimer();
+void init_Clock(uint8_t tick, // The number of ms per game tick
+				uint8_t input_tick, // Used to slow down the repeat rate when holding down
+				uint16_t nudge_delay // Stops nudge sound from playing too often
+				);
 
 // Returns true if a tick occurred;
 bool LevelTimer(uint8_t level);
 bool InputTimer();
-
-extern uint32_t _nudge_delay;
-extern uint32_t _last_nudge_tick;
-
-bool NudgeTimer();
 
 // Cross platform microseconds sleep
 void sleep_us(int microseconds);
