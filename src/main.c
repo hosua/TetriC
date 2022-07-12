@@ -57,7 +57,7 @@ int main(int argc, char **argv){
 	
 	/* Sound stuff */
 	// Loud sound effects into memory
-	SFX_LoadSoundBank();
+	init_SFX(50);
 	SFX_PlayBGM("sfx/trepak.mp3", 50);
 	/* End sound stuff */
 

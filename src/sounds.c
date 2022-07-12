@@ -36,12 +36,9 @@ void SFX_MusicVolDown(){
 // If _should_nudge is true, nudge sound will play and then it will be unset for _nudge_delay milleseconds.
 bool _should_nudge = true;
 
-void init_SFX(){
+void init_SFX(uint8_t bgm_vol){
 	_sfx = (SFX*)malloc(sizeof(SFX));
-}
 
-void SFX_LoadSoundBank(){
-	init_SFX();
 	// Open audio device
     if( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 ) == -1 ){
 		fprintf(stderr, "Error: Failed to open audio device\n");
@@ -54,6 +51,8 @@ void SFX_LoadSoundBank(){
 	_sfx->tetris =  Mix_LoadWAV("sfx/tetris-sound.wav");
 	_sfx->menu = Mix_LoadWAV("sfx/menu-sound.wav");
 	_sfx->nudge = Mix_LoadWAV("sfx/nudge.wav");
+
+	_sfx->bgm_vol = bgm_vol;
 
 	if (!_sfx->lock_piece || !_sfx->tetris || !_sfx->menu ){
 		fprintf(stderr, "Error: There was an error loading an sfx file: %s\n", Mix_GetError());

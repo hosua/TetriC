@@ -38,7 +38,7 @@ typedef struct SFX {
 extern SFX* _sfx;
 
 // Load all sfx into memory
-void SFX_LoadSoundBank();
+void init_SFX(uint8_t bgl_vol);
 
 void SFX_PlaySFX(Mix_Chunk* sfx);
 // Free sfx pointers from memory
