@@ -42,13 +42,13 @@ int main(int argc, char **argv){
 	}
 	if (SDL_Init(SDL_INIT_EVERYTHING)){
 		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
 	if (flags != (sound_res = Mix_Init(flags))) {
         printf("Could not initialize mixer (result: %d).\n", sound_res);
         printf("Mix_Init: %s\n", Mix_GetError());
-        exit(1);
+		exit(EXIT_FAILURE);
     }
 
 	// The points accrued from holding down
@@ -147,15 +147,18 @@ int main(int argc, char **argv){
 			}
 		}
 
-		_game_data->fps = elapsed;
-		// Render Tetronimos	
+		// Render tetronimos	
 		GFX_RenderBlocks(8, 0, window, renderer);
 		// Render the UI elements
 		GFX_RenderUI(20, 0, BLOCK_SIZE, buf, buf_max, _game_data->level, 
 				window, renderer, texture, font);
-		
+		// Render controls help
+		GFX_RenderHelp(20, 15, BLOCK_SIZE, buf, buf_max,  
+				window, renderer, texture, font);
+		// Render tetronimo statistics
 		GFX_RenderStatsUI(3, 1, BLOCK_SIZE/1.8f, buf, buf_max,
 				font, texture, window, renderer);
+		// Render next tetronimo queue
 		GFX_RenderQueue(30, 5, BLOCK_SIZE/1.8f, buf, buf_max, 3,
 				queue, font, texture, window, renderer);
 		// Present the renderings to the screen
@@ -163,6 +166,7 @@ int main(int argc, char **argv){
 		// Calculate FPS
 		uint64_t end = SDL_GetPerformanceCounter();
 		elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
+		_game_data->fps = elapsed;
 	}
 
 	QuitGame(window, renderer);

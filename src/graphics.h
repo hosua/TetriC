@@ -38,12 +38,15 @@ void GFX_RenderText(int x, int y, char *text,
 void GFX_RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max, uint8_t curr_level,
 		SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, TTF_Font* font);
 
+void GFX_RenderHelp(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max,
+		SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, TTF_Font* font);
+
 void GFX_RenderQueue(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size_t buf_max, uint8_t num_to_display,
 		Queue queue, TTF_Font* font, SDL_Texture* texture, SDL_Window* window, SDL_Renderer* renderer);
 
 void GFX_RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size_t buf_max,
 		TTF_Font* font, SDL_Texture* texture, SDL_Window* window, SDL_Renderer* renderer);
 
-Tetronimo* GFX_draw_Piece(T_Type t_type, uint16_t x, uint16_t y);
+Tetronimo* GFX_DrawTetronimo(T_Type t_type, uint16_t x, uint16_t y);
 
 #endif // GRAPHICS_H

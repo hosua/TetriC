@@ -131,7 +131,7 @@ void GFX_RenderText(int x, int y, char *text,
     rect->h = text_height;
 }
 
-Tetronimo* GFX_draw_Piece(T_Type t_type, uint16_t x, uint16_t y){
+Tetronimo* GFX_DrawTetronimo(T_Type t_type, uint16_t x, uint16_t y){
 	Tetronimo* new_piece = (Tetronimo*)malloc(sizeof(Tetronimo));
 	new_piece->t_type = t_type;
 	new_piece->d_rot = D_90;
@@ -165,7 +165,7 @@ void GFX_RenderQueue(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size
 		for (int i = 0; i < num_to_display; i++, queue.head = queue.head->next){
 			y = ((i+1) * 2);
 			t_type = queue.head->t_type;
-			tetronimo = GFX_draw_Piece(t_type, (dx * 2)/ 6, dy + y);
+			tetronimo = GFX_DrawTetronimo(t_type, (dx * 2)/ 6, dy + y);
 			GFX_SetRenderColorByType(t_type, renderer);
 			rects = GFX_GetTetronimoByOrigin(dx, dy + y, block_size, tetronimo, window, renderer);
 			SDL_RenderFillRects(renderer, rects, TETRA);
@@ -176,7 +176,7 @@ void GFX_RenderQueue(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, size
 		for (int i = 0 ; queue.head; queue.head = queue.head->next, i++){
 			y = ((i+1) * 2);
 			t_type = queue.head->t_type;
-			tetronimo = GFX_draw_Piece(t_type, dx, dy + y);
+			tetronimo = GFX_DrawTetronimo(t_type, dx, dy + y);
 			GFX_SetRenderColorByType(t_type, renderer);
 			rects = GFX_GetTetronimoByOrigin(dx, dy + y, block_size, tetronimo, window, renderer);
 			SDL_RenderFillRects(renderer, rects, TETRA);
@@ -206,7 +206,7 @@ void GFX_RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size, char* buf, si
 	uint8_t y;
 	for (int t_type = T_O; t_type <= T_T; t_type++){
 		y = (t_type * 2);
-		tetronimo = GFX_draw_Piece(t_type, dx, dy + y);
+		tetronimo = GFX_DrawTetronimo(t_type, dx, dy + y);
 		GFX_SetRenderColorByType(t_type, renderer);
 		rects = GFX_GetTetronimoByOrigin(dx, dy + y, block_size, tetronimo, window, renderer);
 		SDL_RenderFillRects(renderer, rects, TETRA);
@@ -254,6 +254,34 @@ void GFX_RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8
 	snprintf(buf, buf_max,
 			"FPS: %f", 1.0f/_game_data->fps);
 	GFX_RenderText((dx * block_size), (dy * block_size) + (block_size * 20), buf, renderer, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+}
+
+void GFX_RenderHelp(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uint8_t buf_max,
+		SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* texture, TTF_Font* font){
+	SDL_Rect rect;
+	// After rendering a texture, you must always destroy it, otherwise it will leak memory
+	snprintf(buf, buf_max, "CONTROLS");
+	GFX_RenderText((dx * block_size), (dy * block_size), buf, renderer, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+
+	snprintf(buf, buf_max, "arrow keys: movement");
+	GFX_RenderText((dx * block_size), (dy * block_size) + (block_size * 1), buf, renderer, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+
+	snprintf(buf, buf_max, "z x: rotate");
+	GFX_RenderText((dx * block_size), (dy * block_size) + (block_size * 2), buf, renderer, font, &texture, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+	if (_sfx->muted){
+		snprintf(buf, buf_max, "m: unmute sound");
+	} else {
+		snprintf(buf, buf_max, "m: mute sound");
+	}
+	GFX_RenderText((dx * block_size), (dy * block_size) + (block_size * 3), buf, renderer, font, &texture, &rect);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 	SDL_DestroyTexture(texture);
 }

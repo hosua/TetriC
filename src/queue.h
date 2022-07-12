@@ -24,5 +24,5 @@ T_Type peek(Queue queue);
 
 void print_Queue(Node* head);
 
-#endif
+#endif // QUEUE_H
 

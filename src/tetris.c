@@ -7,6 +7,7 @@ void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 	printf("Game over!\n"
 		   "You cleared %i lines before losing.\n"
 		   "Your final score was: %i\n", _game_data->lines_cleared, _game_data->player_score);
+	free(_game_data);
 	free(_clock);
 	SFX_FreeSFX();
 	SDL_DestroyRenderer(renderer);
@@ -24,9 +25,6 @@ void init_GameData(uint8_t start_level){
 
 	for (int i = 1; i <= NUM_TETRONIMOS; i++)
 		_game_data->tetronimo_counter[i] = 0; 
-	
-	// for (int y = 0; y < FIELD_Y; y++)
-	// 	memset(_game_data->play_field[y], T_NONE, (FIELD_X-1) * sizeof(uint8_t));
 }
 
 // The play field is numbers from lowest to greatest, top to bottom. So the bottom of the play field is not 0, it is 39.
