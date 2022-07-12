@@ -16,6 +16,7 @@ void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 }
 void init_GameData(uint8_t start_level){
 	_game_data = (GameData*)malloc(sizeof(GameData));
+	_game_data->player_score = 0;
 	_game_data->lines_cleared = 0;
 	_game_data->lines_until_level = 0;
 	_game_data->fps = 0;
