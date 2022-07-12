@@ -72,7 +72,7 @@ typedef struct GameData {
 
 extern GameData* _game_data;
 
-void init_GameData();
+void init_GameData(uint8_t start_level);
 
 // Degrees of rotation
 typedef enum { 

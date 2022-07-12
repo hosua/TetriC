@@ -18,7 +18,9 @@ int main(int argc, char **argv){
 
 	int sound_res = 0; 
 	int flags = MIX_INIT_MP3;
-	init_GameData();
+
+	// TODO: Currently, we always start the game at level 0. I need to implement a way to start at a different level.
+	init_GameData(0);
 	// tick = 17, input_tick = 50, nudge delay = 1000, 
 	init_Clock(17, 50, 1000);
 

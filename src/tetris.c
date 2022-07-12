@@ -14,11 +14,12 @@ void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 	SDL_CloseAudio();
 	SDL_Quit();
 }
-void init_GameData(){
+void init_GameData(uint8_t start_level){
 	_game_data = (GameData*)malloc(sizeof(GameData));
 	_game_data->lines_cleared = 0;
 	_game_data->lines_until_level = 0;
 	_game_data->fps = 0;
+	_game_data->level = start_level;
 
 	for (int i = 1; i <= NUM_TETRONIMOS; i++)
 		_game_data->tetronimo_counter[i] = 0; 
