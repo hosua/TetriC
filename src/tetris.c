@@ -9,11 +9,12 @@ void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
 		   "Your final score was: %i\n", _game_data->lines_cleared, _game_data->player_score);
 	free(_game_data);
 	free(_clock);
-	SFX_FreeSFX();
+	free(_sfx);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_CloseAudio();
 	SDL_Quit();
+	exit(EXIT_SUCCESS);
 }
 void init_GameData(uint8_t start_level){
 	_game_data = (GameData*)malloc(sizeof(GameData));
@@ -111,12 +112,12 @@ Tetronimo* new_Tetronimo(T_Type t_type){
 	tetronimo->origin.x = SPAWN_X;
 	tetronimo->origin.y = SPAWN_Y;
 	set_Tetronimo(tetronimo);
-	set_To_Field(tetronimo);
+	set_ToField(tetronimo);
 	return tetronimo;
 }
 
 // Helper function for set_Tetronimo to set tetronimo onto the _game_data->play_field;
-void set_To_Field(Tetronimo* tetronimo){
+void set_ToField(Tetronimo* tetronimo){
 	T_Type t_type = tetronimo->t_type;
 	int x = 0, y = 0;
 
@@ -245,7 +246,7 @@ uint16_t CalcScore(uint8_t lines_cleared, uint8_t level){
 	return calculated_score;
 }
 
-// Sets Tetronimo with respect to its origin and degree of rotation, then calls set_To_Field()
+// Sets Tetronimo with respect to its origin and degree of rotation, then calls set_ToField()
 void set_Tetronimo(Tetronimo* tetronimo){
 	Coords origin = tetronimo->origin;
 	T_Type t_type = tetronimo->t_type;
@@ -2456,6 +2457,6 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 	// Set piece coords in tetronimo struct
 	set_Tetronimo(tetronimo); 
 	// Set tetronimo to _game_data->play_field
-	set_To_Field(tetronimo);
+	set_ToField(tetronimo);
 	return is_falling;
 }

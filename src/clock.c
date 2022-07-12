@@ -47,15 +47,6 @@ void print_ClockVals(){
  * 29+ 		1
  */
 
-/*
- *
- * extern uint32_t _clock->tick;
- * extern uint32_t _clock->last_tick;
- * extern uint32_t _num_ticks_passed;
- * extern uint32_t _clock->input_tick;
- * extern uint32_t _clock->last_input_tick;
-*/
-
 // Returns true if a level tick has passed, false if not.
 // Each tick is roughtly 1/60 seconds
 bool LevelTimer(uint8_t level){

@@ -115,11 +115,11 @@ bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetro
 // Returns true if the player lost
 bool IsPlayerDead();
 
-// set_To_Field() and set_Tetronimo() are helper functions for move_Tetronimo() and should not be called directly 
+// set_ToField() and set_Tetronimo() are helper functions for move_Tetronimo() and should not be called directly 
 // Sets the coordinates of the pieces array in a tetronimo struct
 void set_Tetronimo(Tetronimo* tetronimo);
 // Sets the tetronimo to the _play_field
-void set_To_Field(Tetronimo* tetronimo);
+void set_ToField(Tetronimo* tetronimo);
 
 // Checks for full lines and clears them 
 uint8_t CheckLines();

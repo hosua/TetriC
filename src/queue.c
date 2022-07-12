@@ -1,7 +1,5 @@
 #include "queue.h"
 
-uint8_t _queue_limit = 7;
-
 Node* new_Node(T_Type t_type){
 	Node* new_node = malloc(sizeof(Node));
 	new_node->t_type = t_type;
@@ -9,9 +7,10 @@ Node* new_Node(T_Type t_type){
 	return new_node;
 }
 
-Queue init_Queue(){
+Queue init_Queue(uint8_t queue_limit){
 	Queue queue;
 	queue.tail = queue.head = NULL;
+	queue.limit = queue_limit;
 	return queue;
 }
 
@@ -30,14 +29,17 @@ void enqueue(T_Type t_type, Queue* queue){
 	}
 }
 
-// Dequeue from head
-void dequeue(Queue* queue){
+// Dequeue from head and return the value
+T_Type dequeue(Queue* queue){
+	T_Type t_type = T_NONE;
 	Node *temp = NULL;	
 	if (queue->head){
 		temp = queue->head;
 		queue->head = queue->head->next;
+		t_type = queue->head->t_type;
 	}
 	free(temp);
+	return t_type;
 }
 
 void print_Queue(Node* head){

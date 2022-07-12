@@ -21,8 +21,11 @@ int main(int argc, char **argv){
 
 	// TODO: Currently, we always start the game at level 0. I need to implement a way to start at a different level.
 	init_GameData(0);
-	// tick = 17, input_tick = 50, nudge delay = 1000, 
-	init_Clock(17, 50, 1000);
+
+	init_Clock(17, // ms per tick
+			   50, // ms per input tick
+			   1000 // ms per nudge delay
+			   );
 
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
@@ -62,13 +65,12 @@ int main(int argc, char **argv){
 	/* End sound stuff */
 
 	/* Queue stuff */
-	Queue queue = init_Queue();
+	Queue queue = init_Queue(7);
 	// Fill queue with pieces
-	for (int i = 0; i < _queue_limit; i++)
+	for (int i = 0; i < queue.limit; i++)
 		enqueue(rand_T_Type(), &queue);
 	// Get first piece from queue
-	Tetronimo* tetronimo = new_Tetronimo(peek(queue));
-	dequeue(&queue);
+	Tetronimo* tetronimo = new_Tetronimo(dequeue(&queue));
 	enqueue(rand_T_Type(), &queue);
 	/* End queue stuff */
 	
@@ -122,10 +124,9 @@ int main(int argc, char **argv){
 				free(tetronimo);
 
 				// dequeue a new piece from queue to spawn it, then enqueue another 
-				T_Type t_type = peek(queue);
+				T_Type t_type = dequeue(&queue);
 				tetronimo = new_Tetronimo(t_type);
 				_game_data->tetronimo_counter[t_type]++;
-				dequeue(&queue);
 				enqueue(rand_T_Type(), &queue);
 				// print_Queue(queue.head);
 				
@@ -139,9 +140,8 @@ int main(int argc, char **argv){
 					// Set _game_data->lines_until_level
 					GetLinesUntilNextLevel(_game_data->level);
 					// Carry over extra lines
-					if (carry){
+					if (carry)
 						_game_data->lines_until_level -= carry;
-					}
 				}
 				down_points = 0;
 			}

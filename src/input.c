@@ -53,10 +53,10 @@ void VolumeController(SDL_Event event){
 
 const char* K_Name_to_str(K_Name k_name){
 	switch(k_name){
-		case K_LEFT: return "←";
-		case K_DOWN: return "↓";
-		case K_UP: return "↑";
-		case K_RIGHT: return "→";
+		case K_LEFT: return "left";
+		case K_DOWN: return "down";
+		case K_UP: return "up";
+		case K_RIGHT: return "right";
 		case K_Z: return "z";
 		case K_X: return "x"; 
 		default: return "Unknown K_Name"; 
