@@ -15,6 +15,10 @@ void init_GameData(uint8_t start_level){
 
 	for (int i = 1; i <= NUM_TETRONIMOS; i++)
 		_game_data->tetronimo_counter[i] = 0; 
+
+	// Init play field to 0
+	for (int y = 0; y < FIELD_Y; y++)
+		memset(_game_data->play_field[y], T_NONE, FIELD_X * sizeof(T_Type));
 }
 
 void InitEverything(){

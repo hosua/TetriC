@@ -15,7 +15,6 @@ void PlayGame(){
 
 	InitEverything();
 
-	// The points accrued from holding down
 	GFX_ClearScreen();
 	
 	/* Sound stuff */
@@ -45,7 +44,7 @@ void PlayGame(){
 		uint64_t start = SDL_GetPerformanceCounter();
 		SDL_Event event; 
 		SDL_PollEvent(&event);
-		GFX_ClearScreen(_gfx->window, _gfx->renderer);
+		GFX_ClearScreen();
 		// Get user input
 		SetKeyArray(event);
 		MovementHandler(event, tetronimo);
@@ -123,13 +122,31 @@ void PlayGame(){
 	QuitGame();
 }
 
+void MainMenu(){
+	// Char buffer for rendering text
+	char buf[128];
+	uint8_t buf_max = sizeof(buf);
+	for (;;){
+		GFX_RenderMainMenu(buf, buf_max);
+		SDL_RenderPresent(_gfx->renderer); 
+	}
+}
+
 // Game state
-typedef enum G_State { G_QUIT, G_MAIN, G_PLAYING, G_PAUSE} G_State;
-G_State g_state = G_PLAYING;
+typedef enum G_State { G_QUIT, G_MAIN, G_PLAY, G_PAUSE} G_State;
+G_State g_state = G_PLAY;
 
 int main(int argc, char **argv){
+
+	InitEverything();
+
+	GFX_ClearScreen();
+
 	switch (g_state){
-		case G_PLAYING:
+		case G_MAIN:
+			MainMenu();
+			break;
+		case G_PLAY:
 			PlayGame();
 			break;
 	}

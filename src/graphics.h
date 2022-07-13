@@ -40,7 +40,8 @@ SDL_Rect* GFX_GetTetronimoByOrigin(uint16_t x, uint16_t y, uint8_t block_size, T
 
 void GFX_ClearScreen();
 
-void GFX_RenderText(int x, int y, char *text, SDL_Rect* rect);
+void GFX_RenderText(int x, int y, int *tw, int *th, char *text, 
+		SDL_Color text_color, SDL_Rect* rect);
 
 void GFX_RenderUI(uint16_t dx, uint16_t dy, uint8_t block_size, 
 		char* buf, uint8_t buf_max, uint8_t curr_level);
@@ -55,5 +56,7 @@ void GFX_RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size,
 		char* buf, size_t buf_max);
 
 Tetronimo* GFX_DrawTetronimo(T_Type t_type, uint16_t x, uint16_t y);
+
+void GFX_RenderMainMenu(char* buf, size_t buf_max);
 
 #endif // GRAPHICS_H
