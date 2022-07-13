@@ -33,6 +33,9 @@ struct Coords;
 struct Tetronimo;
 struct I_Piece;
 
+// Initializes necessary startup functions
+void InitEverything();
+
 // Movement direction (And left and right rotation)
 typedef enum { 
 	M_LEFT, 
@@ -110,7 +113,7 @@ Tetronimo* new_Tetronimo(T_Type t_type);
 void print_Tetronimo_Coords(Tetronimo *tetronimo);
 
 // Returns true or false indicating if the piece is still falling or not
-bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction dir);
+bool move_Tetronimo(Tetronimo* tetronimo, M_Direction dir);
 
 // Returns true if the player lost
 bool IsPlayerDead();
@@ -133,6 +136,6 @@ bool* GetLinesToClear();
 void GetLinesUntilNextLevel();
 
 // Exit the game and display the final score
-void QuitGame(SDL_Window* window, SDL_Renderer* renderer);
+void QuitGame();
 
 #endif // TETRIS_H

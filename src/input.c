@@ -1,4 +1,5 @@
 #include "input.h"
+#include "graphics.h"
 
 // If keys[i] = 1, key is down, else it is up
 
@@ -6,12 +7,12 @@
 // K_LEFT, K_DOWN, K_UP, KEY_RIGHT, K_Z, K_X 
 bool keys[NUM_KEYS] = {0};
 
-void SetKeyArray(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer){
+void SetKeyArray(SDL_Event event){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
 	if (kb_state[SDL_SCANCODE_ESCAPE]){
 		printf("Player quit the game.\n");
-		QuitGame(window, renderer);
+		QuitGame(_gfx->window, _gfx->renderer);
 		exit(0);
 	}
 
@@ -64,23 +65,23 @@ const char* K_Name_to_str(K_Name k_name){
 }
 
 // Checks the keys array and moves the piece depending on if the key is set or not
-void DownwardMovementHandler(uint8_t* down_points, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
+void DownwardMovementHandler(uint8_t* down_points, Tetronimo* tetronimo){
 	if(keys[K_DOWN]){ 
-		move_Tetronimo(window, renderer, tetronimo, M_DOWN);
+		move_Tetronimo(tetronimo, M_DOWN);
 		(*down_points)++;
 	}
 }
 
 // All other movement will be 1:1
-void MovementHandler(SDL_Event event, SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo){
+void MovementHandler(SDL_Event event, Tetronimo* tetronimo){
 	const uint8_t *kb_state = SDL_GetKeyboardState(NULL);
 
 	if (event.type == SDL_KEYDOWN && !event.key.repeat){
-		// if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(window, renderer, tetronimo, M_UP);
-		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(window, renderer, tetronimo, M_LEFT);
-		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(window, renderer, tetronimo, M_RIGHT);
-		if (kb_state[SDL_SCANCODE_Z]) move_Tetronimo(window, renderer, tetronimo, M_ROT_LEFT);
-		if (kb_state[SDL_SCANCODE_X]) move_Tetronimo(window, renderer, tetronimo, M_ROT_RIGHT);
+		// if (kb_state[SDL_SCANCODE_UP]) move_Tetronimo(_gfx->window, _gfx->renderer, tetronimo, M_UP);
+		if (kb_state[SDL_SCANCODE_LEFT]) move_Tetronimo(tetronimo, M_LEFT);
+		if (kb_state[SDL_SCANCODE_RIGHT]) move_Tetronimo(tetronimo, M_RIGHT);
+		if (kb_state[SDL_SCANCODE_Z]) move_Tetronimo(tetronimo, M_ROT_LEFT);
+		if (kb_state[SDL_SCANCODE_X]) move_Tetronimo(tetronimo, M_ROT_RIGHT);
 	}
 }
 void PrintKeys(){

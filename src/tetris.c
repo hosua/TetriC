@@ -1,17 +1,43 @@
 #include "tetris.h"
 #include "clock.h"
+#include "graphics.h"
 
 GameData* _game_data = NULL;
 
-void QuitGame(SDL_Window* window, SDL_Renderer* renderer){
+void InitEverything(){
+	int sound_res = 0; 
+	int flags = MIX_INIT_MP3;
+
+	// TODO: Currently, we always start the game at level 0. I need to implement a way to start at a different level.
+	init_GameData(0);
+
+	init_Clock(17, // ms per tick
+			   50, // ms per input tick
+			   1000 // ms per nudge delay
+			   );
+	if (SDL_Init(SDL_INIT_EVERYTHING)){
+		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
+		exit(EXIT_FAILURE);
+	}
+	init_GFX();
+
+	if (flags != (sound_res = Mix_Init(flags))) {
+        printf("Could not initialize mixer (result: %d).\n", sound_res);
+        printf("Mix_Init: %s\n", Mix_GetError());
+		exit(EXIT_FAILURE);
+    }
+	init_SFX(50);
+}
+
+void QuitGame(){
 	printf("Game over!\n"
 		   "You cleared %i lines before losing.\n"
 		   "Your final score was: %i\n", _game_data->lines_cleared, _game_data->player_score);
 	free(_game_data);
 	free(_clock);
 	free(_sfx);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(_gfx->renderer);
+	SDL_DestroyWindow(_gfx->window);
 	SDL_CloseAudio();
 	SDL_Quit();
 	exit(EXIT_SUCCESS);
@@ -551,7 +577,7 @@ D_Rot rotate_Tetronimo(Tetronimo* tetronimo, M_Direction move){
 // Move tetronimo handles actually moving the pieces to their respective coordinates, as well as checking if a move 
 // is legal or not.
 // This function is fat, viewer discretion advised.
-bool move_Tetronimo(SDL_Window* window, SDL_Renderer* renderer, Tetronimo* tetronimo, M_Direction move){
+bool move_Tetronimo(Tetronimo* tetronimo, M_Direction move){
 	// When the piece can no longer move down further, we will need to "lock it".
 	// We do this by returning is_falling, and when it is false, the tetronimo is freed in main, and
 	// then a new one is generated.
