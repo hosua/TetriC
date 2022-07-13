@@ -14,7 +14,7 @@ I intend on making this clone as close to the original port on the NES, with som
 Graphics are rendered using SDL 2.0, so if you want to compile this from source you will need to download
 the SDL2 library files for your OS.
 
-![TetriC-alpha](images/TetriC-14.gif)
+![TetriC-alpha](images/TetriC.gif)
 
 # Compiling on Linux
 
