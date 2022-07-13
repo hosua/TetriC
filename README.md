@@ -14,7 +14,7 @@ I intend on making this clone as close to the original port on the NES, with som
 Graphics are rendered using SDL 2.0, so if you want to compile this from source you will need to download
 the SDL2 library files for your OS.
 
-![TetriC-alpha](images/TetriC-13.gif)
+![TetriC-alpha](images/TetriC-14.gif)
 
 # Compiling on Linux
 
@@ -59,13 +59,6 @@ in the MSYS2 terminal. This will install the ``gcc`` and ``make`` development to
 	- Type ``./compile.bat``, if everything went well, you should now have a file named ``TetriC.exe`` in
 	your Windows folder. You can now open it to play TetriC.
 ___
-### To Do List
-- [ ] Add level picker on game start
-- [ ] Add controls to UI
-- [ ] Implement a title screen
-- [ ] Implement volume controller (instead of just on/off)
-- [ ] Implement ghost piece
-- [ ] Implement a pause menu (or just the ability to pause)
 
 ### Sounds
 - [sxfr](https://sfxr.me/)
