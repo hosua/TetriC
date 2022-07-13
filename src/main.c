@@ -18,32 +18,7 @@ void PlayGame(){
 	int sound_res = 0; 
 	int flags = MIX_INIT_MP3;
 
-	// TODO: Currently, we always start the game at level 0. I need to implement a way to start at a different level.
-	init_GameData(0);
-
-	init_Clock(17, // ms per tick
-			   50, // ms per input tick
-			   1000 // ms per nudge delay
-			   );
-	if (SDL_Init(SDL_INIT_EVERYTHING)){
-		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
-	init_GFX();
-
-	if (flags != (sound_res = Mix_Init(flags))) {
-        printf("Could not initialize mixer (result: %d).\n", sound_res);
-        printf("Mix_Init: %s\n", Mix_GetError());
-		exit(EXIT_FAILURE);
-    }
-	init_SFX(50);
-
-	TTF_Init();
-	_gfx->font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
-	if (!_gfx->font){
-		fprintf(stderr, "Error: Font not found\n");
-		exit(EXIT_FAILURE);
-	}
+	InitEverything();
 
 	// The points accrued from holding down
 	uint8_t down_points = 0;

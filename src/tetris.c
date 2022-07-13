@@ -4,6 +4,18 @@
 
 GameData* _game_data = NULL;
 
+void init_GameData(uint8_t start_level){
+	_game_data = (GameData*)malloc(sizeof(GameData));
+	_game_data->player_score = 0;
+	_game_data->lines_cleared = 0;
+	_game_data->lines_until_level = 0;
+	_game_data->fps = 0;
+	_game_data->level = start_level;
+
+	for (int i = 1; i <= NUM_TETRONIMOS; i++)
+		_game_data->tetronimo_counter[i] = 0; 
+}
+
 void InitEverything(){
 	int sound_res = 0; 
 	int flags = MIX_INIT_MP3;
@@ -41,17 +53,6 @@ void QuitGame(){
 	SDL_CloseAudio();
 	SDL_Quit();
 	exit(EXIT_SUCCESS);
-}
-void init_GameData(uint8_t start_level){
-	_game_data = (GameData*)malloc(sizeof(GameData));
-	_game_data->player_score = 0;
-	_game_data->lines_cleared = 0;
-	_game_data->lines_until_level = 0;
-	_game_data->fps = 0;
-	_game_data->level = start_level;
-
-	for (int i = 1; i <= NUM_TETRONIMOS; i++)
-		_game_data->tetronimo_counter[i] = 0; 
 }
 
 // The play field is numbers from lowest to greatest, top to bottom. So the bottom of the play field is not 0, it is 39.

@@ -22,6 +22,7 @@ typedef struct GFX {
 
 extern GFX* _gfx;
 
+void init_Font();
 void init_GFX();
 
 SDL_Rect GFX_GetRect(uint16_t x, uint16_t y, uint8_t block_size);

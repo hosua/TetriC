@@ -2,6 +2,16 @@
 
 GFX* _gfx = NULL;
 
+void init_Font(){
+	TTF_Init();
+	_gfx->font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
+	if (!_gfx->font){
+		fprintf(stderr, "Error: Font not found\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+// Since init_Font() must occur after init_GFX(), we will just do it in here so we don't fuck it up later on
 void init_GFX(){
 	_gfx = (GFX*)malloc(sizeof(GFX));
 	_gfx->window = SDL_CreateWindow("TetriC", 
@@ -11,6 +21,8 @@ void init_GFX(){
 
 	_gfx->rect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
 	_gfx->texture = NULL;
+
+	init_Font();
 }
 
 // Create and return a single rect
@@ -42,17 +54,15 @@ void PrintPlayField(){
 
 SDL_Rect* GFX_GetBlocksInLine(uint16_t dx, uint16_t dy, uint16_t y, size_t* num_blocks){
 	SDL_Rect* blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
-	for (int i = 0; i < FIELD_X; i++){
+	for (int i = 0; i < FIELD_X; i++)
 		blocks[(*num_blocks)++] = GFX_GetRect((dx+i+1), (dy+y+1) - FIELD_Y/2, BLOCK_SIZE);	
-	}
 	return blocks;
 }
 
 SDL_Rect* GFX_GetTetronimoByOrigin(uint16_t x, uint16_t y, uint8_t block_size, Tetronimo* tetronimo){
 	SDL_Rect *blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * TETRA);
-	for (int i = 0; i < TETRA; i++){
+	for (int i = 0; i < TETRA; i++)
 		blocks[i] = GFX_GetRect(x + tetronimo->pieces[i].x, y + tetronimo->pieces[i].y, block_size);
-	}
 	return blocks;
 }
 
