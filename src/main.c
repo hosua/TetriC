@@ -5,8 +5,6 @@
 #include "queue.h"
 #include "sounds.h"
 
-#include "test.h"
-
 // Variable to determine if a piece is still falling. If one is not falling, a new piece is spawned.
 // and then this variable is set to true again.
 bool is_falling = false;
@@ -15,13 +13,9 @@ void PlayGame(){
 	// seed the RNG
 	srand(time(0));
 
-	int sound_res = 0; 
-	int flags = MIX_INIT_MP3;
-
 	InitEverything();
 
 	// The points accrued from holding down
-	uint8_t down_points = 0;
 	GFX_ClearScreen();
 	
 	/* Sound stuff */
@@ -42,7 +36,6 @@ void PlayGame(){
 	// Char buffer for rendering text
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
-	uint8_t lines_cleared_this_turn = 0;
 
 	float elapsed = 0.0f;
 	_game_data->fps = elapsed;
@@ -60,7 +53,7 @@ void PlayGame(){
 		VolumeController(event);
 		
 		if (InputTimer()){
-			DownwardMovementHandler(&down_points, tetronimo);
+			DownwardMovementHandler(tetronimo);
 		}
 		// NudgeTimer() prevents the nudge sfx from being spammed
 		if (NudgeTimer()){
@@ -71,21 +64,21 @@ void PlayGame(){
 			if (!is_falling){
 				if (IsPlayerDead())
 					QuitGame(_gfx->window, _gfx->renderer);
-				
 
-				lines_cleared_this_turn = CheckLines();
+				_game_data->lines_cleared_this_turn = CheckLines();
 				if (!_sfx->muted){
-					if (lines_cleared_this_turn == 4)
+					if (_game_data->lines_cleared_this_turn == 4)
 						SFX_Play(_sfx->tetris);
-					else if (lines_cleared_this_turn == 0)
+					else if (_game_data->lines_cleared_this_turn == 0)
 						SFX_Play(_sfx->lock_piece);
 					else
 						SFX_Play(_sfx->line_clear);
 
 				}
 				// The number of lines to carry over to the next level
-				uint8_t carry = lines_cleared_this_turn - _game_data->lines_until_level;
-				_game_data->lines_until_level -= lines_cleared_this_turn;
+				uint8_t carry = _game_data->lines_cleared_this_turn - _game_data->lines_until_level;
+				_game_data->lines_until_level -= _game_data->lines_cleared_this_turn;
+
 				free(tetronimo);
 
 				// dequeue a new piece from queue to spawn it, then enqueue another 
@@ -93,9 +86,8 @@ void PlayGame(){
 				tetronimo = new_Tetronimo(t_type);
 				_game_data->tetronimo_counter[t_type]++;
 				enqueue(rand_T_Type(), &queue);
-				
-				_game_data->player_score += CalcScore(lines_cleared_this_turn, _game_data->level);
-				_game_data->player_score += down_points;
+
+				CalcScore();	
 
 				if (_game_data->lines_until_level <= 0){
 					if (!_sfx->muted)
@@ -107,7 +99,6 @@ void PlayGame(){
 					if (carry)
 						_game_data->lines_until_level -= carry;
 				}
-				down_points = 0;
 			}
 		}
 
@@ -129,12 +120,13 @@ void PlayGame(){
 		_game_data->fps = elapsed;
 	}
 
-	QuitGame(_gfx->window, _gfx->renderer);
+	QuitGame();
 }
 
 // Game state
 typedef enum G_State { G_QUIT, G_MAIN, G_PLAYING, G_PAUSE} G_State;
 G_State g_state = G_PLAYING;
+
 int main(int argc, char **argv){
 	switch (g_state){
 		case G_PLAYING:

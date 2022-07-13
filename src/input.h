@@ -23,7 +23,7 @@ void PrintKeys();
 void SetKeyArray(SDL_Event event);
 
 // Checks the arrow states in the keys array and moves the piece depending on if the key is set or not. 
-void DownwardMovementHandler(uint8_t* down_points, Tetronimo* tetronimo);
+void DownwardMovementHandler(Tetronimo* tetronimo);
 
 // Handles rotation movement, ignores repeated keys.
 void MovementHandler(SDL_Event event, Tetronimo* tetronimo);

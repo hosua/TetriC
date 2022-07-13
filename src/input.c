@@ -65,10 +65,10 @@ const char* K_Name_to_str(K_Name k_name){
 }
 
 // Checks the keys array and moves the piece depending on if the key is set or not
-void DownwardMovementHandler(uint8_t* down_points, Tetronimo* tetronimo){
+void DownwardMovementHandler(Tetronimo* tetronimo){
 	if(keys[K_DOWN]){ 
 		move_Tetronimo(tetronimo, M_DOWN);
-		(*down_points)++;
+		_game_data->down_points++;
 	}
 }
 

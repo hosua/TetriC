@@ -8,6 +8,7 @@ void init_GameData(uint8_t start_level){
 	_game_data = (GameData*)malloc(sizeof(GameData));
 	_game_data->player_score = 0;
 	_game_data->lines_cleared = 0;
+	_game_data->lines_cleared_this_turn = 0;
 	_game_data->lines_until_level = 0;
 	_game_data->fps = 0;
 	_game_data->level = start_level;
@@ -247,23 +248,23 @@ void GetLinesUntilNextLevel(){
 // Calculates and returns the score accrued from the lines cleared in a turn 
 // (This function does not include points that are added from soft dropping a piece)
 // Reference: https://tetris.fandom.com/wiki/Scoring
-uint16_t CalcScore(uint8_t lines_cleared, uint8_t level){
+uint16_t CalcScore(){
 	uint16_t calculated_score = 0;
-	switch(lines_cleared){
+	switch(_game_data->lines_cleared_this_turn){
 		case 0:
 			calculated_score = 0;
 			break;
 		case 1:
-			calculated_score = 40 * (level + 1);
+			calculated_score = 40 * (_game_data->level + 1);
 			break;
 		case 2:
-			calculated_score = 100 * (level + 1);
+			calculated_score = 100 * (_game_data->level + 1);
 			break;
 		case 3:
-			calculated_score = 300 * (level + 1);
+			calculated_score = 300 * (_game_data->level + 1);
 			break;
 		case 4:
-			calculated_score = 1200 * (level + 1);
+			calculated_score = 1200 * (_game_data->level + 1);
 			break;
 		default:
 			fprintf(stderr, "Error: More than 4 lines were deleted in a single turn, this shouldn't be possible\n");

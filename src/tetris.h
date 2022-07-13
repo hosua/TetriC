@@ -64,8 +64,10 @@ const char* T_Type_to_str(T_Type t_type);
 typedef struct GameData {
 	uint8_t level;
 	uint32_t lines_cleared;
+	uint8_t lines_cleared_this_turn;
 	uint32_t player_score;
 	int16_t lines_until_level;
+	uint8_t down_points;
 	float fps;
 	uint16_t tetronimo_counter[NUM_TETRONIMOS+1];
 	// First 20 (the top 20) lines respective to the y-axis are not visible.
@@ -127,7 +129,8 @@ void set_ToField(Tetronimo* tetronimo);
 // Checks for full lines and clears them 
 uint8_t CheckLines();
 
-uint16_t CalcScore(uint8_t lines_cleared, uint8_t level);
+uint16_t CalcScore();
+
 // CheckLines() helper functions
 void ClearLine(uint8_t y);
 bool* GetLinesToClear();
