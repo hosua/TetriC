@@ -14,10 +14,6 @@ Queue init_Queue(uint8_t queue_limit){
 	return queue;
 }
 
-T_Type peek(Queue queue){
-	return queue.head->t_type;
-}
-
 // Enqueue to tail
 void enqueue(T_Type t_type, Queue* queue){
 	Node* new_node = new_Node(t_type);
@@ -35,8 +31,8 @@ T_Type dequeue(Queue* queue){
 	Node *temp = NULL;	
 	if (queue->head){
 		temp = queue->head;
-		queue->head = queue->head->next;
 		t_type = queue->head->t_type;
+		queue->head = queue->head->next;
 	}
 	free(temp);
 	return t_type;

@@ -17,7 +17,6 @@ typedef enum { K_LEFT, K_DOWN, K_UP, K_RIGHT, K_Z, K_X } K_Name;
 const char* K_Name_to_str(K_Name k_name);
 
 // If keys[i] = 1, key is down, else it is up
-extern bool keys[NUM_KEYS];
 void PrintKeys();
 
 // Sets the key array to true or false depending on the key state

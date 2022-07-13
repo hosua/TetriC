@@ -67,7 +67,7 @@ int main(int argc, char **argv){
 	/* Queue stuff */
 	Queue queue = init_Queue(7);
 	// Fill queue with pieces
-	for (int i = 0; i < queue.limit; i++)
+	for (int i = 0; i < queue.limit-1; i++)
 		enqueue(rand_T_Type(), &queue);
 	// Get first piece from queue
 	Tetronimo* tetronimo = new_Tetronimo(dequeue(&queue));
@@ -111,11 +111,11 @@ int main(int argc, char **argv){
 				lines_cleared_this_turn = CheckLines();
 				if (!_sfx->muted){
 					if (lines_cleared_this_turn == 4)
-						SFX_PlaySFX(_sfx->tetris);
+						SFX_Play(_sfx->tetris);
 					else if (lines_cleared_this_turn == 0)
-						SFX_PlaySFX(_sfx->lock_piece);
+						SFX_Play(_sfx->lock_piece);
 					else
-						SFX_PlaySFX(_sfx->line_clear);
+						SFX_Play(_sfx->line_clear);
 
 				}
 				// The number of lines to carry over to the next level
@@ -128,14 +128,13 @@ int main(int argc, char **argv){
 				tetronimo = new_Tetronimo(t_type);
 				_game_data->tetronimo_counter[t_type]++;
 				enqueue(rand_T_Type(), &queue);
-				// print_Queue(queue.head);
 				
 				_game_data->player_score += CalcScore(lines_cleared_this_turn, _game_data->level);
 				_game_data->player_score += down_points;
 
 				if (_game_data->lines_until_level <= 0){
 					if (!_sfx->muted)
-						SFX_PlaySFX(_sfx->level_up);
+						SFX_Play(_sfx->level_up);
 					_game_data->level++;
 					// Set _game_data->lines_until_level
 					GetLinesUntilNextLevel(_game_data->level);

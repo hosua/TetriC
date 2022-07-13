@@ -37,7 +37,7 @@ extern SFX* _sfx;
 // Load all sfx into memory
 void init_SFX(uint8_t bgl_vol);
 
-void SFX_PlaySFX(Mix_Chunk* sfx);
+void SFX_Play(Mix_Chunk* sfx);
 
 void SFX_MusicVolUp();
 void SFX_MusicVolDown();

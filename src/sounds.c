@@ -60,7 +60,7 @@ void init_SFX(uint8_t vol){
 	}
 }
 
-void SFX_PlaySFX(Mix_Chunk* sfx){
+void SFX_Play(Mix_Chunk* sfx){
 	
 	int channel = Mix_PlayChannel(-1, sfx, 0);
 	if (!sfx) { 
