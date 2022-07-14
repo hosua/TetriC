@@ -126,7 +126,11 @@ void MainMenu(){
 	// Char buffer for rendering text
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
+	init_GFX();
 	for (;;){
+		SDL_Event event;
+		SDL_PollEvent(&event);
+		SetKeyArray(event);
 		GFX_RenderMainMenu(buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
 	}

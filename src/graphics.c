@@ -335,6 +335,30 @@ void GFX_RenderHelp(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uin
 			color, &rect);
 }
 
+/* All code below this point is Menu rendering related stuff */
+/* TODO: See https://lazyfoo.net/tutorials/SDL/17_mouse_events/index.php */
+
+typedef struct Button {
+    // The attributes of the button
+    SDL_Rect box;
+    // The part of the button sprite sheet that will be shown
+    SDL_Rect* clip;
+    int x, y, w, h;
+} Button;
+
+// Initialize button variables
+Button init_Button(int x, int y, int w, int h){
+	Button button;
+	button.x = x, button.y = y, button.w = w, button.h = h;
+	button.clip = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+	return button;
+}
+
+// Handles events and set the button's sprite region
+void Button_handle_events(Button* button);
+// Shows the button on the screen
+void Button_show(Button button);
+
 void GFX_RenderMainMenu(char* buf, size_t buf_max){
 	int tw, th;
 	SDL_Rect rect;
