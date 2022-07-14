@@ -28,6 +28,11 @@
 #define TETRA 4 
 // +1 to include T_NONE but we won't count T_NONE pieces
 
+// Game state
+typedef enum G_State { G_QUIT, G_MAIN, G_PLAY, G_PAUSE} G_State;
+
+extern G_State _g_state;
+
 struct RGB_Color;
 struct Coords;
 struct Tetronimo;

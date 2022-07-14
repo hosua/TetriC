@@ -57,6 +57,35 @@ void GFX_RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size,
 
 Tetronimo* GFX_DrawTetronimo(T_Type t_type, uint16_t x, uint16_t y);
 
-void GFX_RenderMainMenu(char* buf, size_t buf_max);
+
+/* Menu stuff below */
+
+void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max);
+
+typedef enum B_Sprite {
+	 B_MOUSE_OUT,
+	 B_MOUSE_OVER,
+	 B_MOUSE_DOWN,
+	 B_MOUSE_UP,
+	 B_TOTAL
+} B_Sprite;
+
+typedef struct Button {
+    // The attributes of the button
+    SDL_Rect box;
+    // The part of the button sprite sheet that will be shown
+    SDL_Rect* clip;
+    int x, y, w, h;
+	// Origin is top left of button
+	SDL_Point origin;
+	B_Sprite curr_sprite;
+} Button;
+void set_Button(int x, int y, Button* button);
+Button init_Button(int w, int h,
+					int ox, int oy // x and y of origin
+					);
+void GFX_RenderButton(char* buf, size_t buf_max, Button button);
+
+void GFX_HandleButtonEvents(SDL_Event *e, Button* button);
 
 #endif // GRAPHICS_H

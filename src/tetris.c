@@ -2,6 +2,8 @@
 #include "clock.h"
 #include "graphics.h"
 
+// global game state
+G_State _g_state = G_MAIN;
 GameData* _game_data = NULL;
 
 void init_GameData(uint8_t start_level){

@@ -336,56 +336,105 @@ void GFX_RenderHelp(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uin
 }
 
 /* All code below this point is Menu rendering related stuff */
-/* TODO: See https://lazyfoo.net/tutorials/SDL/17_mouse_events/index.php */
-
-typedef struct Button {
-    // The attributes of the button
-    SDL_Rect box;
-    // The part of the button sprite sheet that will be shown
-    SDL_Rect* clip;
-    int x, y, w, h;
-} Button;
+// TODO: This code needs to be designed better
 
 // Initialize button variables
-Button init_Button(int x, int y, int w, int h){
+void set_Button(int x, int y, Button* button){
+	button->origin.x = x, button->origin.y = y;
+}
+Button init_Button(int w, int h,
+					int ox, int oy){
 	Button button;
-	button.x = x, button.y = y, button.w = w, button.h = h;
+	button.x = 0, button.y = 0;
+	button.w = w, button.h = h;
+
+	button.origin.x = ox, button.origin.y = oy;
 	button.clip = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+	button.curr_sprite = B_MOUSE_OUT;
 	return button;
 }
 
-// Handles events and set the button's sprite region
-void Button_handle_events(Button* button);
 // Shows the button on the screen
-void Button_show(Button button);
+void GFX_RenderButton(char* buf, size_t buf_max, Button button){
+	int tw = 0, th = 0;
+	// void GFX_RenderText(int x, int y, int *tw, int *th, char *text, 
+	// 		SDL_Color text_color, SDL_Rect* rect);
+	// printf("origin: (%i,%i)\n", button.origin.x, button.origin.y);
+	SDL_Rect rect;
+	SDL_Color color = {255, 255, 255, 255};
+	GFX_RenderText(button.origin.x, button.origin.y,
+					&tw, &th,
+					buf,
+					color,
+					&rect);
 
-void GFX_RenderMainMenu(char* buf, size_t buf_max){
+	rect.x = button.origin.x;
+	rect.y = button.origin.y;
+	rect.w = tw;
+	rect.h = th;
+	SDL_RenderDrawRect(_gfx->renderer, &rect);
+}
+
+void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max){
 	int tw, th;
 	SDL_Rect rect;
 	SDL_Color color = {255, 255, 255, 255};
-	uint16_t x = (SCREEN_X*3)/7;
-	uint16_t y = (SCREEN_Y/3);
-	uint16_t dy = BLOCK_SIZE;
-	// After rendering a _gfx->texture, you must always destroy it, otherwise it will leak memory
-	GFX_RenderImage(SCREEN_X/7, 0, 
+
+	GFX_RenderImage(SCREEN_X/4, 0, 
 			"img/TetriC-logo.png");
 
 	snprintf(buf, buf_max, "Play");
-	GFX_RenderText(x, y + (dy * 1), 
-			&tw, &th,
-			buf, 
-			color, &rect);
+	Button button = init_Button(50, 50, SCREEN_X, SCREEN_Y);
+	set_Button(SCREEN_X/3 + BLOCK_SIZE, SCREEN_Y/2, &button);
+	GFX_RenderButton(buf, buf_max, button);
+	GFX_HandleButtonEvents(&event, &button);
+}
 
-	snprintf(buf, buf_max, "Level select");
-	GFX_RenderText(x, y + (dy * 2), 
-			&tw, &th,
-			buf, 
-			color, &rect);
-
-	snprintf(buf, buf_max, "Settings");
-	GFX_RenderText(x, y + (dy * 3), 
-			&tw, &th,
-			buf, 
-			color, &rect);
-
+// TODO: Move to input.c
+// Handles events and set the button's sprite region
+void GFX_HandleButtonEvents(SDL_Event *e, Button* button){
+//If mouse event happened
+    if(e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP){
+        // Get mouse position
+        int mx, my;
+        SDL_GetMouseState(&mx, &my);
+		// Check if mouse is in button
+        bool inside = true;
+		// printf("mouse: (%i,%i)\n", mx, my);
+        // Mouse is left of the button
+        if (mx < button->origin.x){
+            inside = false;
+        // Mouse is right of the button
+        } else if (mx > button->origin.x + button->w){
+            inside = false;
+        // Mouse above the button
+        } else if (my < button->origin.y ){
+            inside = false;
+        // Mouse below the button
+        } else if (my > button->origin.y + button->h){
+            inside = false;
+        }
+		 //Mouse is outside button
+        if(!inside){
+            button->curr_sprite = B_MOUSE_OUT;
+        //Mouse is inside button
+        } else {
+            //Set mouse over sprite
+            switch( e->type ){
+                case SDL_MOUSEMOTION:
+                button->curr_sprite = B_MOUSE_OVER;
+                break;
+            
+                case SDL_MOUSEBUTTONDOWN:
+				printf("Clicked play\n");
+                button->curr_sprite = B_MOUSE_DOWN;
+				_g_state = G_PLAY;
+                break;
+                
+                case SDL_MOUSEBUTTONUP:
+                button->curr_sprite = B_MOUSE_UP;
+                break;
+            }
+        }
+	}
 }

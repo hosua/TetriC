@@ -16,7 +16,7 @@ void PlayGame(){
 	InitEverything();
 
 	GFX_ClearScreen();
-	
+
 	/* Sound stuff */
 	// Loud sound effects into memory
 	SFX_PlayBGM();
@@ -31,7 +31,7 @@ void PlayGame(){
 	Tetronimo* tetronimo = new_Tetronimo(dequeue(&queue));
 	enqueue(rand_T_Type(), &queue);
 	/* End queue stuff */
-	
+
 	// Char buffer for rendering text
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
@@ -48,9 +48,9 @@ void PlayGame(){
 		// Get user input
 		SetKeyArray(event);
 		MovementHandler(event, tetronimo);
-		
+
 		VolumeController(event);
-		
+
 		if (InputTimer()){
 			DownwardMovementHandler(tetronimo);
 		}
@@ -125,33 +125,31 @@ void PlayGame(){
 void MainMenu(){
 	// Char buffer for rendering text
 	char buf[128];
-	uint8_t buf_max = sizeof(buf);
-	init_GFX();
+	size_t buf_max = sizeof(buf);
+	SDL_Event event;
 	for (;;){
-		SDL_Event event;
+		GFX_ClearScreen();
 		SDL_PollEvent(&event);
 		SetKeyArray(event);
-		GFX_RenderMainMenu(buf, buf_max);
+		GFX_RenderMainMenu(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
+		if (_g_state == G_PLAY)
+			break;
 	}
 }
-
-// Game state
-typedef enum G_State { G_QUIT, G_MAIN, G_PLAY, G_PAUSE} G_State;
-G_State g_state = G_PLAY;
 
 int main(int argc, char **argv){
 
 	InitEverything();
-
 	GFX_ClearScreen();
-
-	switch (g_state){
-		case G_MAIN:
-			MainMenu();
-			break;
-		case G_PLAY:
-			PlayGame();
-			break;
+	for (;;){
+		switch (_g_state){
+			case G_MAIN:
+				MainMenu();
+				break;
+			case G_PLAY:
+				PlayGame();
+				break;
+		}
 	}
 }
