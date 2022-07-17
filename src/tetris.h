@@ -15,7 +15,7 @@
 
 #include "sounds.h"
 
-#define VERBOSE false
+#define VERBOSE true
 #define SCREEN_X 800
 #define SCREEN_Y 550
 #define FIELD_X 10
@@ -39,6 +39,7 @@ typedef enum G_State {
 } G_State;
 
 extern G_State _game_state;
+extern uint8_t _start_level;
 
 struct RGB_Color;
 struct Coords;
@@ -46,6 +47,7 @@ struct Tetronimo;
 struct I_Piece;
 
 // Initializes necessary startup functions
+// Note, InitEverything() does NOT initialize GameData, that needs to be executed at the start of PlayGame() after everything is initialized, 
 void InitEverything();
 
 // Movement direction (And left and right rotation)
@@ -141,7 +143,7 @@ void set_ToField(Tetronimo* tetronimo);
 // Checks for full lines and clears them 
 uint8_t CheckLines();
 
-uint16_t CalcScore();
+void CalcScore();
 
 // CheckLines() helper functions
 void ClearLine(uint8_t y);
@@ -152,10 +154,10 @@ void GetLinesUntilNextLevel();
 
 // Exit types
 typedef enum E_Type {
-	E_ERROR, // Exit due to an error
-	E_MAINMENU, // Exit from the main menu
-	E_PAUSEMENU, // Exit from the pause menu
-	E_ESC, // Exit by pressing ESC
+	E_ERROR, // Exited due to an error
+	E_MAINMENU, // Exited from the main menu
+	E_PAUSEMENU, // Exited from the pause menu
+	E_INGAME, // Exited while playing the gam
 } E_Type;
 
 void PrintGameOver();

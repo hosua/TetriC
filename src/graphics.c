@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "input.h"
 
 // TODO: https://lazyfoo.net/SDL_tutorials/lesson09/index.php
 
@@ -29,21 +30,13 @@ void init_GFX(){
 
 // Create and return a single rect
 SDL_Rect GFX_GetRect(uint16_t x, uint16_t y, uint8_t block_size){
-	 SDL_Rect rect;
+	SDL_Rect rect;
 	rect.x = x * block_size;
 	rect.y = y * block_size;
 
 	rect.w = block_size;
 	rect.h = block_size;
 	return rect;
-}
-
-SDL_Rect* GFX_GetFieldLine(uint8_t x, uint8_t y){
-	SDL_Rect* rect_arr = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
-	for (int x = 0; x < FIELD_X; x++){
-		rect_arr[x] = GFX_GetRect(x + (x+1), y, BLOCK_SIZE);	
-	}
-	return rect_arr;
 }
 
 void PrintPlayField(){
@@ -54,7 +47,7 @@ void PrintPlayField(){
 	}
 }
 
-SDL_Rect* GFX_GetBlocksInLine(uint16_t dx, uint16_t dy, uint16_t y, size_t* num_blocks){
+SDL_Rect* GFX_GetPlayfieldLine(uint16_t dx, uint16_t dy, uint16_t y, size_t* num_blocks){
 	SDL_Rect* blocks = (SDL_Rect*)malloc(sizeof(SDL_Rect) * FIELD_X);
 	for (int i = 0; i < FIELD_X; i++)
 		blocks[(*num_blocks)++] = GFX_GetRect((dx+i+1), (dy+y+1) - FIELD_Y/2, BLOCK_SIZE);	
@@ -106,7 +99,22 @@ void GFX_SetRenderColorByType(T_Type t_type){
 			// printf("INVALID\n");
 			SDL_SetRenderDrawColor(_gfx->renderer, 255, 255, 255, 255);
 			// fprintf(stderr, "Error: Invalid or unimplemented T_Type\n");
-		break;
+			break;
+	}
+}
+
+// Set button text color based on mouse events
+void GFX_SetRenderColorByEventType(SDL_Event event){
+	switch (event.type){
+		case SDL_MOUSEBUTTONDOWN:
+			// printf("T_NONE\n");
+			SDL_SetRenderDrawColor(_gfx->renderer, 255, 255, 255, 255);
+			break;
+		default:
+			// printf("INVALID\n");
+			SDL_SetRenderDrawColor(_gfx->renderer, 255, 255, 255, 255);
+			// fprintf(stderr, "Error: Invalid or unimplemented T_Type\n");
+			break;
 	}
 }
 
@@ -121,7 +129,7 @@ void GFX_RenderBlocks(uint16_t dx, uint16_t dy){
 	size_t num_blocks = 0;
 	// Lines 0-19 inclusive in the _game_data->play_field are off-screen and do not get rendered.
 	for (int y = FIELD_Y/2; y < FIELD_Y; y++){
-		line = GFX_GetBlocksInLine(dx, dy, y, &num_blocks);
+		line = GFX_GetPlayfieldLine(dx, dy, y, &num_blocks);
 		for (int x = 0; x < num_blocks; x++){
 			T_Type t_type = _game_data->play_field[y][x];
 			GFX_SetRenderColorByType(t_type);
@@ -137,18 +145,18 @@ void GFX_RenderBlocks(uint16_t dx, uint16_t dy){
 
 // Text stuff
 void GFX_RenderText(int x, int y, int *tw, int *th, char *text, 
-		SDL_Color text_color, SDL_Rect* rect){
-    SDL_Surface *surface;
-
-    surface = TTF_RenderText_Solid(_gfx->font, text, text_color);
-    _gfx->texture = SDL_CreateTextureFromSurface(_gfx->renderer, surface);
-    *tw = surface->w;
-    *th = surface->h;
-    SDL_FreeSurface(surface);
-    rect->x = x;
-    rect->y = y;
-    rect->w = *tw;
-    rect->h = *th;
+		SDL_Color color, SDL_Rect* rect){
+	SDL_Surface *surface;
+	SDL_SetRenderDrawColor(_gfx->renderer, color.r, color.g, color.b, color.a);
+	surface = TTF_RenderText_Solid(_gfx->font, text, color);
+	_gfx->texture = SDL_CreateTextureFromSurface(_gfx->renderer, surface);
+	*tw = surface->w;
+	*th = surface->h;
+	SDL_FreeSurface(surface);
+	rect->x = x;
+	rect->y = y;
+	rect->w = *tw;
+	rect->h = *th;
 
 	SDL_RenderCopy(_gfx->renderer, _gfx->texture, NULL, rect);
 	SDL_DestroyTexture(_gfx->texture);
@@ -336,66 +344,75 @@ void GFX_RenderHelp(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uin
 }
 
 /* All code below this point is Menu rendering related stuff */
-// TODO: This code needs to be designed better
 
-// Initialize button variables
+// Set the position of the button
 void set_Button(int x, int y, Button* button){
 	button->origin.x = x, button->origin.y = y;
 }
 
-Button init_Button(int w, int h,
-					int ox, int oy,
-					B_Action action){
+Button init_Button(int w, int h, // width and height
+		int ox, int oy, // Origin's x and y
+		char* buf, size_t buf_max, // our message buffer and its length
+		B_Action action){ // The button's action type
+	// Default font color is white
+	SDL_Color color = {255, 255, 255, 255};
 	Button button;
-	button.x = 0, button.y = 0;
-	button.w = w, button.h = h;
+	button.color = color;
+	button.box.x = 0, button.box.y = 0;
+	button.box.w = w, button.box.h = h;
 	button.action = action;	
+	button.buf = buf;
+	button.buf_max = buf_max;
 	button.origin.x = ox, button.origin.y = oy;
 	button.clip = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-	
+
 	return button;
 }
 
 // Shows the button on the screen
-void GFX_RenderButton(char* buf, size_t buf_max, Button button){
+void GFX_RenderButton(Button button){
 	int tw = 0, th = 0;
-	// void GFX_RenderText(int x, int y, int *tw, int *th, char *text, 
-	// 		SDL_Color text_color, SDL_Rect* rect);
-	// printf("origin: (%i,%i)\n", button.origin.x, button.origin.y);
-	SDL_Rect rect;
-	SDL_Color color = {255, 255, 255, 255};
+	SDL_Rect rect = button.box;
 	GFX_RenderText(button.origin.x, button.origin.y,
-					&tw, &th,
-					buf,
-					color,
-					&rect);
+			&tw, &th,
+			button.buf,
+			button.color,
+			&rect);
 
-	rect.x = button.origin.x;
-	rect.y = button.origin.y;
-	rect.w = tw;
-	rect.h = th;
+	// rect.x = button.origin.x;
+	// rect.y = button.origin.y;
+	// rect.w = tw;
+	// rect.h = th;
 	SDL_RenderDrawRect(_gfx->renderer, &rect);
 }
 
 void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max){
-	int tw, th;
 	SDL_Rect rect;
 	SDL_Color color = {255, 255, 255, 255};
 
 	GFX_RenderImage(SCREEN_X/4, 0, 
 			"img/TetriC-logo.png");
 
+	// Play -> Level select -> game
 	snprintf(buf, buf_max, "Play");
-	Button play_button = init_Button(50, 25, SCREEN_X, SCREEN_Y, B_PLAY);
+	Button play_button = init_Button(50, 25, 
+			SCREEN_X, SCREEN_Y, 
+			buf, buf_max,
+			B_LEVELSELECT);
+
 	set_Button((SCREEN_X*9)/20, SCREEN_Y/5, &play_button);
-	GFX_RenderButton(buf, buf_max, play_button);
-	GFX_HandleButtonEvents(&event, &play_button);
+	GFX_RenderButton(play_button);
+	Input_HandleButtonEvents(&event, &play_button);
 
 	snprintf(buf, buf_max, "Quit");
-	Button quit_button = init_Button(50, 25, SCREEN_X, SCREEN_Y, B_QUIT);
-	set_Button((SCREEN_X*9)/20, SCREEN_Y/4, &quit_button);
-	GFX_RenderButton(buf, buf_max, quit_button);
-	GFX_HandleButtonEvents(&event, &quit_button);
+	Button quit_button = init_Button(50, 25, 
+			SCREEN_X, SCREEN_Y, 
+			buf, buf_max,
+			B_QUIT);
+
+	set_Button((SCREEN_X*9)/20, SCREEN_Y/3, &quit_button);
+	GFX_RenderButton(quit_button);
+	Input_HandleButtonEvents(&event, &quit_button);
 }
 
 void GFX_RenderGameover(SDL_Event event, char* buf, size_t buf_max){
@@ -422,70 +439,54 @@ void GFX_RenderGameover(SDL_Event event, char* buf, size_t buf_max){
 			color, &rect);
 
 	snprintf(buf, buf_max, "Go back to main menu");
-	Button main_menu_button = init_Button(50, 50, SCREEN_X, SCREEN_Y, B_MAINMENU);
+	Button main_menu_button = init_Button(150, 50, 
+			SCREEN_X, SCREEN_Y, 
+			buf, buf_max,
+			B_MAINMENU);
 	set_Button((SCREEN_X*6)/20, SCREEN_Y/2, &main_menu_button);
-	GFX_RenderButton(buf, buf_max, main_menu_button);
-	GFX_HandleButtonEvents(&event, &main_menu_button);
+	GFX_RenderButton(main_menu_button);
+	Input_HandleButtonEvents(&event, &main_menu_button);
 }
 
-// TODO: Move to input.c
-// Handles events and set the button's sprite region
-void GFX_HandleButtonEvents(SDL_Event *e, Button* button){
-//If mouse event happened
-    if(e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP){
-        // Get mouse position
-        int mx, my;
-        SDL_GetMouseState(&mx, &my);
-		// Check if mouse is in button
-        bool inside = true;
-		// printf("mouse: (%i,%i)\n", mx, my);
-        // Mouse is left of the button
-        if (mx < button->origin.x){
-            inside = false;
-        // Mouse is right of the button
-        } else if (mx > button->origin.x + button->w){
-            inside = false;
-        // Mouse above the button
-        } else if (my < button->origin.y ){
-            inside = false;
-        // Mouse below the button
-        } else if (my > button->origin.y + button->h){
-            inside = false;
-        }
-		 //Mouse is outside button
-        if(!inside){
-        //Mouse is inside button
-        } else {
-            switch( e->type ){
-                case SDL_MOUSEMOTION:
-                	break;
-            
-                case SDL_MOUSEBUTTONDOWN:
-					switch (button->action){
-						case B_PLAY:
-							printf("Starting the game...\n");
-							_game_state = G_PLAY;
-							break;
-						case B_LEVELSELECT:
-							printf("Entering level select screen...\n");
-							break;
-						case B_MAINMENU:
-							_game_state = G_MAINMENU;
-							printf("Entering main menu...\n");
-							break;
-						case B_SETTINGS:
-							printf("Entering settings menu...\n");
-							break;
-						case B_QUIT:
-							printf("Quitting the game...\n");
-							QuitGame(E_MAINMENU);
-							break;
-					}
-                	break;
-                
-                case SDL_MOUSEBUTTONUP:
-                	break;
-            }
-        }
-	}
+uint8_t GFX_GetLevelButtonLevel(Button* button){
+	return atoi(button->buf);	
 }
+
+void GFX_RenderLevelSelect(SDL_Event event, char* buf, size_t buf_max){
+	int tw, th;
+	SDL_Rect rect;
+	SDL_Color color = {255, 255, 255, 255};
+	snprintf(buf, buf_max, "Select a level.");
+	GFX_RenderText((SCREEN_X/2), (SCREEN_Y/5), 
+			&tw, &th,
+			buf, 
+			color, &rect);
+
+	for (int level = 0; level <= 20; level++){
+		int dx = 0, dy = 0;
+		if (level <= 10) {
+			dx = 0;
+		} else {
+			dx = 2;
+			dy = 10;
+		}
+		snprintf(buf, buf_max, "%i", level);
+		Button level_button = init_Button(50, 25,
+				SCREEN_X, SCREEN_Y,
+				buf, buf_max,
+				B_LEVEL);
+		set_Button((SCREEN_X*(6+dx))/20, 25 * (level+1-dy), &level_button);
+		GFX_RenderButton(level_button);
+		Input_HandleButtonEvents(&event, &level_button);
+	}
+
+	snprintf(buf, buf_max, "Go back to main menu");
+	Button main_menu_button = init_Button(150, 50, 
+			SCREEN_X, SCREEN_Y, 
+			buf, buf_max,
+			B_MAINMENU);
+	set_Button((SCREEN_X*10)/20, SCREEN_Y/2, &main_menu_button);
+	GFX_RenderButton(main_menu_button);
+	Input_HandleButtonEvents(&event, &main_menu_button);
+}
+

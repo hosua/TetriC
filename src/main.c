@@ -12,9 +12,9 @@ bool is_falling = false;
 void PlayGame(){
 	// seed the RNG
 	srand(time(0));
-
-	InitEverything();
-
+	
+	// InitEverything(_game_data->level);
+	init_GameData(_start_level);
 	GFX_ClearScreen();
 
 	/* Sound stuff */
@@ -22,8 +22,8 @@ void PlayGame(){
 	SFX_PlayBGM();
 	/* End sound stuff */
 
-	/* Queue stuff */
-	Queue queue = init_Queue(7);
+	/* Queue stuff, queue limit must be n+1 the total displayed tetronimos */
+	Queue queue = init_Queue(4);
 	// Fill queue with pieces
 	for (int i = 0; i < queue.limit-1; i++)
 		enqueue(rand_T_Type(), &queue);
@@ -46,13 +46,13 @@ void PlayGame(){
 		SDL_PollEvent(&event);
 		GFX_ClearScreen();
 		// Get user input
-		SetKeyArray(event);
-		MovementHandler(event, tetronimo);
+		Input_SetKeyArray(event);
+		Input_MovementHandler(event, tetronimo);
 
-		VolumeController(event);
+		Input_VolumeController(event);
 
 		if (InputTimer()){
-			DownwardMovementHandler(tetronimo);
+			Input_DownwardMovementHandler(tetronimo);
 		}
 		// NudgeTimer() prevents the nudge sfx from being spammed
 		if (NudgeTimer()){
@@ -87,9 +87,11 @@ void PlayGame(){
 				tetronimo = new_Tetronimo(t_type);
 				_game_data->tetronimo_counter[t_type]++;
 				enqueue(rand_T_Type(), &queue);
-
-				CalcScore();	
-
+			
+				// Do all point calculations for this turn
+				CalcScore();
+				
+				// If player levels up
 				if (_game_data->lines_until_level <= 0){
 					if (!_sfx->muted)
 						SFX_Play(_sfx->level_up);
@@ -131,26 +133,41 @@ void MainMenu(){
 	for (;;){
 		GFX_ClearScreen();
 		SDL_PollEvent(&event);
-		SetKeyArray(event);
+		Input_SetKeyArray(event);
 		GFX_RenderMainMenu(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
-		if (_game_state == G_PLAY)
+		if (_game_state != G_MAINMENU)
 			break;
 	}
 }
 
 void Gameover(){
-
 	char buf[128];
 	uint8_t buf_max = sizeof(buf);
 	PrintGameOver();
 	for (;;){
+		GFX_ClearScreen();
 		SDL_Event event;
 		SDL_PollEvent(&event);
-		SetKeyArray(event);
+		Input_SetKeyArray(event);
 		GFX_RenderGameover(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
-		if (_game_state == G_MAINMENU)
+		if (_game_state != G_GAMEOVER)
+			break;
+	}
+}
+
+void LevelSelect(){
+	char buf[128];
+	uint8_t buf_max = sizeof(buf);
+	for (;;){
+		GFX_ClearScreen();
+		SDL_Event event;
+		SDL_PollEvent(&event);
+		Input_SetKeyArray(event);
+		GFX_RenderLevelSelect(event, buf, buf_max);
+		SDL_RenderPresent(_gfx->renderer); 
+		if (_game_state != G_LEVELSELECT)
 			break;
 	}
 }
@@ -159,10 +176,17 @@ int main(int argc, char **argv){
 
 	InitEverything();
 	GFX_ClearScreen();
+	uint8_t start_level = 0;
+
 	for (;;){
 		switch (_game_state){
 			case G_MAINMENU:
 				MainMenu();
+				break;
+
+			case G_LEVELSELECT:
+				LevelSelect();
+				// printf("Selected level %i\n", _game_data->level);
 				break;
 
 			case G_PLAY:
@@ -172,13 +196,13 @@ int main(int argc, char **argv){
 			case G_GAMEOVER:
 				Gameover();
 				break;
-			case G_LEVELSELECT:
-				break;
 
 			case G_SETTINGS:
+				printf("Not yet implemented\n");
 				break;
 
 			case G_PAUSE:
+				printf("Not yet implemented\n");
 				break;
 		}
 	}

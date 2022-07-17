@@ -5,6 +5,9 @@
 // global game state
 G_State _game_state = G_MAINMENU;
 GameData* _game_data = NULL;
+bool _is_paused = true;
+
+uint8_t _start_level = 0;
 
 void init_GameData(uint8_t start_level){
 	_game_data = (GameData*)malloc(sizeof(GameData));
@@ -27,22 +30,23 @@ void InitEverything(){
 	int sound_res = 0; 
 	int flags = MIX_INIT_MP3;
 
-	// TODO: Currently, we always start the game at level 0. I need to implement a way to start at a different level.
-	init_GameData(0);
+	// init_GameData(start_level);
 
 	init_Clock(17, // ms per tick
-			   50, // ms per input tick
+			   50, // ms per down-movement input tick
 			   1000 // ms per nudge delay
 			   );
 	if (SDL_Init(SDL_INIT_EVERYTHING)){
 		fprintf(stderr, "Error initializing SDL: %s\n", SDL_GetError());
+		QuitGame(E_ERROR);
 		exit(EXIT_FAILURE);
 	}
 	init_GFX();
 
 	if (flags != (sound_res = Mix_Init(flags))) {
-        printf("Could not initialize mixer (result: %d).\n", sound_res);
-        printf("Mix_Init: %s\n", Mix_GetError());
+        fprintf(stderr, "Error: Could not initialize mixer (result: %d).\n", sound_res);
+        fprintf(stderr, "Mix_Init: %s\n", Mix_GetError());
+		QuitGame(E_ERROR);
 		exit(EXIT_FAILURE);
     }
 	init_SFX(50);
@@ -61,12 +65,12 @@ void QuitGame(E_Type exit_type){
 		exit(EXIT_FAILURE);
 	}
 	// If exiting via ESC key or the pause menu, display the score.
-	if (exit_type == E_ESC || exit_type == E_PAUSEMENU){
+	if (exit_type == E_INGAME || exit_type == E_PAUSEMENU){
 		PrintGameOver();
+		free(_game_data);
+		free(_clock);
+		free(_sfx);
 	} 
-	free(_game_data);
-	free(_clock);
-	free(_sfx);
 	SDL_DestroyRenderer(_gfx->renderer);
 	SDL_DestroyWindow(_gfx->window);
 	SDL_CloseAudio();
@@ -82,7 +86,7 @@ int max_x(Tetronimo* tetronimo){
 		if (x_pos > max)
 			max = x_pos;
 	}
-	if (VERBOSE) printf("max_x: %i\n", max);
+	// if (VERBOSE) printf("max_x: %i\n", max);
 	return max;
 }
 int min_x(Tetronimo* tetronimo){
@@ -92,7 +96,7 @@ int min_x(Tetronimo* tetronimo){
 		if (x_pos < min)
 			min = x_pos;
 	}
-	if (VERBOSE) printf("min_x: %i\n", min);
+	// if (VERBOSE) printf("min_x: %i\n", min);
 	return min;
 }
 int max_y(Tetronimo* tetronimo){
@@ -102,7 +106,7 @@ int max_y(Tetronimo* tetronimo){
 		if (y_pos > max)
 			max = y_pos;
 	}
-	if (VERBOSE) printf("max_y: %i\n", max);
+	// if (VERBOSE) printf("max_y: %i\n", max);
 	return max;
 }
 int min_y(Tetronimo* tetronimo){
@@ -112,7 +116,7 @@ int min_y(Tetronimo* tetronimo){
 		if (y_pos < min)
 			min = y_pos;
 	}
-	if (VERBOSE) printf("min_y: %i\n", min);
+	// if (VERBOSE) printf("min_y: %i\n", min);
 	return min;
 }
 
@@ -266,7 +270,7 @@ void GetLinesUntilNextLevel(){
 // Calculates and returns the score accrued from the lines cleared in a turn 
 // (This function does not include points that are added from soft dropping a piece)
 // Reference: https://tetris.fandom.com/wiki/Scoring
-uint16_t CalcScore(){
+void CalcScore(){
 	uint16_t calculated_score = 0;
 	switch(_game_data->lines_cleared_this_turn){
 		case 0:
@@ -289,7 +293,10 @@ uint16_t CalcScore(){
 			calculated_score = 0;
 			break;
 	}
-	return calculated_score;
+	// Set player score 
+	_game_data->player_score += calculated_score + _game_data->down_points;	
+	// Reset down-hold point counter
+	_game_data->down_points = 0;
 }
 
 // Sets Tetronimo with respect to its origin and degree of rotation, then calls set_ToField()

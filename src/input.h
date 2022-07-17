@@ -3,6 +3,7 @@
 
 #include "tetris.h"
 #include "sounds.h"
+#include "graphics.h"
 
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL.h>
@@ -13,22 +14,40 @@
 
 // Key name enums
 // left down up right z x
-typedef enum { K_LEFT, K_DOWN, K_UP, K_RIGHT, K_Z, K_X } K_Name;
+typedef enum K_Name { 
+	K_LEFT, 
+	K_DOWN, 
+	K_UP, 
+	K_RIGHT, 
+	K_Z, 
+	K_X 
+} K_Name;
+
+// Button mouse events
+typedef enum BM_Event{
+	BM_OUT, // Mouse moved outside of box
+	BM_OVER, // Mouse moved over box
+	BM_DOWN, // Mouse was over box and clicked down
+	BM_UP, // Mouse was over box and let go of mousedown input
+} BM_Event;
+
 const char* K_Name_to_str(K_Name k_name);
 
 // If keys[i] = 1, key is down, else it is up
-void PrintKeys();
+void Input_PrintKeys();
 
 // Sets the key array to true or false depending on the key state
-void SetKeyArray(SDL_Event event);
+void Input_SetKeyArray(SDL_Event event);
 
 // Checks the arrow states in the keys array and moves the piece depending on if the key is set or not. 
-void DownwardMovementHandler(Tetronimo* tetronimo);
+void Input_DownwardMovementHandler(Tetronimo* tetronimo);
 
 // Handles rotation movement, ignores repeated keys.
-void MovementHandler(SDL_Event event, Tetronimo* tetronimo);
+void Input_MovementHandler(SDL_Event event, Tetronimo* tetronimo);
+
+void Input_HandleButtonEvents(SDL_Event *e, Button* button);
 
 // Mutes and unmutes sounds;
-void VolumeController(SDL_Event event);
+void Input_VolumeController(SDL_Event event);
 
 #endif // INPUT_H

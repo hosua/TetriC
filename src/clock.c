@@ -29,23 +29,6 @@ void print_ClockVals(){
 	printf("last nudge tick: %i\n", _clock->last_nudge_tick);
 
 }
-/* Level 	Frames per Gridcell
- * 00 		48
- * 01 		43
- * 02 		38
- * 03 		33
- * 04 		28
- * 05 		23
- * 06 		18
- * 07 		13
- * 08 		8
- * 09 		6
- * 10–12 	5
- * 13–15 	4
- * 16–18 	3
- * 19–28 	2
- * 29+ 		1
- */
 
 // Returns true if a level tick has passed, false if not.
 // Each tick is roughtly 1/60 seconds
@@ -54,6 +37,23 @@ bool LevelTimer(uint8_t level){
 	// Frames per Gridcell
 	uint8_t fpg = 0;
 	switch (level){
+		/* Level 	Frames per Gridcell
+		 * 00 		48
+		 * 01 		43
+		 * 02 		38
+		 * 03 		33
+		 * 04 		28
+		 * 05 		23
+		 * 06 		18
+		 * 07 		13
+		 * 08 		8
+		 * 09 		6
+		 * 10–12 	5
+		 * 13–15 	4
+		 * 16–18 	3
+		 * 19–28 	2
+		 * 29+ 		1
+		 */
 		case 0: fpg = 48; break;
 		case 1: fpg = 43; break;
 		case 2: fpg = 38; break;
