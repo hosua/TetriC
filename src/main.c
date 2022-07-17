@@ -61,8 +61,10 @@ void PlayGame(){
 		if (LevelTimer(_game_data->level)){
 			is_falling = move_Tetronimo(tetronimo, M_DOWN);
 			if (!is_falling){
-				if (IsPlayerDead())
-					QuitGame(_gfx->window, _gfx->renderer);
+				if (IsPlayerDead()){
+					_game_state = G_GAMEOVER;
+					break;
+				}
 
 				_game_data->lines_cleared_this_turn = CheckLines();
 				if (!_sfx->muted){
@@ -119,7 +121,6 @@ void PlayGame(){
 		_game_data->fps = elapsed;
 	}
 
-	QuitGame();
 }
 
 void MainMenu(){
@@ -133,7 +134,23 @@ void MainMenu(){
 		SetKeyArray(event);
 		GFX_RenderMainMenu(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
-		if (_g_state == G_PLAY)
+		if (_game_state == G_PLAY)
+			break;
+	}
+}
+
+void Gameover(){
+
+	char buf[128];
+	uint8_t buf_max = sizeof(buf);
+	PrintGameOver();
+	for (;;){
+		SDL_Event event;
+		SDL_PollEvent(&event);
+		SetKeyArray(event);
+		GFX_RenderGameover(event, buf, buf_max);
+		SDL_RenderPresent(_gfx->renderer); 
+		if (_game_state == G_MAINMENU)
 			break;
 	}
 }
@@ -143,12 +160,25 @@ int main(int argc, char **argv){
 	InitEverything();
 	GFX_ClearScreen();
 	for (;;){
-		switch (_g_state){
-			case G_MAIN:
+		switch (_game_state){
+			case G_MAINMENU:
 				MainMenu();
 				break;
+
 			case G_PLAY:
 				PlayGame();
+				break;
+
+			case G_GAMEOVER:
+				Gameover();
+				break;
+			case G_LEVELSELECT:
+				break;
+
+			case G_SETTINGS:
+				break;
+
+			case G_PAUSE:
 				break;
 		}
 	}

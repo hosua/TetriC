@@ -12,8 +12,7 @@ void SetKeyArray(SDL_Event event){
 
 	if (kb_state[SDL_SCANCODE_ESCAPE]){
 		printf("Player quit the game.\n");
-		QuitGame(_gfx->window, _gfx->renderer);
-		exit(EXIT_SUCCESS);
+		QuitGame(E_ESC);
 	}
 
 	if (kb_state[SDL_SCANCODE_LEFT]) keys[K_LEFT] = true;

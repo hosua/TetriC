@@ -342,15 +342,17 @@ void GFX_RenderHelp(uint16_t dx, uint16_t dy, uint8_t block_size, char* buf, uin
 void set_Button(int x, int y, Button* button){
 	button->origin.x = x, button->origin.y = y;
 }
+
 Button init_Button(int w, int h,
-					int ox, int oy){
+					int ox, int oy,
+					B_Action action){
 	Button button;
 	button.x = 0, button.y = 0;
 	button.w = w, button.h = h;
-
+	button.action = action;	
 	button.origin.x = ox, button.origin.y = oy;
 	button.clip = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-	button.curr_sprite = B_MOUSE_OUT;
+	
 	return button;
 }
 
@@ -384,10 +386,46 @@ void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max){
 			"img/TetriC-logo.png");
 
 	snprintf(buf, buf_max, "Play");
-	Button button = init_Button(50, 50, SCREEN_X, SCREEN_Y);
-	set_Button(SCREEN_X/3 + BLOCK_SIZE, SCREEN_Y/2, &button);
-	GFX_RenderButton(buf, buf_max, button);
-	GFX_HandleButtonEvents(&event, &button);
+	Button play_button = init_Button(50, 25, SCREEN_X, SCREEN_Y, B_PLAY);
+	set_Button((SCREEN_X*9)/20, SCREEN_Y/5, &play_button);
+	GFX_RenderButton(buf, buf_max, play_button);
+	GFX_HandleButtonEvents(&event, &play_button);
+
+	snprintf(buf, buf_max, "Quit");
+	Button quit_button = init_Button(50, 25, SCREEN_X, SCREEN_Y, B_QUIT);
+	set_Button((SCREEN_X*9)/20, SCREEN_Y/4, &quit_button);
+	GFX_RenderButton(buf, buf_max, quit_button);
+	GFX_HandleButtonEvents(&event, &quit_button);
+}
+
+void GFX_RenderGameover(SDL_Event event, char* buf, size_t buf_max){
+	int tw, th;
+	SDL_Rect rect;
+	SDL_Color color = {255, 255, 255, 255};
+
+	snprintf(buf, buf_max, "Game Over!");
+	GFX_RenderText((SCREEN_X*7/20), (SCREEN_Y/5.5f), 
+			&tw, &th,
+			buf, 
+			color, &rect);
+
+	snprintf(buf, buf_max, "You cleared %i lines before losing.", _game_data->lines_cleared);
+	GFX_RenderText((SCREEN_X*5/20), (SCREEN_Y/4), 
+			&tw, &th,
+			buf, 
+			color, &rect);
+
+	snprintf(buf, buf_max, "Your final score was: %i", _game_data->player_score);
+	GFX_RenderText((SCREEN_X*5)/20, (SCREEN_Y/3), 
+			&tw, &th,
+			buf, 
+			color, &rect);
+
+	snprintf(buf, buf_max, "Go back to main menu");
+	Button main_menu_button = init_Button(50, 50, SCREEN_X, SCREEN_Y, B_MAINMENU);
+	set_Button((SCREEN_X*6)/20, SCREEN_Y/2, &main_menu_button);
+	GFX_RenderButton(buf, buf_max, main_menu_button);
+	GFX_HandleButtonEvents(&event, &main_menu_button);
 }
 
 // TODO: Move to input.c
@@ -416,24 +454,37 @@ void GFX_HandleButtonEvents(SDL_Event *e, Button* button){
         }
 		 //Mouse is outside button
         if(!inside){
-            button->curr_sprite = B_MOUSE_OUT;
         //Mouse is inside button
         } else {
-            //Set mouse over sprite
             switch( e->type ){
                 case SDL_MOUSEMOTION:
-                button->curr_sprite = B_MOUSE_OVER;
-                break;
+                	break;
             
                 case SDL_MOUSEBUTTONDOWN:
-				printf("Clicked play\n");
-                button->curr_sprite = B_MOUSE_DOWN;
-				_g_state = G_PLAY;
-                break;
+					switch (button->action){
+						case B_PLAY:
+							printf("Starting the game...\n");
+							_game_state = G_PLAY;
+							break;
+						case B_LEVELSELECT:
+							printf("Entering level select screen...\n");
+							break;
+						case B_MAINMENU:
+							_game_state = G_MAINMENU;
+							printf("Entering main menu...\n");
+							break;
+						case B_SETTINGS:
+							printf("Entering settings menu...\n");
+							break;
+						case B_QUIT:
+							printf("Quitting the game...\n");
+							QuitGame(E_MAINMENU);
+							break;
+					}
+                	break;
                 
                 case SDL_MOUSEBUTTONUP:
-                button->curr_sprite = B_MOUSE_UP;
-                break;
+                	break;
             }
         }
 	}

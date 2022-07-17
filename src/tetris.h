@@ -29,9 +29,16 @@
 // +1 to include T_NONE but we won't count T_NONE pieces
 
 // Game state
-typedef enum G_State { G_QUIT, G_MAIN, G_PLAY, G_PAUSE} G_State;
+typedef enum G_State { 
+	G_MAINMENU, 
+	G_PLAY, 
+	G_LEVELSELECT,
+	G_SETTINGS,
+	G_PAUSE,
+	G_GAMEOVER,
+} G_State;
 
-extern G_State _g_state;
+extern G_State _game_state;
 
 struct RGB_Color;
 struct Coords;
@@ -143,7 +150,17 @@ bool* GetLinesToClear();
 // Sets global lines until next level for every level up
 void GetLinesUntilNextLevel();
 
+// Exit types
+typedef enum E_Type {
+	E_ERROR, // Exit due to an error
+	E_MAINMENU, // Exit from the main menu
+	E_PAUSEMENU, // Exit from the pause menu
+	E_ESC, // Exit by pressing ESC
+} E_Type;
+
+void PrintGameOver();
+
 // Exit the game and display the final score
-void QuitGame();
+void QuitGame(E_Type exit_type);
 
 #endif // TETRIS_H

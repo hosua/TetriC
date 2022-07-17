@@ -3,7 +3,7 @@
 #include "graphics.h"
 
 // global game state
-G_State _g_state = G_MAIN;
+G_State _game_state = G_MAINMENU;
 GameData* _game_data = NULL;
 
 void init_GameData(uint8_t start_level){
@@ -48,10 +48,22 @@ void InitEverything(){
 	init_SFX(50);
 }
 
-void QuitGame(){
+void PrintGameOver(){
 	printf("Game over!\n"
 		   "You cleared %i lines before losing.\n"
 		   "Your final score was: %i\n", _game_data->lines_cleared, _game_data->player_score);
+}
+
+// TODO: I don't know why the main menu shows when the player quits but I really want to fix it...
+void QuitGame(E_Type exit_type){
+	GFX_ClearScreen();
+	if (exit_type == E_ERROR){
+		exit(EXIT_FAILURE);
+	}
+	// If exiting via ESC key or the pause menu, display the score.
+	if (exit_type == E_ESC || exit_type == E_PAUSEMENU){
+		PrintGameOver();
+	} 
 	free(_game_data);
 	free(_clock);
 	free(_sfx);
@@ -248,7 +260,7 @@ void GetLinesUntilNextLevel(){
 			_game_data->lines_until_level = 200;
 			break;
 	}
-	printf("Lines until next _game_data->level: %i\n", _game_data->lines_until_level);
+	printf("Lines until next level: %i\n", _game_data->lines_until_level);
 }
 
 // Calculates and returns the score accrued from the lines cleared in a turn 

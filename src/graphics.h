@@ -62,13 +62,16 @@ Tetronimo* GFX_DrawTetronimo(T_Type t_type, uint16_t x, uint16_t y);
 
 void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max);
 
-typedef enum B_Sprite {
-	 B_MOUSE_OUT,
-	 B_MOUSE_OVER,
-	 B_MOUSE_DOWN,
-	 B_MOUSE_UP,
-	 B_TOTAL
-} B_Sprite;
+void GFX_RenderGameover(SDL_Event event, char* buf, size_t buf_max);
+
+/* Button action */
+typedef enum B_Action {
+	B_PLAY,
+	B_LEVELSELECT,
+	B_SETTINGS,
+	B_MAINMENU,
+	B_QUIT,
+} B_Action;
 
 typedef struct Button {
     // The attributes of the button
@@ -78,12 +81,15 @@ typedef struct Button {
     int x, y, w, h;
 	// Origin is top left of button
 	SDL_Point origin;
-	B_Sprite curr_sprite;
+	B_Action action;
 } Button;
-void set_Button(int x, int y, Button* button);
-Button init_Button(int w, int h,
-					int ox, int oy // x and y of origin
-					);
+
+void set_Button(int x, int y, Button* button); // Set button to (x,y) coordinates
+
+Button init_Button(int w, int h, // width and height
+					int ox, int oy, // Origin x and y
+					B_Action action);
+
 void GFX_RenderButton(char* buf, size_t buf_max, Button button);
 
 void GFX_HandleButtonEvents(SDL_Event *e, Button* button);
