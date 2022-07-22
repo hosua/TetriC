@@ -1,5 +1,7 @@
 # TetriC
 
+To start on a higher level, run the game with the level as a command line argument. e.g. ``./TetriC 10`` or ``./TetriC.exe 10`` for Windows users.
+
 ```
 Controls:
 ← ↓ ↑ → : movement
