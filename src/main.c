@@ -5,13 +5,13 @@
 #include "queue.h"
 #include "sounds.h"
 
-// Variable to determine if a piece is still falling. If one is not falling, a new piece is spawned.
-// and then this variable is set to true again.
-bool is_falling = false;
 
 void PlayGame(){
 	// seed the RNG
 	srand(time(0));
+	// Variable to determine if a piece is still falling. If one is not falling, a new piece is spawned.
+	// and then this variable is set to true again.
+	bool is_falling = false;
 	
 	// InitEverything(_game_data->level);
 	init_GameData(_start_level);
@@ -22,7 +22,7 @@ void PlayGame(){
 	SFX_PlayBGM();
 	/* End sound stuff */
 
-	/* Queue stuff, queue limit must be n+1 the total displayed tetronimos */
+	/* Queue limit must be n+1 the total displayed tetronimos */
 	Queue queue = init_Queue(4);
 	// Fill queue with pieces
 	for (int i = 0; i < queue.limit-1; i++)
@@ -62,7 +62,8 @@ void PlayGame(){
 			is_falling = move_Tetronimo(tetronimo, M_DOWN);
 			if (!is_falling){
 				if (IsPlayerDead()){
-					_game_state = G_GAMEOVER;
+					QuitGame(E_INGAME);
+					// _game_state = G_GAMEOVER;
 					break;
 				}
 
@@ -176,7 +177,13 @@ int main(int argc, char **argv){
 
 	InitEverything();
 	GFX_ClearScreen();
-	uint8_t start_level = 0;
+	int level;
+	if (argc > 1)
+		level = atoi(argv[1]);
+	else 
+		level = 0;
+	printf("argc: %i Start level: %i\n",argc, level);
+	_start_level = level;
 
 	for (;;){
 		switch (_game_state){
@@ -184,7 +191,7 @@ int main(int argc, char **argv){
 				MainMenu();
 				break;
 
-			case G_LEVELSELECT:
+			case G_LEVELSELECT: // Level select will be done on CLI, I give up on doing the main menu.
 				LevelSelect();
 				// printf("Selected level %i\n", _game_data->level);
 				break;

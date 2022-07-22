@@ -59,14 +59,25 @@ void GFX_RenderStatsUI(uint8_t dx, uint8_t dy, uint8_t block_size,
 Tetronimo* GFX_DrawTetronimo(T_Type t_type, uint16_t x, uint16_t y);
 
 /* Button action */
-typedef enum B_Action {
-	B_PLAY,
-	B_MAINMENU,
-	B_LEVELSELECT,
-	B_LEVEL, 
-	B_SETTINGS,
+typedef enum B_Type {
+	B_PLAY, 
+	B_MAINMENU, 
+	B_LEVELSELECT, // The button to get to the level select screen
+	B_LEVEL, // The numbered buttons on the level select screen
+	B_SETTINGS, // TODO implement settings
 	B_QUIT,
-} B_Action;
+} B_Type;
+
+// Button mouse events
+typedef enum BMOUSE_Event{
+	BMOUSE_OUT, // Mouse moved outside of button
+	BMOUSE_OVER, // Mouse moved over button
+	BMOUSE_DOWN, // Mouse was over button and clicked down
+	BMOUSE_UP, // Mouse was over button and let go of mousedown input
+} BMOUSE_Event;
+
+const char* BMOUSE_Event_to_str(BMOUSE_Event bm_event);
+
 
 typedef struct Button {
 	// renderer color
@@ -78,7 +89,8 @@ typedef struct Button {
     // int x, y, w, h;
 	// Origin is top left of button
 	SDL_Point origin;
-	B_Action action;
+	B_Type type; // Button type
+	BMOUSE_Event mouse_event;
 	char* buf;
 	size_t buf_max;
 } Button;
@@ -86,14 +98,14 @@ typedef struct Button {
 Button init_Button(int w, int h, // width and height
 					int ox, int oy, // Origin x and y
 					char* buf, size_t buf_max,
-					B_Action action);
-
+					SDL_Event* event, B_Type action); // The button's action type
 
 void set_Button(int x, int y, Button* button); // Set button to (x,y) coordinates
 											   
 uint8_t GFX_GetLevelButtonLevel(Button* button);
+void GFX_SetButtonColor(Button* button);
 
-void GFX_RenderButton(Button button);
+void GFX_RenderButton(Button* button);
 
 /* Menu stuff below */
 

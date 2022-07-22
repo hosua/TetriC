@@ -89,7 +89,7 @@ bool LevelTimer(uint8_t level){
 	return false;
 }
 
-// Input Timer will only have an effect on downward movement.
+// Input timer will delay downward movement
 bool InputTimer(){
 	uint32_t curr_tick = SDL_GetTicks();
 	if (curr_tick > _clock->last_input_tick + _clock->input_tick){

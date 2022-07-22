@@ -61,6 +61,7 @@ SDL_Rect* GFX_GetTetronimoByOrigin(uint16_t x, uint16_t y, uint8_t block_size, T
 	return blocks;
 }
 
+// Set render color by tetronimo type
 void GFX_SetRenderColorByType(T_Type t_type){
 	switch (t_type){
 		case T_NONE:
@@ -103,19 +104,14 @@ void GFX_SetRenderColorByType(T_Type t_type){
 	}
 }
 
-// Set button text color based on mouse events
-void GFX_SetRenderColorByEventType(SDL_Event event){
-	switch (event.type){
-		case SDL_MOUSEBUTTONDOWN:
-			// printf("T_NONE\n");
-			SDL_SetRenderDrawColor(_gfx->renderer, 255, 255, 255, 255);
-			break;
-		default:
-			// printf("INVALID\n");
-			SDL_SetRenderDrawColor(_gfx->renderer, 255, 255, 255, 255);
-			// fprintf(stderr, "Error: Invalid or unimplemented T_Type\n");
-			break;
+const char* BMOUSE_Event_to_str(BMOUSE_Event bm_event){
+	switch(bm_event){
+		case BMOUSE_OUT: return "BMOUSE_OUT"; break;
+		case BMOUSE_OVER: return "BMOUSE_OVER"; break;
+		case BMOUSE_DOWN: return "BMOUSE_DOWN"; break;
+		case BMOUSE_UP: return "BMOUSE_DOWN"; break;
 	}
+	return "BMOUSE_ERROR";
 }
 
 void GFX_ClearScreen(){
@@ -350,40 +346,87 @@ void set_Button(int x, int y, Button* button){
 	button->origin.x = x, button->origin.y = y;
 }
 
-Button init_Button(int w, int h, // width and height
+Button init_Button(int x, int y,
+		// int w, int h, // width and height
 		int ox, int oy, // Origin's x and y
 		char* buf, size_t buf_max, // our message buffer and its length
-		B_Action action){ // The button's action type
+		SDL_Event* event, B_Type b_type){ // The button type
 	// Default font color is white
-	SDL_Color color = {255, 255, 255, 255};
+	// SDL_Color color = {255, 255, 255, 255};
 	Button button;
-	button.color = color;
-	button.box.x = 0, button.box.y = 0;
-	button.box.w = w, button.box.h = h;
-	button.action = action;	
+	button.box.x = x, button.box.y = y;
+	button.origin.x = ox, button.origin.y = oy;
+	set_Button(x, y, &button);
 	button.buf = buf;
 	button.buf_max = buf_max;
-	button.origin.x = ox, button.origin.y = oy;
+	button.color.r = 255;
+	button.color.g = 255;
+	button.color.b = 255;
+	button.color.a = 255;
+	// TODO: Need to set button mouse_event appropriately here
+	// Input_HandleInitButtonEvents(event, &button);
+	// GFX_SetButtonColor(&button);
+	// button.color = color;
+	// Though calling render text in the initialization will only display it for a negligible amount of time, the main purpose
+	// for doing this in the constructor is to automatically set the width and the height to the Button's box attribute.
+	// This lets us initialize buttons automatically to the size of the text instead having to hard-code the width and the height.
+	GFX_RenderText(button.origin.x, button.origin.y,
+					&button.box.w, &button.box.h,
+					button.buf,
+					button.color,
+					&button.box);
+	// button.box.w = w, button.box.h = h;
+	button.type = b_type;	
 	button.clip = (SDL_Rect*)malloc(sizeof(SDL_Rect));
 
 	return button;
 }
 
-// Shows the button on the screen
-void GFX_RenderButton(Button button){
-	int tw = 0, th = 0;
-	SDL_Rect rect = button.box;
-	GFX_RenderText(button.origin.x, button.origin.y,
-			&tw, &th,
-			button.buf,
-			button.color,
-			&rect);
+void GFX_SetButtonColor(Button* button){
+	BMOUSE_Event button_mouse_event = button->mouse_event;
+	switch(button_mouse_event){
+		case BMOUSE_OUT:
+			button->color.r = 255;
+			button->color.g = 255;
+			button->color.b = 255;
+			button->color.a = 255;
+			break;
+		case BMOUSE_OVER:
+			button->color.r = 128;
+			button->color.g = 128;
+			button->color.b = 128;
+			button->color.a = 255;
+			break;
+		case BMOUSE_UP:
+			button->color.r = 128;
+			button->color.g = 128;
+			button->color.b = 128;
+			button->color.a = 255;
+			break;
+		case BMOUSE_DOWN:
+			button->color.r = 69;
+			button->color.g = 69;
+			button->color.b = 69;
+			button->color.a = 255;
+			break;
+	}
+}
 
-	// rect.x = button.origin.x;
-	// rect.y = button.origin.y;
-	// rect.w = tw;
-	// rect.h = th;
-	SDL_RenderDrawRect(_gfx->renderer, &rect);
+// Shows the button on the screen
+void GFX_RenderButton(Button* button){
+	int tw = 0, th = 0;
+	BMOUSE_Event button_mouse_event = button->mouse_event;
+	// if (button->mouse_event == BMOUSE_OVER){
+	// printf("Color: (%i,%i,%i)\n", button->color.r, button->color.g, button->color.b);
+	// }
+	// GFX_SetButtonColor(button);
+	SDL_SetRenderDrawColor(_gfx->renderer, button->color.r, button->color.g, button->color.b, button->color.a);
+	GFX_RenderText(button->origin.x, button->origin.y,
+			&tw, &th,
+			button->buf,
+			button->color,
+			&button->box);
+	SDL_RenderDrawRect(_gfx->renderer, &button->box);
 }
 
 void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max){
@@ -393,26 +436,27 @@ void GFX_RenderMainMenu(SDL_Event event, char* buf, size_t buf_max){
 	GFX_RenderImage(SCREEN_X/4, 0, 
 			"img/TetriC-logo.png");
 
-	// Play -> Level select -> game
+	// Clicking play brings us to the G_LEVELSELECT state.
+	// Selecting a level brings us to G_PLAY state.
 	snprintf(buf, buf_max, "Play");
 	Button play_button = init_Button(50, 25, 
 			SCREEN_X, SCREEN_Y, 
 			buf, buf_max,
-			B_LEVELSELECT);
+			&event, B_LEVELSELECT);
 
 	set_Button((SCREEN_X*9)/20, SCREEN_Y/5, &play_button);
-	GFX_RenderButton(play_button);
-	Input_HandleButtonEvents(&event, &play_button);
+	GFX_RenderButton(&play_button);
+	Input_HandleMouseEvents(&event, &play_button);
 
 	snprintf(buf, buf_max, "Quit");
 	Button quit_button = init_Button(50, 25, 
 			SCREEN_X, SCREEN_Y, 
 			buf, buf_max,
-			B_QUIT);
+			&event, B_QUIT);
 
 	set_Button((SCREEN_X*9)/20, SCREEN_Y/3, &quit_button);
-	GFX_RenderButton(quit_button);
-	Input_HandleButtonEvents(&event, &quit_button);
+	GFX_RenderButton(&quit_button);
+	Input_HandleMouseEvents(&event, &quit_button);
 }
 
 void GFX_RenderGameover(SDL_Event event, char* buf, size_t buf_max){
@@ -442,10 +486,10 @@ void GFX_RenderGameover(SDL_Event event, char* buf, size_t buf_max){
 	Button main_menu_button = init_Button(150, 50, 
 			SCREEN_X, SCREEN_Y, 
 			buf, buf_max,
-			B_MAINMENU);
+			&event, B_MAINMENU);
 	set_Button((SCREEN_X*6)/20, SCREEN_Y/2, &main_menu_button);
-	GFX_RenderButton(main_menu_button);
-	Input_HandleButtonEvents(&event, &main_menu_button);
+	GFX_RenderButton(&main_menu_button);
+	Input_HandleMouseEvents(&event, &main_menu_button);
 }
 
 uint8_t GFX_GetLevelButtonLevel(Button* button){
@@ -474,19 +518,19 @@ void GFX_RenderLevelSelect(SDL_Event event, char* buf, size_t buf_max){
 		Button level_button = init_Button(50, 25,
 				SCREEN_X, SCREEN_Y,
 				buf, buf_max,
-				B_LEVEL);
+				&event, B_LEVEL);
 		set_Button((SCREEN_X*(6+dx))/20, 25 * (level+1-dy), &level_button);
-		GFX_RenderButton(level_button);
-		Input_HandleButtonEvents(&event, &level_button);
+		GFX_RenderButton(&level_button);
+		Input_HandleMouseEvents(&event, &level_button);
 	}
 
 	snprintf(buf, buf_max, "Go back to main menu");
 	Button main_menu_button = init_Button(150, 50, 
 			SCREEN_X, SCREEN_Y, 
 			buf, buf_max,
-			B_MAINMENU);
+			&event, B_MAINMENU);
 	set_Button((SCREEN_X*10)/20, SCREEN_Y/2, &main_menu_button);
-	GFX_RenderButton(main_menu_button);
-	Input_HandleButtonEvents(&event, &main_menu_button);
+	GFX_RenderButton(&main_menu_button);
+	Input_HandleMouseEvents(&event, &main_menu_button);
 }
 

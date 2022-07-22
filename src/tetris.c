@@ -3,7 +3,7 @@
 #include "graphics.h"
 
 // global game state
-G_State _game_state = G_MAINMENU;
+G_State _game_state = G_PLAY;
 GameData* _game_data = NULL;
 bool _is_paused = true;
 
@@ -17,6 +17,7 @@ void init_GameData(uint8_t start_level){
 	_game_data->lines_until_level = 0;
 	_game_data->fps = 0;
 	_game_data->level = start_level;
+	_game_data->first_piece = true;
 
 	for (int i = 1; i <= NUM_TETRONIMOS; i++)
 		_game_data->tetronimo_counter[i] = 0; 
@@ -54,12 +55,14 @@ void InitEverything(){
 
 void PrintGameOver(){
 	printf("Game over!\n"
+		   "You died on level %i\n"
 		   "You cleared %i lines before losing.\n"
-		   "Your final score was: %i\n", _game_data->lines_cleared, _game_data->player_score);
+		   "Your final score was: %i\n", _game_data->level, _game_data->lines_cleared, _game_data->player_score);
 }
 
 // TODO: I don't know why the main menu shows when the player quits but I really want to fix it...
 void QuitGame(E_Type exit_type){
+	PrintGameOver();
 	GFX_ClearScreen();
 	if (exit_type == E_ERROR){
 		exit(EXIT_FAILURE);
@@ -159,8 +162,14 @@ Tetronimo* new_Tetronimo(T_Type t_type){
 	Tetronimo* tetronimo = (Tetronimo*)malloc(sizeof(Tetronimo));
 	tetronimo->t_type = t_type;
 	tetronimo->d_rot = D_90;
-	tetronimo->origin.x = SPAWN_X;
-	tetronimo->origin.y = SPAWN_Y;
+	if (_game_data->first_piece == true && _game_data->level > 8){
+		tetronimo->origin.x = SPAWN_X;
+		tetronimo->origin.y = 2;
+		_game_data->first_piece = false;
+	} else {
+		tetronimo->origin.x = SPAWN_X;
+		tetronimo->origin.y = SPAWN_Y;
+	}
 	set_Tetronimo(tetronimo);
 	set_ToField(tetronimo);
 	return tetronimo;

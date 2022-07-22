@@ -44,7 +44,6 @@ extern uint8_t _start_level;
 struct RGB_Color;
 struct Coords;
 struct Tetronimo;
-struct I_Piece;
 
 // Initializes necessary startup functions
 // Note, InitEverything() does NOT initialize GameData, that needs to be executed at the start of PlayGame() after everything is initialized, 
@@ -76,6 +75,7 @@ typedef enum {
 const char* T_Type_to_str(T_Type t_type);
 
 typedef struct GameData {
+	bool first_piece;
 	uint8_t level;
 	uint32_t lines_cleared;
 	uint8_t lines_cleared_this_turn;

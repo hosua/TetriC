@@ -94,7 +94,7 @@ void Input_PrintKeys(){
 }
 
 // Handles events and set the button's sprite region
-void Input_HandleButtonEvents(SDL_Event *e, Button* button){
+void Input_HandleMouseEvents(SDL_Event *e, Button* button){
 //If mouse event happened
     if(e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP){
         // Get mouse position
@@ -118,16 +118,17 @@ void Input_HandleButtonEvents(SDL_Event *e, Button* button){
         }
 		 //Mouse is outside button
         if(!inside){
-			SDL_Color color = {128, 128, 50, 255};
-			button->color = color;
+			button->mouse_event = BMOUSE_OUT;
         //Mouse is inside button
         } else {
+			button->mouse_event = BMOUSE_OVER;
             switch( e->type ){
                 case SDL_MOUSEMOTION:
                 	break;
             
                 case SDL_MOUSEBUTTONDOWN:
-					switch (button->action){
+					button->mouse_event = BMOUSE_DOWN;
+					switch (button->type){
 						case B_PLAY:
 							printf("Starting the game\n");
 							_game_state = G_PLAY;
@@ -162,9 +163,59 @@ void Input_HandleButtonEvents(SDL_Event *e, Button* button){
                 	break;
                 
                 case SDL_MOUSEBUTTONUP:
+					button->mouse_event = BMOUSE_UP;
                 	break;
             }
         }
 	}
+	// int tw, th;
+	// GFX_SetButtonColor(button);
+	// SDL_SetRenderDrawColor(_gfx->renderer, button->color.r, button->color.g, button->color.b, button->color.a);
+	// GFX_RenderText(button->origin.x, button->origin.y,
+	// 		&tw, &th,
+	// 		button->buf,
+	// 		button->color,
+	// 		&button->box);
+	// SDL_RenderDrawRect(_gfx->renderer, &button->box);
 }
 
+// TODO: Unused: this sucks and is broken. Returns the BMOUSE_Event
+BMOUSE_Event Input_HandleInitButtonEvents(SDL_Event *e, Button* button){
+//If mouse event happened
+	button->mouse_event = BMOUSE_OUT;
+    if(e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP){
+        // Get mouse position
+        int mx, my;
+        SDL_GetMouseState(&mx, &my);
+		// Check if mouse is in button
+		printf("mouse: (%i,%i)\n", mx, my);
+		printf("origin (%i,%i)\n", button->origin.x, button->origin.y);
+        bool inside = true;
+        if (mx < button->origin.x && mx > button->origin.x + button->box.w
+			&& my < button->origin.y && my > button->origin.y + button->box.y){
+            inside = false;
+		}
+		//Mouse is outside button
+        if(!inside){
+			printf("outside\n");
+			button->mouse_event = BMOUSE_OUT;
+        //Mouse is inside button
+        } else {
+			printf("inside\n");
+            switch( e->type ){
+                case SDL_MOUSEMOTION:
+					button->mouse_event = BMOUSE_OVER;
+                	break;
+            
+                case SDL_MOUSEBUTTONDOWN:
+					button->mouse_event = BMOUSE_DOWN;
+               		break;
+                
+                case SDL_MOUSEBUTTONUP:
+					button->mouse_event = BMOUSE_UP;
+                	break;
+            }
+        }
+	}
+	return button->mouse_event;
+}

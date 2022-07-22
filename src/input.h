@@ -13,6 +13,7 @@
 #define NUM_KEYS 6
 
 // Key name enums
+
 // left down up right z x
 typedef enum K_Name { 
 	K_LEFT, 
@@ -22,14 +23,6 @@ typedef enum K_Name {
 	K_Z, 
 	K_X 
 } K_Name;
-
-// Button mouse events
-typedef enum BM_Event{
-	BM_OUT, // Mouse moved outside of box
-	BM_OVER, // Mouse moved over box
-	BM_DOWN, // Mouse was over box and clicked down
-	BM_UP, // Mouse was over box and let go of mousedown input
-} BM_Event;
 
 const char* K_Name_to_str(K_Name k_name);
 
@@ -45,7 +38,9 @@ void Input_DownwardMovementHandler(Tetronimo* tetronimo);
 // Handles rotation movement, ignores repeated keys.
 void Input_MovementHandler(SDL_Event event, Tetronimo* tetronimo);
 
-void Input_HandleButtonEvents(SDL_Event *e, Button* button);
+void Input_HandleMouseEvents(SDL_Event *e, Button* button);
+
+BMOUSE_Event Input_HandleInitButtonEvents(SDL_Event *e, Button* button);
 
 // Mutes and unmutes sounds;
 void Input_VolumeController(SDL_Event event);
