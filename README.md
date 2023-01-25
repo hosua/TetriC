@@ -1,5 +1,7 @@
 # TetriC
 
+A Tetris clone written in C. 
+
 To start on a higher level, run the game with the level as a command line argument. e.g. ``./TetriC 10`` or ``./TetriC.exe 10`` for Windows users.
 
 ```
@@ -8,10 +10,6 @@ Controls:
 z x : rotate
 m : mute/unmute music
 ```
-
-A Tetris clone written in C. 
-
-I intend on making this clone as close to the original port on the NES, with some changes here and there.
 
 Graphics are rendered using SDL 2.0, so if you want to compile this from source you will need to download
 the SDL2 library files for your OS.
