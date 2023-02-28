@@ -38,10 +38,6 @@ void Input_DownwardMovementHandler(Tetronimo* tetronimo);
 // Handles rotation movement, ignores repeated keys.
 void Input_MovementHandler(SDL_Event event, Tetronimo* tetronimo);
 
-void Input_HandleMouseEvents(SDL_Event *e, Button* button);
-
-BMOUSE_Event Input_HandleInitButtonEvents(SDL_Event *e, Button* button);
-
 // Mutes and unmutes sounds;
 void Input_VolumeController(SDL_Event event);
 

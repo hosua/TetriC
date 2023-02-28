@@ -15,7 +15,7 @@
 
 #include "sounds.h"
 
-#define VERBOSE true
+#define VERBOSE false // Turn true for debugging print statements
 #define SCREEN_X 800
 #define SCREEN_Y 550
 #define FIELD_X 10
@@ -51,25 +51,15 @@ void InitEverything();
 
 // Movement direction (And left and right rotation)
 typedef enum { 
-	M_LEFT, 
-	M_DOWN, 
-	M_RIGHT, 
-	M_UP, 
-	M_ROT_RIGHT, 
-	M_ROT_LEFT 
+	M_LEFT, M_DOWN, M_RIGHT, M_UP, 
+	M_ROT_RIGHT, M_ROT_LEFT 
 } M_Direction;
 
 // Each type of tetromino. There are 7 pieces.
 // Enums will automatically assign the next enumeration as +1 of the previous value
 typedef enum { 
 	T_NONE, 
-	T_O, 
-	T_I, 
-	T_S, 
-	T_Z, 
-	T_L, 
-	T_J, 
-	T_T
+	T_O, T_I, T_S, T_Z, T_L, T_J, T_T
 } T_Type;
 
 const char* T_Type_to_str(T_Type t_type);
@@ -95,10 +85,7 @@ void init_GameData(uint8_t start_level);
 
 // Degrees of rotation
 typedef enum { 
-	D_0, 
-	D_90, 
-	D_180, 
-	D_270 
+	D_0, D_90, D_180, D_270 
 } D_Rot;
 
 const char* D_Rot_to_str(D_Rot d_rot);

@@ -89,7 +89,6 @@ int max_x(Tetronimo* tetronimo){
 		if (x_pos > max)
 			max = x_pos;
 	}
-	// if (VERBOSE) printf("max_x: %i\n", max);
 	return max;
 }
 int min_x(Tetronimo* tetronimo){
@@ -99,7 +98,6 @@ int min_x(Tetronimo* tetronimo){
 		if (x_pos < min)
 			min = x_pos;
 	}
-	// if (VERBOSE) printf("min_x: %i\n", min);
 	return min;
 }
 int max_y(Tetronimo* tetronimo){
@@ -109,7 +107,6 @@ int max_y(Tetronimo* tetronimo){
 		if (y_pos > max)
 			max = y_pos;
 	}
-	// if (VERBOSE) printf("max_y: %i\n", max);
 	return max;
 }
 int min_y(Tetronimo* tetronimo){
@@ -119,7 +116,6 @@ int min_y(Tetronimo* tetronimo){
 		if (y_pos < min)
 			min = y_pos;
 	}
-	// if (VERBOSE) printf("min_y: %i\n", min);
 	return min;
 }
 

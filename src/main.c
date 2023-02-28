@@ -135,7 +135,6 @@ void MainMenu(){
 		GFX_ClearScreen();
 		SDL_PollEvent(&event);
 		Input_SetKeyArray(event);
-		GFX_RenderMainMenu(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
 		if (_game_state != G_MAINMENU)
 			break;
@@ -151,7 +150,6 @@ void Gameover(){
 		SDL_Event event;
 		SDL_PollEvent(&event);
 		Input_SetKeyArray(event);
-		GFX_RenderGameover(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
 		if (_game_state != G_GAMEOVER)
 			break;
@@ -166,7 +164,6 @@ void LevelSelect(){
 		SDL_Event event;
 		SDL_PollEvent(&event);
 		Input_SetKeyArray(event);
-		GFX_RenderLevelSelect(event, buf, buf_max);
 		SDL_RenderPresent(_gfx->renderer); 
 		if (_game_state != G_LEVELSELECT)
 			break;
@@ -174,43 +171,10 @@ void LevelSelect(){
 }
 
 int main(int argc, char **argv){
-
 	InitEverything();
 	GFX_ClearScreen();
-	int level;
-	if (argc > 1)
-		level = atoi(argv[1]);
-	else 
-		level = 0;
-	printf("argc: %i Start level: %i\n",argc, level);
+	int level = (argc > 1) ? atoi(argv[1]) :  0;
+	printf("Starting on level: %i\n", level);
 	_start_level = level;
-
-	for (;;){
-		switch (_game_state){
-			case G_MAINMENU:
-				MainMenu();
-				break;
-
-			case G_LEVELSELECT: // Level select will be done on CLI, I give up on doing the main menu.
-				LevelSelect();
-				// printf("Selected level %i\n", _game_data->level);
-				break;
-
-			case G_PLAY:
-				PlayGame();
-				break;
-
-			case G_GAMEOVER:
-				Gameover();
-				break;
-
-			case G_SETTINGS:
-				printf("Not yet implemented\n");
-				break;
-
-			case G_PAUSE:
-				printf("Not yet implemented\n");
-				break;
-		}
-	}
+	PlayGame();
 }
