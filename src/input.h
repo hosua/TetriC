@@ -10,18 +10,19 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 
-#define NUM_KEYS 6
+#define NUM_KEYS 7
 
 // Key name enums
 
 // left down up right z x
 typedef enum K_Name { 
-	K_LEFT, 
-	K_DOWN, 
-	K_UP, 
-	K_RIGHT, 
-	K_Z, 
-	K_X 
+    K_LEFT, 
+    K_DOWN, 
+    K_UP, 
+    K_RIGHT, 
+    K_Z, 
+    K_X,
+    K_P, 
 } K_Name;
 
 const char* K_Name_to_str(K_Name k_name);
@@ -40,5 +41,7 @@ void Input_MovementHandler(SDL_Event event, Tetronimo* tetronimo);
 
 // Mutes and unmutes sounds;
 void Input_VolumeController(SDL_Event event);
+
+void Input_PauseHandler(SDL_Event event);
 
 #endif // INPUT_H
